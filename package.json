@@ -1,0 +1,22 @@
+{
+  "name": "vk-chat-bot",
+  "version": "1.0.0",
+  "description": "Простой чат-бот для Max",
+  "main": "dist/bot.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/bot.js",
+    "dev": "tsc && node dist/bot.js"
+  },
+  "keywords": ["bot", "max", "chat"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@maxhub/max-bot-api": "^0.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.5",
+    "typescript": "^5.4.2"
+  }
+}
+
