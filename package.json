@@ -6,21 +6,31 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/bot.js",
-    "dev": "tsc && node dist/bot.js"
+    "dev": "tsc && node dist/bot.js",
+    "parse-groups": "tsc parsing/parse-groups.ts --outDir dist/parsing --module Node16 --moduleResolution Node16 --target ES2020 --esModuleInterop --resolveJsonModule --skipLibCheck && node dist/parsing/parse-groups.js",
+    "fetch-timetable": "tsc scripts/fetch-timetable.ts --outDir dist/scripts --module Node16 --moduleResolution Node16 --target ES2020 --esModuleInterop --resolveJsonModule --skipLibCheck && node dist/scripts/scripts/fetch-timetable.js"
   },
-  "keywords": ["bot", "max", "chat", "campus", "schedule", "university"],
+  "keywords": [
+    "bot",
+    "max",
+    "chat",
+    "campus",
+    "schedule",
+    "university"
+  ],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@maxhub/max-bot-api": "^0.2.1",
+    "axios": "^1.13.2",
     "better-sqlite3": "^9.2.2",
+    "cheerio": "^1.1.2",
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.8",
     "@types/node": "^22.5.5",
     "@types/node-cron": "^3.0.11",
-    "@types/better-sqlite3": "^7.6.8",
     "typescript": "^5.4.2"
   }
 }
-

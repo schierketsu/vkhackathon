@@ -8,6 +8,15 @@ export interface Lesson {
   room: string;
   teacher?: string;
   subgroup?: number | null;
+  lessonType?: string; // Вид занятия: лб, лк, пр и т.д.
+  weekParity?: 'odd' | 'even' | null; // Нечетная/четная неделя
+  weeks?: number[]; // Массив номеров недель, когда проводится занятие
+  substitutions?: Array<{
+    date: string;
+    teacher?: string;
+    room?: string;
+    note?: string;
+  }>; // Замены
 }
 
 export interface DaySchedule {
@@ -38,8 +47,14 @@ export interface WeekSchedule {
 }
 
 export interface TimetableData {
-  groups: {
-    [groupName: string]: WeekSchedule;
+  faculties: {
+    [facultyName: string]: {
+      [studyFormat: string]: {
+        [degree: string]: {
+          [groupName: string]: WeekSchedule;
+        };
+      };
+    };
   };
 }
 
@@ -93,9 +108,42 @@ export function loadTimetableData(): TimetableData | null {
   return JSON.parse(timetableData) as TimetableData;
 }
 
+/**
+ * Поиск расписания группы в новой структуре с факультетами
+ */
+function findGroupSchedule(timetableData: TimetableData, groupName: string): WeekSchedule | null {
+  // Проверяем новую структуру с факультетами
+  if (timetableData.faculties) {
+    for (const facultyName in timetableData.faculties) {
+      const faculty = timetableData.faculties[facultyName];
+      for (const studyFormat in faculty) {
+        const format = faculty[studyFormat];
+        for (const degree in format) {
+          const degreeGroups = format[degree];
+          if (degreeGroups[groupName]) {
+            return degreeGroups[groupName];
+          }
+        }
+      }
+    }
+  }
+  
+  // Обратная совместимость со старой структурой
+  if ((timetableData as any).groups && (timetableData as any).groups[groupName]) {
+    return (timetableData as any).groups[groupName];
+  }
+  
+  return null;
+}
+
 export function getTodaySchedule(group: string, subgroup?: number | null): DaySchedule | null {
   const timetableData = loadTimetableData();
-  if (!timetableData || !timetableData.groups[group]) {
+  if (!timetableData) {
+    return null;
+  }
+  
+  const weekSchedule = findGroupSchedule(timetableData, group);
+  if (!weekSchedule) {
     return null;
   }
   
@@ -105,11 +153,10 @@ export function getTodaySchedule(group: string, subgroup?: number | null): DaySc
   const weekParity = getWeekParity(today, semesterStart);
   const dayName = getDayOfWeek(today);
   
-  const weekSchedule = timetableData.groups[group];
   const dayLessons = weekSchedule[`${weekParity}_week` as keyof WeekSchedule][dayName as keyof typeof weekSchedule.odd_week] || [];
   
   // Фильтруем по подгруппе
-  const filteredLessons = dayLessons.filter(lesson => {
+  const filteredLessons = dayLessons.filter((lesson: Lesson) => {
     if (lesson.subgroup === null) return true; // Общие занятия
     if (subgroup === null || subgroup === undefined) return true; // Если подгруппа не указана, показываем все
     return lesson.subgroup === subgroup;
@@ -126,7 +173,12 @@ export function getTodaySchedule(group: string, subgroup?: number | null): DaySc
 
 export function getTomorrowSchedule(group: string, subgroup?: number | null): DaySchedule | null {
   const timetableData = loadTimetableData();
-  if (!timetableData || !timetableData.groups[group]) {
+  if (!timetableData) {
+    return null;
+  }
+  
+  const weekSchedule = findGroupSchedule(timetableData, group);
+  if (!weekSchedule) {
     return null;
   }
   
@@ -138,11 +190,10 @@ export function getTomorrowSchedule(group: string, subgroup?: number | null): Da
   const weekParity = getWeekParity(tomorrow, semesterStart);
   const dayName = getDayOfWeek(tomorrow);
   
-  const weekSchedule = timetableData.groups[group];
   const dayLessons = weekSchedule[`${weekParity}_week` as keyof WeekSchedule][dayName as keyof typeof weekSchedule.odd_week] || [];
   
   // Фильтруем по подгруппе
-  const filteredLessons = dayLessons.filter(lesson => {
+  const filteredLessons = dayLessons.filter((lesson: Lesson) => {
     if (lesson.subgroup === null) return true;
     if (subgroup === null || subgroup === undefined) return true;
     return lesson.subgroup === subgroup;
@@ -160,7 +211,12 @@ export function getTomorrowSchedule(group: string, subgroup?: number | null): Da
 // Получить расписание на неделю начиная с указанной даты
 function getWeekScheduleFromDate(group: string, startDate: Date, subgroup?: number | null): DaySchedule[] {
   const timetableData = loadTimetableData();
-  if (!timetableData || !timetableData.groups[group]) {
+  if (!timetableData) {
+    return [];
+  }
+  
+  const groupSchedule = findGroupSchedule(timetableData, group);
+  if (!groupSchedule) {
     return [];
   }
   
@@ -175,11 +231,10 @@ function getWeekScheduleFromDate(group: string, startDate: Date, subgroup?: numb
     const weekParity = getWeekParity(date, semesterStart);
     const dayName = getDayOfWeek(date);
     
-    const groupSchedule = timetableData.groups[group];
     const dayLessons = groupSchedule[`${weekParity}_week` as keyof WeekSchedule][dayName as keyof typeof groupSchedule.odd_week] || [];
     
     // Фильтруем по подгруппе
-    const filteredLessons = dayLessons.filter(lesson => {
+    const filteredLessons = dayLessons.filter((lesson: Lesson) => {
       if (lesson.subgroup === null) return true;
       if (subgroup === null || subgroup === undefined) return true;
       return lesson.subgroup === subgroup;
@@ -271,11 +326,107 @@ export function formatSchedule(daySchedule: DaySchedule | null): string {
   return text.trim();
 }
 
-// Получить список доступных групп
+// Получить список доступных факультетов
+export function getAvailableFaculties(): string[] {
+  const timetableData = loadTimetableData();
+  if (!timetableData || !timetableData.faculties) {
+    return [];
+  }
+  
+  return Object.keys(timetableData.faculties);
+}
+
+// Получить список форм обучения для факультета
+export function getStudyFormatsForFaculty(facultyName: string): string[] {
+  const timetableData = loadTimetableData();
+  if (!timetableData || !timetableData.faculties || !timetableData.faculties[facultyName]) {
+    return [];
+  }
+  
+  return Object.keys(timetableData.faculties[facultyName]);
+}
+
+// Получить список степеней для факультета и формы обучения
+export function getDegreesForFacultyAndFormat(facultyName: string, studyFormat: string): string[] {
+  const timetableData = loadTimetableData();
+  if (!timetableData || !timetableData.faculties || 
+      !timetableData.faculties[facultyName] || 
+      !timetableData.faculties[facultyName][studyFormat]) {
+    return [];
+  }
+  
+  return Object.keys(timetableData.faculties[facultyName][studyFormat]);
+}
+
+// Получить список групп для факультета, формы обучения и степени
+export function getGroupsForFacultyFormatDegree(facultyName: string, studyFormat: string, degree: string): string[] {
+  const timetableData = loadTimetableData();
+  if (!timetableData || !timetableData.faculties || 
+      !timetableData.faculties[facultyName] || 
+      !timetableData.faculties[facultyName][studyFormat] ||
+      !timetableData.faculties[facultyName][studyFormat][degree]) {
+    return [];
+  }
+  
+  return Object.keys(timetableData.faculties[facultyName][studyFormat][degree]);
+}
+
+// Получить список доступных подгрупп для группы
+export function getAvailableSubgroups(groupName: string): number[] {
+  const timetableData = loadTimetableData();
+  if (!timetableData) {
+    return [];
+  }
+  
+  const weekSchedule = findGroupSchedule(timetableData, groupName);
+  if (!weekSchedule) {
+    return [];
+  }
+  
+  const subgroups = new Set<number>();
+  
+  // Проходим по всем неделям и дням
+  for (const weekType of ['odd_week', 'even_week'] as const) {
+    const week = weekSchedule[weekType];
+    for (const day of Object.values(week)) {
+      for (const lesson of day) {
+        if (lesson.subgroup !== null && lesson.subgroup !== undefined) {
+          subgroups.add(lesson.subgroup);
+        }
+      }
+    }
+  }
+  
+  return Array.from(subgroups).sort((a, b) => a - b);
+}
+
+// Получить список доступных групп (для обратной совместимости)
 export function getAvailableGroups(): string[] {
   const timetableData = loadTimetableData();
   if (!timetableData) {
     return [];
   }
-  return Object.keys(timetableData.groups);
+  
+  const groups: string[] = [];
+  
+  // Обрабатываем новую структуру с факультетами
+  if (timetableData.faculties) {
+    for (const facultyName in timetableData.faculties) {
+      const faculty = timetableData.faculties[facultyName];
+      for (const studyFormat in faculty) {
+        const format = faculty[studyFormat];
+        for (const degree in format) {
+          const degreeGroups = format[degree];
+          groups.push(...Object.keys(degreeGroups));
+        }
+      }
+    }
+  }
+  
+  // Обратная совместимость со старой структурой
+  if ((timetableData as any).groups) {
+    groups.push(...Object.keys((timetableData as any).groups));
+  }
+  
+  return groups;
 }

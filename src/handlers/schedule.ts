@@ -1,5 +1,16 @@
 import { Context, Keyboard } from '@maxhub/max-bot-api';
-import { getTodaySchedule, getTomorrowSchedule, getCurrentWeekSchedule, formatSchedule, getAvailableGroups } from '../utils/timetable';
+import { 
+  getTodaySchedule, 
+  getTomorrowSchedule, 
+  getCurrentWeekSchedule, 
+  formatSchedule, 
+  getAvailableGroups,
+  getAvailableFaculties,
+  getStudyFormatsForFaculty,
+  getDegreesForFacultyAndFormat,
+  getGroupsForFacultyFormatDegree,
+  getAvailableSubgroups
+} from '../utils/timetable';
 import { getUser, createUser, updateUserGroup, updateUserSubgroup } from '../utils/users';
 import { getConfig } from '../utils/config';
 import { getScheduleMenu, getMainMenu, getSettingsMenu } from '../utils/menu';
@@ -95,7 +106,7 @@ export function setupScheduleHandlers(bot: any) {
     });
   });
 
-  // Команда /group
+  // Команда /group - начинаем с выбора факультета
   bot.command('group', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
@@ -104,15 +115,18 @@ export function setupScheduleHandlers(bot: any) {
       user = createUser(userId);
     }
     
-    // Получаем доступные группы из расписания
-    const availableGroups = getAvailableGroups();
-    const groupsToShow = availableGroups.length > 0 ? availableGroups : config.groups;
+    // Получаем список факультетов
+    const faculties = getAvailableFaculties();
     
-    const buttons = groupsToShow.map(group => 
-      [Keyboard.button.callback(group, `set_group:${group}`)]
+    if (faculties.length === 0) {
+      return ctx.reply('❌ Факультеты не найдены в расписании.');
+    }
+    
+    const buttons = faculties.map((faculty: string) => 
+      [Keyboard.button.callback(faculty, `select_faculty:${faculty}`)]
     );
     
-    let message = `📋 Выберите вашу группу:\n\n`;
+    let message = `📋 Выберите факультет:\n\n`;
     message += `Текущая группа: ${user.group_name || 'не указана'}\n`;
     message += `Текущая подгруппа: ${user.subgroup !== null && user.subgroup !== undefined ? user.subgroup : 'не указана'}`;
     
@@ -152,10 +166,118 @@ export function setupScheduleHandlers(bot: any) {
     );
   });
 
-  // Обработчик callback для выбора группы
-  bot.action(/set_group:(.+)/, async (ctx: Context) => {
+  // Обработчик выбора факультета (используется и в menu.ts)
+  bot.action(/select_faculty:(.+)/, async (ctx: Context) => {
+    const facultyName = decodeURIComponent(ctx.match?.[1] || '');
+    
+    if (!facultyName) {
+      return ctx.answerOnCallback({
+        notification: 'Ошибка при выборе факультета'
+      });
+    }
+    
+    // Получаем формы обучения для факультета
+    const studyFormats = getStudyFormatsForFaculty(facultyName);
+    
+    if (studyFormats.length === 0) {
+      return ctx.answerOnCallback({
+        notification: 'Формы обучения не найдены'
+      });
+    }
+    
+    const buttons = studyFormats.map((format: string) => 
+      [Keyboard.button.callback(format, `select_format:${encodeURIComponent(facultyName)}:${encodeURIComponent(format)}`)]
+    );
+    buttons.push([Keyboard.button.callback('◀️ Назад', 'select_group_start')]);
+    
+    await ctx.answerOnCallback({
+      message: {
+        text: `📋 Выберите форму обучения:\n\nФакультет: ${facultyName}`,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    });
+  });
+
+  // Обработчик выбора формы обучения
+  bot.action(/select_format:(.+):(.+)/, async (ctx: Context) => {
+    const facultyName = decodeURIComponent(ctx.match?.[1] || '');
+    const studyFormat = decodeURIComponent(ctx.match?.[2] || '');
+    
+    if (!facultyName || !studyFormat) {
+      return ctx.answerOnCallback({
+        notification: 'Ошибка при выборе формы обучения'
+      });
+    }
+    
+    // Получаем степени для факультета и формы обучения
+    const degrees = getDegreesForFacultyAndFormat(facultyName, studyFormat);
+    
+    if (degrees.length === 0) {
+      return ctx.answerOnCallback({
+        notification: 'Степени не найдены'
+      });
+    }
+    
+    const buttons = degrees.map((degree: string) => 
+      [Keyboard.button.callback(degree, `select_degree:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}:${encodeURIComponent(degree)}`)]
+    );
+    // Кнопка "Назад" - возвращаем к выбору формы обучения
+    buttons.push([Keyboard.button.callback('◀️ Назад', `select_format:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}`)]);
+    
+    await ctx.answerOnCallback({
+      message: {
+        text: `📋 Выберите степень:\n\nФакультет: ${facultyName}\nФорма обучения: ${studyFormat}`,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    });
+  });
+
+  // Обработчик выбора степени
+  bot.action(/select_degree:(.+):(.+):(.+)/, async (ctx: Context) => {
+    const facultyName = decodeURIComponent(ctx.match?.[1] || '');
+    const studyFormat = decodeURIComponent(ctx.match?.[2] || '');
+    const degree = decodeURIComponent(ctx.match?.[3] || '');
+    
+    if (!facultyName || !studyFormat || !degree) {
+      return ctx.answerOnCallback({
+        notification: 'Ошибка при выборе степени'
+      });
+    }
+    
+    // Получаем группы для факультета, формы обучения и степени
+    const groups = getGroupsForFacultyFormatDegree(facultyName, studyFormat, degree);
+    
+    if (groups.length === 0) {
+      return ctx.answerOnCallback({
+        notification: 'Группы не найдены'
+      });
+    }
+    
+    // Разбиваем группы на кнопки (по 2 в ряд для компактности)
+    const buttons: any[][] = [];
+    for (let i = 0; i < groups.length; i += 2) {
+      const row = groups.slice(i, i + 2).map((group: string) => 
+        Keyboard.button.callback(group, `select_group:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}:${encodeURIComponent(degree)}:${encodeURIComponent(group)}`)
+      );
+      buttons.push(row);
+    }
+    buttons.push([Keyboard.button.callback('◀️ Назад', `select_format:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}`)]);
+    
+    await ctx.answerOnCallback({
+      message: {
+        text: `📋 Выберите группу:\n\nФакультет: ${facultyName}\nФорма обучения: ${studyFormat}\nСтепень: ${degree}`,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    });
+  });
+
+  // Обработчик выбора группы (финальный шаг)
+  bot.action(/select_group:(.+):(.+):(.+):(.+)/, async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
-    const groupName = ctx.match?.[1];
+    const facultyName = decodeURIComponent(ctx.match?.[1] || '');
+    const studyFormat = decodeURIComponent(ctx.match?.[2] || '');
+    const degree = decodeURIComponent(ctx.match?.[3] || '');
+    const groupName = decodeURIComponent(ctx.match?.[4] || '');
     
     if (!groupName) {
       return ctx.answerOnCallback({
@@ -163,12 +285,63 @@ export function setupScheduleHandlers(bot: any) {
       });
     }
     
+    // Получаем доступные подгруппы для этой группы
+    const subgroups = getAvailableSubgroups(groupName);
+    
     updateUserGroup(userId, groupName, null);
+    
+    // Если есть подгруппы, предлагаем выбрать
+    if (subgroups.length > 0) {
+      const subButtons = subgroups.map((sub: number) => 
+        [Keyboard.button.callback(`Подгруппа ${sub}`, `set_subgroup:${sub}`)]
+      );
+      subButtons.push([Keyboard.button.callback('Общая (без подгруппы)', 'set_subgroup:null')]);
+      
+      await ctx.answerOnCallback({
+        message: {
+          text: `✅ Группа изменена на ${groupName}\n\nВыберите подгруппу:`,
+          attachments: [Keyboard.inlineKeyboard(subButtons)]
+        }
+      });
+    } else {
+      await ctx.answerOnCallback({
+        message: {
+          text: `✅ Группа изменена на ${groupName}`,
+          attachments: [getSettingsMenu()]
+        }
+      });
+    }
+  });
+
+  // Обработчик для начала выбора группы (кнопка "Назад" к списку факультетов)
+  bot.action('select_group_start', async (ctx: Context) => {
+    const userId = ctx.user?.user_id?.toString() || '';
+    let user = getUser(userId);
+    
+    if (!user) {
+      user = createUser(userId);
+    }
+    
+    const faculties = getAvailableFaculties();
+    
+    if (faculties.length === 0) {
+      return ctx.answerOnCallback({
+        notification: 'Факультеты не найдены'
+      });
+    }
+    
+    const buttons = faculties.map((faculty: string) => 
+      [Keyboard.button.callback(faculty, `select_faculty:${faculty}`)]
+    );
+    
+    let message = `📋 Выберите факультет:\n\n`;
+    message += `Текущая группа: ${user.group_name || 'не указана'}\n`;
+    message += `Текущая подгруппа: ${user.subgroup !== null && user.subgroup !== undefined ? user.subgroup : 'не указана'}`;
     
     await ctx.answerOnCallback({
       message: {
-        text: `✅ Группа изменена на ${groupName}\n\nТеперь выберите подгруппу в настройках.`,
-        attachments: [getSettingsMenu()]
+        text: message,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
       }
     });
   });
@@ -199,7 +372,7 @@ export function setupScheduleHandlers(bot: any) {
     });
   });
 
-  // Обработчик callback для выбора группы из /today
+  // Обработчик callback для выбора группы из /today и других мест
   bot.action('select_group', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
@@ -208,16 +381,25 @@ export function setupScheduleHandlers(bot: any) {
       user = createUser(userId);
     }
     
-    const availableGroups = getAvailableGroups();
-    const groupsToShow = availableGroups.length > 0 ? availableGroups : config.groups;
+    const faculties = getAvailableFaculties();
     
-    const buttons = groupsToShow.map(group => 
-      [Keyboard.button.callback(group, `set_group:${group}`)]
+    if (faculties.length === 0) {
+      return ctx.answerOnCallback({
+        notification: 'Факультеты не найдены'
+      });
+    }
+    
+    const buttons = faculties.map(faculty => 
+      [Keyboard.button.callback(faculty, `select_faculty:${faculty}`)]
     );
+    
+    let message = `📋 Выберите факультет:\n\n`;
+    message += `Текущая группа: ${user.group_name || 'не указана'}\n`;
+    message += `Текущая подгруппа: ${user.subgroup !== null && user.subgroup !== undefined ? user.subgroup : 'не указана'}`;
     
     await ctx.answerOnCallback({
       message: {
-        text: `📋 Выберите вашу группу:\n\nТекущая группа: ${user.group_name || 'не указана'}`,
+        text: message,
         attachments: [Keyboard.inlineKeyboard(buttons)]
       }
     });

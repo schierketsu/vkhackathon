@@ -1,10 +1,20 @@
 import { Context, Keyboard } from '@maxhub/max-bot-api';
-import { getTodaySchedule, getTomorrowSchedule, getCurrentWeekSchedule, getNextWeekSchedule, formatSchedule } from '../utils/timetable';
+import { 
+  getTodaySchedule, 
+  getTomorrowSchedule, 
+  getCurrentWeekSchedule, 
+  getNextWeekSchedule, 
+  formatSchedule,
+  getAvailableFaculties,
+  getStudyFormatsForFaculty,
+  getDegreesForFacultyAndFormat,
+  getGroupsForFacultyFormatDegree,
+  getAvailableSubgroups
+} from '../utils/timetable';
 import { getUpcomingEvents, formatEvents } from '../utils/events';
 import { getActiveDeadlines, formatDeadlines } from '../utils/deadlines';
 import { getUser, toggleNotifications, toggleEventsSubscription, updateUserGroup, updateUserSubgroup } from '../utils/users';
 import { getConfig } from '../utils/config';
-import { getAvailableGroups } from '../utils/timetable';
 import { getMainMenu, getSettingsMenu, getScheduleMenu, getScheduleMainMenu, getDeadlinesMenu, getEventsMenu } from '../utils/menu';
 
 export function setupMenuHandlers(bot: any) {
@@ -259,24 +269,31 @@ export function setupMenuHandlers(bot: any) {
     });
   });
 
-  // Быстрый доступ к группе из настроек
+  // Быстрый доступ к группе из настроек - начинаем с выбора факультета
   bot.action('menu:group', async (ctx: Context) => {
     if (!ctx.user) return;
     const userId = ctx.user.user_id.toString();
     const user = getUser(userId);
     
-    const availableGroups = getAvailableGroups();
-    const config = getConfig();
-    const groupsToShow = availableGroups.length > 0 ? availableGroups : config.groups;
+    const faculties = getAvailableFaculties();
     
-    const buttons = groupsToShow.map(group => 
-      [Keyboard.button.callback(group, `set_group:${group}`)]
+    if (faculties.length === 0) {
+      return ctx.answerOnCallback({
+        message: {
+          text: '❌ Факультеты не найдены в расписании.',
+          attachments: [getSettingsMenu()]
+        }
+      });
+    }
+    
+    const buttons = faculties.map(faculty => 
+      [Keyboard.button.callback(faculty, `select_faculty:${faculty}`)]
     );
     buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:settings')]);
     
     await ctx.answerOnCallback({
       message: {
-        text: `📋 Выберите вашу группу:\n\nТекущая группа: ${user?.group_name || 'не указана'}`,
+        text: `📋 Выберите факультет:\n\nТекущая группа: ${user?.group_name || 'не указана'}`,
         attachments: [Keyboard.inlineKeyboard(buttons)]
       }
     });
@@ -298,21 +315,29 @@ export function setupMenuHandlers(bot: any) {
       return;
     }
     
+    // Получаем доступные подгруппы для группы
+    const subgroups = getAvailableSubgroups(user.group_name);
+    
+    const buttons: any[][] = [];
+    
+    // Если есть подгруппы в расписании, показываем их
+    if (subgroups.length > 0) {
+      for (let i = 0; i < subgroups.length; i += 2) {
+        const row = subgroups.slice(i, i + 2).map(sub => 
+          Keyboard.button.callback(`Подгруппа ${sub}`, `set_subgroup:${sub}`)
+        );
+        buttons.push(row);
+      }
+    }
+    
+    // Всегда добавляем опцию "Общая"
+    buttons.push([Keyboard.button.callback('Общая (без подгруппы)', 'set_subgroup:null')]);
+    buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:settings')]);
+    
     await ctx.answerOnCallback({
       message: {
-        text: `👥 Выберите подгруппу:\n\nТекущая: ${user.subgroup !== null && user.subgroup !== undefined ? user.subgroup : 'не указана'}\n\nЕсли у вас нет подгрупп, выберите "Общая"`,
-        attachments: [
-          Keyboard.inlineKeyboard([
-            [
-              Keyboard.button.callback('Общая', 'set_subgroup:null'),
-              Keyboard.button.callback('1', 'set_subgroup:1')
-            ],
-            [
-              Keyboard.button.callback('2', 'set_subgroup:2'),
-              Keyboard.button.callback('◀️ Назад', 'menu:settings')
-            ]
-          ])
-        ]
+        text: `👥 Выберите подгруппу:\n\nТекущая: ${user.subgroup !== null && user.subgroup !== undefined ? user.subgroup : 'не указана'}\nГруппа: ${user.group_name}\n\nЕсли у вас нет подгрупп, выберите "Общая"`,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
       }
     });
   });
