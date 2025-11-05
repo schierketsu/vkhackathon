@@ -1,6 +1,7 @@
 node_modules/
 dist/
-*.log
+*.db
+*.db-journal
 .env
 .DS_Store
-
+*.log

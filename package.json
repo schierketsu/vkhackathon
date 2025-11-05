@@ -1,21 +1,25 @@
 {
-  "name": "vk-chat-bot",
+  "name": "maxcampus-bot",
   "version": "1.0.0",
-  "description": "Простой чат-бот для Max",
+  "description": "Чат-бот для MAX: расписание, мероприятия и дедлайны",
   "main": "dist/bot.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/bot.js",
     "dev": "tsc && node dist/bot.js"
   },
-  "keywords": ["bot", "max", "chat"],
+  "keywords": ["bot", "max", "chat", "campus", "schedule", "university"],
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@maxhub/max-bot-api": "^0.2.1"
+    "@maxhub/max-bot-api": "^0.2.1",
+    "better-sqlite3": "^9.2.2",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
+    "@types/node-cron": "^3.0.11",
+    "@types/better-sqlite3": "^7.6.8",
     "typescript": "^5.4.2"
   }
 }

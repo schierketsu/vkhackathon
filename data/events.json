@@ -1,0 +1,31 @@
+[
+  {
+    "date": "07.11.2024",
+    "title": "День карьеры",
+    "location": "актовый зал",
+    "description": "Встреча с работодателями и компании-партнеры",
+    "link": "https://example.com/career"
+  },
+  {
+    "date": "09.11.2024",
+    "title": "Мастер-класс по Python",
+    "location": "ауд. 405",
+    "description": "Практические примеры работы с Python",
+    "link": ""
+  },
+  {
+    "date": "11.11.2024",
+    "title": "Киберспортивный турнир",
+    "location": "спортивный зал",
+    "description": "Турнир по Dota 2 и CS:GO",
+    "link": ""
+  },
+  {
+    "date": "15.11.2024",
+    "title": "Хакатон VK",
+    "location": "главный корпус",
+    "description": "48-часовой хакатон от VK",
+    "link": "https://vk.com/hackathon"
+  }
+]
+
