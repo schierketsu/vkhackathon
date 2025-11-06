@@ -93,7 +93,7 @@ function getWeekStart(date: Date): Date {
   return result;
 }
 
-function getDayOfWeek(date: Date): string {
+export function getDayOfWeek(date: Date): string {
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   return days[date.getDay()];
 }

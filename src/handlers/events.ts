@@ -4,8 +4,8 @@ import { getUser, createUser, toggleEventsSubscription } from '../utils/users';
 import { getEventsMenu, getMainMenu } from '../utils/menu';
 
 export function setupEventsHandlers(bot: any) {
-  // Команда /events
-  bot.command('events', async (ctx: Context) => {
+  // Команда /мероприятия
+  bot.command('мероприятия', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     
@@ -21,8 +21,8 @@ export function setupEventsHandlers(bot: any) {
     });
   });
 
-  // Команда /subscribe
-  bot.command('subscribe', async (ctx: Context) => {
+  // Команда /подписка
+  bot.command('подписка', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     

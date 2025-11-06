@@ -21,8 +21,8 @@ import { formatFacultyName, formatCourseButton, formatCourseNumber } from '../ut
 export function setupScheduleHandlers(bot: any) {
   const config = getConfig();
 
-  // Команда /today
-  bot.command('today', async (ctx: Context) => {
+  // Команда /сегодня
+  bot.command('сегодня', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     
@@ -32,7 +32,7 @@ export function setupScheduleHandlers(bot: any) {
     
     if (!user.group_name) {
       return ctx.reply(
-        '❌ Группа не указана. Используйте команду /group для выбора группы.',
+        '❌ Группа не указана. Используйте команду /группа для выбора группы.',
         {
           attachments: [
             Keyboard.inlineKeyboard([
@@ -51,8 +51,8 @@ export function setupScheduleHandlers(bot: any) {
     });
   });
 
-  // Команда /tomorrow
-  bot.command('tomorrow', async (ctx: Context) => {
+  // Команда /завтра
+  bot.command('завтра', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     
@@ -62,7 +62,7 @@ export function setupScheduleHandlers(bot: any) {
     
     if (!user.group_name) {
       return ctx.reply(
-        '❌ Группа не указана. Используйте команду /group для выбора группы.'
+        '❌ Группа не указана. Используйте команду /группа для выбора группы.'
       );
     }
     
@@ -74,8 +74,8 @@ export function setupScheduleHandlers(bot: any) {
     });
   });
 
-  // Команда /week
-  bot.command('week', async (ctx: Context) => {
+  // Команда /неделя
+  bot.command('неделя', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     
@@ -85,7 +85,7 @@ export function setupScheduleHandlers(bot: any) {
     
     if (!user.group_name) {
       return ctx.reply(
-        '❌ Группа не указана. Используйте команду /group для выбора группы.'
+        '❌ Группа не указана. Используйте команду /группа для выбора группы.'
       );
     }
     
@@ -109,8 +109,8 @@ export function setupScheduleHandlers(bot: any) {
     });
   });
 
-  // Команда /group - начинаем с выбора факультета
-  bot.command('group', async (ctx: Context) => {
+  // Команда /группа - начинаем с выбора факультета
+  bot.command('группа', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     
@@ -138,8 +138,8 @@ export function setupScheduleHandlers(bot: any) {
     });
   });
 
-  // Команда /subgroup
-  bot.command('subgroup', async (ctx: Context) => {
+  // Команда /подгруппа
+  bot.command('подгруппа', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     
@@ -149,7 +149,7 @@ export function setupScheduleHandlers(bot: any) {
     
     if (!user.group_name) {
       return ctx.reply(
-        '❌ Сначала выберите группу командой /group'
+        '❌ Сначала выберите группу командой /группа'
       );
     }
     

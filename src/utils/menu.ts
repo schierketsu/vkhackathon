@@ -108,3 +108,64 @@ export function getEventsMenu(): InlineKeyboard {
   ]);
 }
 
+// Меню преподавателей
+export function getTeachersMenu(hasFavorites: boolean): InlineKeyboard {
+  const buttons: any[][] = [
+    [
+      Keyboard.button.callback('🔍 Поиск', 'menu:teachers_search'),
+      Keyboard.button.callback('📋 Все', 'menu:teachers_all')
+    ]
+  ];
+  
+  if (hasFavorites) {
+    buttons.push([
+      Keyboard.button.callback('⭐ Избранные', 'menu:teachers_favorites')
+    ]);
+  }
+  
+  buttons.push([
+    Keyboard.button.callback('◀️ Главное меню', 'menu:main')
+  ]);
+  
+  return Keyboard.inlineKeyboard(buttons);
+}
+
+// Меню расписания преподавателя
+export function getTeacherScheduleMenu(teacherName: string, isFavorite: boolean = false): InlineKeyboard {
+  const encodedName = encodeURIComponent(teacherName);
+  const buttons: any[][] = [
+    [
+      Keyboard.button.callback('📅 Сегодня', `teacher_schedule:today:${encodedName}`),
+      Keyboard.button.callback('📆 Завтра', `teacher_schedule:tomorrow:${encodedName}`)
+    ],
+    [
+      Keyboard.button.callback('📚 Неделя', `teacher_schedule:week:${encodedName}`)
+    ]
+  ];
+  
+  if (isFavorite) {
+    buttons.push([
+      Keyboard.button.callback('❌ Удалить из избранного', `teacher_favorite:remove:${encodedName}`)
+    ]);
+  } else {
+    buttons.push([
+      Keyboard.button.callback('⭐ Добавить в избранное', `teacher_favorite:add:${encodedName}`)
+    ]);
+  }
+  
+  buttons.push([
+    Keyboard.button.callback('◀️ Преподаватели', 'menu:teachers')
+  ]);
+  
+  return Keyboard.inlineKeyboard(buttons);
+}
+
+// Меню поиска преподавателей
+export function getTeacherSearchMenu(): InlineKeyboard {
+  return Keyboard.inlineKeyboard([
+    [
+      Keyboard.button.callback('◀️ Назад', 'menu:teachers')
+    ]
+  ]);
+}
+

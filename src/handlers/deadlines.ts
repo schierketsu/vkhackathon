@@ -9,8 +9,8 @@ import { getUser, createUser, toggleNotifications } from '../utils/users';
 import { getDeadlinesMenu, getMainMenu } from '../utils/menu';
 
 export function setupDeadlinesHandlers(bot: any) {
-  // Команда /deadlines
-  bot.command('deadlines', async (ctx: Context) => {
+  // Команда /дедлайны
+  bot.command('дедлайны', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     
@@ -26,8 +26,8 @@ export function setupDeadlinesHandlers(bot: any) {
     });
   });
 
-  // Команда /adddeadline
-  bot.command('adddeadline', async (ctx: Context) => {
+  // Команда /новыйдедлайн
+  bot.command('новыйдедлайн', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     
@@ -41,9 +41,9 @@ export function setupDeadlinesHandlers(bot: any) {
     if (parts.length < 2) {
       return ctx.reply(
         '❌ Неверный формат команды.\n\n' +
-        'Использование: /adddeadline <название> <дата>\n\n' +
-        'Пример: /adddeadline РГР по ТРПО 20.11.2024\n' +
-        'Или: /adddeadline "Курсовая работа" 15.12.2024'
+        'Использование: /новыйдедлайн <название> <дата>\n\n' +
+        'Пример: /новыйдедлайн РГР по ТРПО 20.11.2024\n' +
+        'Или: /новыйдедлайн "Курсовая работа" 15.12.2024'
       );
     }
     
@@ -64,7 +64,7 @@ export function setupDeadlinesHandlers(bot: any) {
     if (!dateStr) {
       return ctx.reply(
         '❌ Дата не найдена. Используйте формат: DD.MM.YYYY или DD.MM\n\n' +
-        'Пример: /adddeadline РГР по ТРПО 20.11.2024'
+        'Пример: /новыйдедлайн РГР по ТРПО 20.11.2024'
       );
     }
     
@@ -84,8 +84,8 @@ export function setupDeadlinesHandlers(bot: any) {
     }
   });
 
-  // Команда /notifyon
-  bot.command('notifyon', async (ctx: Context) => {
+  // Команда /уведомления
+  bot.command('уведомления', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
     

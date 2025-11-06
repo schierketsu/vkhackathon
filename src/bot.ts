@@ -1,15 +1,16 @@
-import { Bot } from '@maxhub/max-bot-api';
+import { Bot, Keyboard } from '@maxhub/max-bot-api';
 import { initDatabase } from './utils/database';
 import { setupScheduleHandlers } from './handlers/schedule';
 import { setupEventsHandlers } from './handlers/events';
 import { setupDeadlinesHandlers } from './handlers/deadlines';
 import { setupMenuHandlers } from './handlers/menu';
-import { getMainMenu } from './utils/menu';
+import { setupTeachersHandlers } from './handlers/teachers';
+import { searchTeachers, getTeacherScheduleForDate, formatTeacherSchedule, isFavoriteTeacher, getAllTeachers } from './utils/teachers';
+import { getTeacherSearchMenu, getTeachersMenu, getTeacherScheduleMenu, getMainMenu } from './utils/menu';
 import { startScheduler, setBotApi } from './utils/scheduler';
 import { createUser, getUser } from './utils/users';
 import { getTodaySchedule, formatSchedule } from './utils/timetable';
 import { getUpcomingEvents, formatEvents } from './utils/events';
-import { Keyboard } from '@maxhub/max-bot-api';
 
 // Токен бота из переменной окружения или захардкоженный
 const BOT_TOKEN = process.env.BOT_TOKEN || 'f9LHodD0cOIt4K8Vo1cVPjs6fgvu-1qb-jPkrptyJK32kQ2mGItB-uyU0pChqMe3yY6pvDHctFo3VXFTjZOk';
@@ -126,24 +127,158 @@ bot.command('start', async (ctx) => {
 bot.command('help', async (ctx) => {
   const helpText = `📚 Доступные команды:\n\n` +
     `📅 Расписание:\n` +
-    `  /today — пары на сегодня\n` +
-    `  /tomorrow — пары на завтра\n` +
-    `  /week — расписание недели\n` +
-    `  /group — выбрать группу\n` +
-    `  /subgroup — выбрать подгруппу\n\n` +
+    `  /сегодня — пары на сегодня\n` +
+    `  /завтра — пары на завтра\n` +
+    `  /неделя — расписание недели\n` +
+    `  /группа — выбрать группу\n` +
+    `  /подгруппа — выбрать подгруппу\n\n` +
+    `👨‍🏫 Преподаватели:\n` +
+    `  /поиск <имя> — поиск преподавателя\n\n` +
     `🎉 Мероприятия:\n` +
-    `  /events — ближайшие события\n` +
-    `  /subscribe — подписка на уведомления\n\n` +
+    `  /мероприятия — ближайшие мероприятия\n` +
+    `  /подписка — подписка на уведомления\n\n` +
     `⏰ Дедлайны:\n` +
-    `  /deadlines — список активных дедлайнов\n` +
-    `  /adddeadline <название> <дата> — добавить дедлайн\n` +
-    `  /notifyon — настройки уведомлений\n\n` +
+    `  /дедлайны — список активных дедлайнов\n` +
+    `  /новыйдедлайн <название> <дата> — добавить дедлайн\n` +
+    `  /уведомления — настройки уведомлений\n\n` +
     `Пример добавления дедлайна:\n` +
-    `  /adddeadline РГР по ТРПО 20.11.2024`;
+    `  /новыйдедлайн РГР по ТРПО 20.11.2024\n\n` +
+    `💡 Совет: Используйте кнопки меню для быстрого доступа!`;
   
   await ctx.reply(helpText, {
     attachments: [getMainMenu()]
   });
+});
+
+// Обработчик данных от мини-приложения и поиска преподавателя
+bot.on('message_created', async (ctx) => {
+  try {
+    if (!ctx.user) return;
+    
+    const message = ctx.message as any;
+    
+    // Сначала проверяем данные от мини-приложения
+    const data = message?.body?.data;
+    if (data) {
+      try {
+        const appData = typeof data === 'string' ? JSON.parse(data) : data;
+        const userId = ctx.user?.user_id?.toString() || '';
+        
+        console.log('Получены данные от мини-приложения:', appData);
+        
+        // Обрабатываем различные действия
+        switch (appData.action) {
+          case 'deadline_added':
+            await ctx.reply(`✅ Дедлайн "${appData.title}" успешно добавлен!`);
+            break;
+          case 'deadline_deleted':
+            await ctx.reply('✅ Дедлайн удален');
+            break;
+          case 'group_updated':
+            await ctx.reply(`✅ Группа обновлена: ${appData.group_name}`);
+            break;
+          case 'setting_updated':
+            const settingName = appData.setting === 'notifications_enabled' ? 'уведомления' : 'подписка на мероприятия';
+            await ctx.reply(`✅ Настройка "${settingName}" обновлена`);
+            break;
+          default:
+            console.log('Неизвестное действие от мини-приложения:', appData.action);
+        }
+        return; // Выходим, если обработали данные от мини-приложения
+      } catch (error) {
+        console.error('Ошибка обработки данных от мини-приложения:', error);
+      }
+    }
+    
+    // Обработка поиска преподавателя
+    const messageText = message?.body?.text || '';
+    if (!messageText) return;
+    
+    // Проверяем, начинается ли сообщение с /поиск
+    const isSearchCommand = messageText.startsWith('/поиск ');
+    if (!isSearchCommand) return;
+    
+    console.log('🔍 Команда поиска преподавателя обнаружена');
+    console.log('📝 Текст сообщения:', messageText);
+    
+    // Извлекаем запрос
+    const parts = messageText.split(' ');
+    const query = parts.slice(1).join(' ').trim();
+    
+    console.log('🔎 Запрос для поиска:', query);
+    
+    if (!query) {
+      await ctx.reply(
+        '❌ Укажите имя преподавателя для поиска.\n\nПример: /поиск Иванов',
+        { attachments: [getTeacherSearchMenu()] }
+      );
+      return;
+    }
+
+    console.log('🔍 Начинаю поиск...');
+    const allTeachers = getAllTeachers();
+    console.log('📊 Всего преподавателей в базе:', allTeachers.length);
+    
+    const results = searchTeachers(query);
+    console.log('✅ Найдено преподавателей:', results.length);
+    if (results.length > 0) {
+      console.log('📋 Первые результаты:', results.slice(0, 3));
+    } else {
+      console.log('⚠️ Результаты поиска пусты');
+      console.log('🔍 Примеры преподавателей в базе:', allTeachers.slice(0, 5));
+    }
+    
+    if (results.length === 0) {
+      await ctx.reply(
+        `❌ Преподаватели по запросу "${query}" не найдены.\n\n` +
+        `Попробуйте ввести фамилию преподавателя, например:\n` +
+        `/поиск Иванов\n` +
+        `/поиск Андреева`,
+        { attachments: [getTeacherSearchMenu()] }
+      );
+      return;
+    }
+
+    // Если найден один преподаватель, показываем его расписание
+    if (results.length === 1) {
+      const teacherName = results[0];
+      const userId = (ctx.user as any)?.user_id?.toString() || '';
+      const today = new Date();
+      const schedule = getTeacherScheduleForDate(teacherName, today);
+      const text = formatTeacherSchedule(schedule);
+      const favorite = isFavoriteTeacher(userId, teacherName);
+      
+      await ctx.reply(`👨‍🏫 ${teacherName}\n\n${text}`, {
+        attachments: [getTeacherScheduleMenu(teacherName, favorite)]
+      });
+      return;
+    }
+
+    // Если найдено несколько, показываем список
+    let message = `🔍 Найдено преподавателей: ${results.length}\n\n`;
+    const buttons: any[][] = [];
+    
+    const displayResults = results.slice(0, 20);
+    for (let i = 0; i < displayResults.length; i += 2) {
+      const row = displayResults.slice(i, i + 2).map(teacher =>
+        Keyboard.button.callback(teacher, `teacher:${encodeURIComponent(teacher)}`)
+      );
+      buttons.push(row);
+    }
+    
+    if (results.length > 20) {
+      message += `Показано первых 20 результатов. Уточните запрос.\n\n`;
+    }
+    
+    buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:teachers')]);
+    
+    await ctx.reply(message, {
+      attachments: [Keyboard.inlineKeyboard(buttons)]
+    });
+  } catch (error) {
+    console.error('Ошибка в обработчике сообщений:', error);
+    // Не отвечаем на ошибку, чтобы не мешать другим обработчикам
+  }
 });
 
 // Настройка обработчиков
@@ -151,6 +286,7 @@ setupScheduleHandlers(bot);
 setupEventsHandlers(bot);
 setupDeadlinesHandlers(bot);
 setupMenuHandlers(bot);
+setupTeachersHandlers(bot);
 
 // Обработка ошибок
 bot.catch((error, ctx) => {

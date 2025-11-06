@@ -60,6 +60,18 @@ export function initDatabase() {
     )
   `);
 
+  // Таблица избранных преподавателей
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS favorite_teachers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT NOT NULL,
+      teacher_name TEXT NOT NULL,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, teacher_name),
+      FOREIGN KEY (user_id) REFERENCES users(user_id)
+    )
+  `);
+
   console.log('✅ База данных инициализирована');
 }
 
