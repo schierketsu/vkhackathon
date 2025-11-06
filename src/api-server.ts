@@ -1,12 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import * as path from 'path';
-import { initDatabase, database } from '../utils/database';
-import { getUser, createUser, updateUserGroup, updateUserSubgroup, toggleNotifications, toggleEventsSubscription } from '../utils/users';
-import { getTodaySchedule, getTomorrowSchedule, getCurrentWeekSchedule, getNextWeekSchedule, getAvailableFaculties, getStudyFormatsForFaculty, getDegreesForFacultyAndFormat, getGroupsForFacultyFormatDegree, getAvailableSubgroups } from '../utils/timetable';
-import { getUpcomingEvents } from '../utils/events';
-import { getActiveDeadlines, addDeadline, deleteDeadline } from '../utils/deadlines';
-import { getAllTeachers, searchTeachers } from '../utils/teachers';
+import { initDatabase, database } from './utils/database';
+import { getUser, createUser, updateUserGroup, updateUserSubgroup, toggleNotifications, toggleEventsSubscription } from './utils/users';
+import { getTodaySchedule, getTomorrowSchedule, getCurrentWeekSchedule, getNextWeekSchedule, getAvailableFaculties, getStudyFormatsForFaculty, getDegreesForFacultyAndFormat, getGroupsForFacultyFormatDegree, getAvailableSubgroups } from './utils/timetable';
+import { getUpcomingEvents } from './utils/events';
+import { getActiveDeadlines, addDeadline, deleteDeadline } from './utils/deadlines';
+import { getAllTeachers, searchTeachers } from './utils/teachers';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -131,14 +131,15 @@ app.get('/api/groups', (req, res) => {
     const faculties = getAvailableFaculties();
     const allGroups: string[] = [];
     
-    faculties.forEach(faculty => {
+    faculties.forEach((faculty: string) => {
       const formats = getStudyFormatsForFaculty(faculty);
-      formats.forEach(format => {
+      formats.forEach((format: string) => {
         const degrees = getDegreesForFacultyAndFormat(faculty, format);
-        degrees.forEach(degree => {
+        degrees.forEach((degree: string) => {
           const courses = Object.keys(getGroupsForFacultyFormatDegree(faculty, format, degree));
-          courses.forEach(course => {
-            const groups = Object.keys(getGroupsForFacultyFormatDegree(faculty, format, degree)[course]);
+          courses.forEach((course: string) => {
+            const courseData = getGroupsForFacultyFormatDegree(faculty, format, degree);
+            const groups = Object.keys(courseData[course as keyof typeof courseData] || {});
             allGroups.push(...groups);
           });
         });

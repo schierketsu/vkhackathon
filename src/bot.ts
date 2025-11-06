@@ -155,14 +155,15 @@ bot.on('message_created', async (ctx) => {
   try {
     if (!ctx.user) return;
     
-    const message = ctx.message as any;
+    const msg = ctx.message as any;
     
     // Сначала проверяем данные от мини-приложения
-    const data = message?.body?.data;
+    const data = msg?.body?.data;
     if (data) {
       try {
         const appData = typeof data === 'string' ? JSON.parse(data) : data;
-        const userId = ctx.user?.user_id?.toString() || '';
+        const user = ctx.user as { user_id: number; name?: string };
+        const userId = user.user_id.toString();
         
         console.log('Получены данные от мини-приложения:', appData);
         
@@ -191,7 +192,7 @@ bot.on('message_created', async (ctx) => {
     }
     
     // Обработка поиска преподавателя
-    const messageText = message?.body?.text || '';
+    const messageText = msg?.body?.text || '';
     if (!messageText) return;
     
     // Проверяем, начинается ли сообщение с /поиск
@@ -255,7 +256,7 @@ bot.on('message_created', async (ctx) => {
     }
 
     // Если найдено несколько, показываем список
-    let message = `🔍 Найдено преподавателей: ${results.length}\n\n`;
+    let replyText = `🔍 Найдено преподавателей: ${results.length}\n\n`;
     const buttons: any[][] = [];
     
     const displayResults = results.slice(0, 20);
@@ -267,12 +268,12 @@ bot.on('message_created', async (ctx) => {
     }
     
     if (results.length > 20) {
-      message += `Показано первых 20 результатов. Уточните запрос.\n\n`;
+      replyText += `Показано первых 20 результатов. Уточните запрос.\n\n`;
     }
     
     buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:teachers')]);
     
-    await ctx.reply(message, {
+    await ctx.reply(replyText, {
       attachments: [Keyboard.inlineKeyboard(buttons)]
     });
   } catch (error) {
