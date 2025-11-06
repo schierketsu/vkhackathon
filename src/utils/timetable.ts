@@ -397,43 +397,85 @@ export function getAvailableFaculties(): string[] {
     return [];
   }
   
+  // Возвращаем ключи как есть (включая возможные пробелы в конце)
   return Object.keys(timetableData.faculties);
+}
+
+// Нормализовать название факультета (убрать пробелы в начале и конце)
+function normalizeFacultyName(facultyName: string): string {
+  return facultyName.trim();
+}
+
+// Найти факультет по нормализованному названию
+function findFacultyByName(timetableData: TimetableData, facultyName: string): string | null {
+  const normalized = normalizeFacultyName(facultyName);
+  // Сначала проверяем точное совпадение
+  if (timetableData.faculties[facultyName]) {
+    return facultyName;
+  }
+  // Затем проверяем нормализованное совпадение
+  for (const key in timetableData.faculties) {
+    if (normalizeFacultyName(key) === normalized) {
+      console.log(`[DEBUG] Найден факультет по нормализованному названию: "${facultyName}" -> "${key}"`);
+      return key;
+    }
+  }
+  console.log(`[DEBUG] Факультет не найден: "${facultyName}" (нормализовано: "${normalized}")`);
+  return null;
 }
 
 // Получить список форм обучения для факультета
 export function getStudyFormatsForFaculty(facultyName: string): string[] {
   const timetableData = loadTimetableData();
-  if (!timetableData || !timetableData.faculties || !timetableData.faculties[facultyName]) {
+  if (!timetableData || !timetableData.faculties) {
     return [];
   }
   
-  return Object.keys(timetableData.faculties[facultyName]);
+  // Находим факультет по нормализованному названию
+  const actualFacultyName = findFacultyByName(timetableData, facultyName);
+  if (!actualFacultyName || !timetableData.faculties[actualFacultyName]) {
+    return [];
+  }
+  
+  return Object.keys(timetableData.faculties[actualFacultyName]);
 }
 
 // Получить список степеней для факультета и формы обучения
 export function getDegreesForFacultyAndFormat(facultyName: string, studyFormat: string): string[] {
   const timetableData = loadTimetableData();
-  if (!timetableData || !timetableData.faculties || 
-      !timetableData.faculties[facultyName] || 
-      !timetableData.faculties[facultyName][studyFormat]) {
+  if (!timetableData || !timetableData.faculties) {
     return [];
   }
   
-  return Object.keys(timetableData.faculties[facultyName][studyFormat]);
+  // Находим факультет по нормализованному названию
+  const actualFacultyName = findFacultyByName(timetableData, facultyName);
+  if (!actualFacultyName || 
+      !timetableData.faculties[actualFacultyName] || 
+      !timetableData.faculties[actualFacultyName][studyFormat]) {
+    return [];
+  }
+  
+  return Object.keys(timetableData.faculties[actualFacultyName][studyFormat]);
 }
 
 // Получить список курсов для факультета, формы обучения и степени
 export function getCoursesForFacultyFormatDegree(facultyName: string, studyFormat: string, degree: string): number[] {
   const timetableData = loadTimetableData();
-  if (!timetableData || !timetableData.faculties || 
-      !timetableData.faculties[facultyName] || 
-      !timetableData.faculties[facultyName][studyFormat] ||
-      !timetableData.faculties[facultyName][studyFormat][degree]) {
+  if (!timetableData || !timetableData.faculties) {
+    return [];
+  }
+  
+  // Находим факультет по нормализованному названию
+  const actualFacultyName = findFacultyByName(timetableData, facultyName);
+  if (!actualFacultyName || 
+      !timetableData.faculties[actualFacultyName] || 
+      !timetableData.faculties[actualFacultyName][studyFormat] ||
+      !timetableData.faculties[actualFacultyName][studyFormat][degree]) {
     return [];
   }
   
   // Получаем все ключи курсов и преобразуем в числа, сортируем
-  const courses = Object.keys(timetableData.faculties[facultyName][studyFormat][degree])
+  const courses = Object.keys(timetableData.faculties[actualFacultyName][studyFormat][degree])
     .map(c => parseInt(c))
     .filter(c => !isNaN(c) && c > 0)
     .sort((a, b) => a - b);
@@ -444,29 +486,41 @@ export function getCoursesForFacultyFormatDegree(facultyName: string, studyForma
 // Получить список групп для факультета, формы обучения, степени и курса
 export function getGroupsForFacultyFormatDegreeCourse(facultyName: string, studyFormat: string, degree: string, course: number): string[] {
   const timetableData = loadTimetableData();
-  if (!timetableData || !timetableData.faculties || 
-      !timetableData.faculties[facultyName] || 
-      !timetableData.faculties[facultyName][studyFormat] ||
-      !timetableData.faculties[facultyName][studyFormat][degree] ||
-      !timetableData.faculties[facultyName][studyFormat][degree][course.toString()]) {
+  if (!timetableData || !timetableData.faculties) {
     return [];
   }
   
-  return Object.keys(timetableData.faculties[facultyName][studyFormat][degree][course.toString()]);
+  // Находим факультет по нормализованному названию
+  const actualFacultyName = findFacultyByName(timetableData, facultyName);
+  if (!actualFacultyName || 
+      !timetableData.faculties[actualFacultyName] || 
+      !timetableData.faculties[actualFacultyName][studyFormat] ||
+      !timetableData.faculties[actualFacultyName][studyFormat][degree] ||
+      !timetableData.faculties[actualFacultyName][studyFormat][degree][course.toString()]) {
+    return [];
+  }
+  
+  return Object.keys(timetableData.faculties[actualFacultyName][studyFormat][degree][course.toString()]);
 }
 
 // Получить список групп для факультета, формы обучения и степени (для обратной совместимости)
 export function getGroupsForFacultyFormatDegree(facultyName: string, studyFormat: string, degree: string): string[] {
   const timetableData = loadTimetableData();
-  if (!timetableData || !timetableData.faculties || 
-      !timetableData.faculties[facultyName] || 
-      !timetableData.faculties[facultyName][studyFormat] ||
-      !timetableData.faculties[facultyName][studyFormat][degree]) {
+  if (!timetableData || !timetableData.faculties) {
+    return [];
+  }
+  
+  // Находим факультет по нормализованному названию
+  const actualFacultyName = findFacultyByName(timetableData, facultyName);
+  if (!actualFacultyName || 
+      !timetableData.faculties[actualFacultyName] || 
+      !timetableData.faculties[actualFacultyName][studyFormat] ||
+      !timetableData.faculties[actualFacultyName][studyFormat][degree]) {
     return [];
   }
   
   // Проверяем новую структуру с курсами
-  const degreeData = timetableData.faculties[facultyName][studyFormat][degree];
+  const degreeData = timetableData.faculties[actualFacultyName][studyFormat][degree];
   if (typeof degreeData === 'object' && !Array.isArray(degreeData)) {
     // Если это объект с курсами
     const allGroups: string[] = [];

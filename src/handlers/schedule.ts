@@ -201,7 +201,39 @@ export function setupScheduleHandlers(bot: any) {
     });
   });
 
-  // Обработчик выбора формы обучения
+  // Обработчик выбора формы обучения - показывает список форм обучения для факультета
+  bot.action(/show_formats:(.+)/, async (ctx: Context) => {
+    const facultyName = decodeURIComponent(ctx.match?.[1] || '');
+    
+    if (!facultyName) {
+      return ctx.answerOnCallback({
+        notification: 'Ошибка при выборе факультета'
+      });
+    }
+    
+    // Получаем формы обучения для факультета
+    const studyFormats = getStudyFormatsForFaculty(facultyName);
+    
+    if (studyFormats.length === 0) {
+      return ctx.answerOnCallback({
+        notification: 'Формы обучения не найдены'
+      });
+    }
+    
+    const buttons = studyFormats.map((format: string) => 
+      [Keyboard.button.callback(format, `select_format:${encodeURIComponent(facultyName)}:${encodeURIComponent(format)}`)]
+    );
+    buttons.push([Keyboard.button.callback('◀️ Назад', `select_faculty:${encodeURIComponent(facultyName)}`)]);
+    
+    await ctx.answerOnCallback({
+      message: {
+        text: `📋 Выберите форму обучения:\n\nФакультет: ${formatFacultyName(facultyName)}`,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    });
+  });
+
+  // Обработчик выбора формы обучения - показывает степени
   bot.action(/select_format:(.+):(.+)/, async (ctx: Context) => {
     const facultyName = decodeURIComponent(ctx.match?.[1] || '');
     const studyFormat = decodeURIComponent(ctx.match?.[2] || '');
@@ -225,7 +257,7 @@ export function setupScheduleHandlers(bot: any) {
       [Keyboard.button.callback(degree, `select_degree:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}:${encodeURIComponent(degree)}`)]
     );
     // Кнопка "Назад" - возвращаем к выбору формы обучения
-    buttons.push([Keyboard.button.callback('◀️ Назад', `select_format:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}`)]);
+    buttons.push([Keyboard.button.callback('◀️ Назад', `show_formats:${encodeURIComponent(facultyName)}`)]);
     
     await ctx.answerOnCallback({
       message: {
