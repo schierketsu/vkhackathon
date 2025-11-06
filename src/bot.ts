@@ -11,6 +11,7 @@ import { startScheduler, setBotApi } from './utils/scheduler';
 import { createUser, getUser } from './utils/users';
 import { getTodaySchedule, formatSchedule } from './utils/timetable';
 import { getUpcomingEvents, formatEvents } from './utils/events';
+import 'dotenv/config';
 
 // Токен бота из переменной окружения или захардкоженный
 const BOT_TOKEN = process.env.BOT_TOKEN || 'f9LHodD0cOIt4K8Vo1cVPjs6fgvu-1qb-jPkrptyJK32kQ2mGItB-uyU0pChqMe3yY6pvDHctFo3VXFTjZOk';
@@ -150,46 +151,12 @@ bot.command('help', async (ctx) => {
   });
 });
 
-// Обработчик данных от мини-приложения и поиска преподавателя
+// Обработчик поиска преподавателя
 bot.on('message_created', async (ctx) => {
   try {
     if (!ctx.user) return;
     
     const msg = ctx.message as any;
-    
-    // Сначала проверяем данные от мини-приложения
-    const data = msg?.body?.data;
-    if (data) {
-      try {
-        const appData = typeof data === 'string' ? JSON.parse(data) : data;
-        const user = ctx.user as { user_id: number; name?: string };
-        const userId = user.user_id.toString();
-        
-        console.log('Получены данные от мини-приложения:', appData);
-        
-        // Обрабатываем различные действия
-        switch (appData.action) {
-          case 'deadline_added':
-            await ctx.reply(`✅ Дедлайн "${appData.title}" успешно добавлен!`);
-            break;
-          case 'deadline_deleted':
-            await ctx.reply('✅ Дедлайн удален');
-            break;
-          case 'group_updated':
-            await ctx.reply(`✅ Группа обновлена: ${appData.group_name}`);
-            break;
-          case 'setting_updated':
-            const settingName = appData.setting === 'notifications_enabled' ? 'уведомления' : 'подписка на мероприятия';
-            await ctx.reply(`✅ Настройка "${settingName}" обновлена`);
-            break;
-          default:
-            console.log('Неизвестное действие от мини-приложения:', appData.action);
-        }
-        return; // Выходим, если обработали данные от мини-приложения
-      } catch (error) {
-        console.error('Ошибка обработки данных от мини-приложения:', error);
-      }
-    }
     
     // Обработка поиска преподавателя
     const messageText = msg?.body?.text || '';

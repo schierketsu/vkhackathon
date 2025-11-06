@@ -214,31 +214,6 @@ export function setupMenuHandlers(bot: any) {
 
   // Преподаватели - обработчик перенесен в teachers.ts
 
-  // В приложение
-  bot.action('menu:app', async (ctx: Context) => {
-    if (!ctx.user) return;
-    
-    const user = ctx.user as { user_id: number; name?: string };
-    const userId = user.user_id.toString();
-    const userName = user.name || 'Пользователь';
-    
-    // URL мини-приложения (замените на ваш реальный URL)
-    const appUrl = process.env.MINI_APP_URL || 'http://localhost:3000';
-    const deepLink = `${appUrl}?user_id=${userId}&user_name=${encodeURIComponent(userName)}`;
-    
-    await ctx.answerOnCallback({
-      message: {
-        text: `📱 Открыть мини-приложение\n\nНажмите на кнопку ниже, чтобы открыть приложение в браузере.`,
-        attachments: [
-          Keyboard.inlineKeyboard([
-            [Keyboard.button.link('📱 Открыть приложение', deepLink)],
-            [Keyboard.button.callback('◀️ Назад', 'menu:main')]
-          ])
-        ]
-      }
-    });
-  });
-
   // Дедлайны
   bot.action('menu:deadlines', async (ctx: Context) => {
     if (!ctx.user) return;
