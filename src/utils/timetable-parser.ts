@@ -14,6 +14,42 @@ export interface Group {
   faculty?: string;
   studyFormat?: string;
   degree?: string;
+  course?: number | null;
+}
+
+/**
+ * Определение курса по названию группы
+ * Берет первые два числа после второго дефиса
+ * "25" - 1 курс, "24" - 2 курс, "23" - 3 курс, "22" - 4 курс, "21" - 5 курс
+ */
+export function getCourseFromGroupName(groupName: string): number | null {
+  // Разбиваем по дефисам
+  const parts = groupName.split('-');
+  if (parts.length < 3) {
+    return null;
+  }
+  
+  // Берем часть после второго дефиса
+  const afterSecondDash = parts[2];
+  
+  // Извлекаем первые два числа
+  const match = afterSecondDash.match(/^(\d{2})/);
+  if (!match) {
+    return null;
+  }
+  
+  const yearCode = match[1];
+  
+  // Маппинг: "25" -> 1, "24" -> 2, "23" -> 3, "22" -> 4, "21" -> 5
+  const courseMap: { [key: string]: number } = {
+    '25': 1,
+    '24': 2,
+    '23': 3,
+    '22': 4,
+    '21': 5
+  };
+  
+  return courseMap[yearCode] || null;
 }
 
 // Конфигурация авторизации
@@ -90,6 +126,17 @@ function getAxiosInstance(): AxiosInstance {
   }
   
   return axiosInstance;
+}
+
+/**
+ * Получение пути к папке debug и создание её, если она не существует
+ */
+function getDebugDir(): string {
+  const debugDir = path.join(process.cwd(), 'debug');
+  if (!fs.existsSync(debugDir)) {
+    fs.mkdirSync(debugDir, { recursive: true });
+  }
+  return debugDir;
 }
 
 /**
@@ -255,7 +302,9 @@ export async function parseGroupTimetable(groupUrl: string, groupName: string): 
     
     // Сохраняем HTML для отладки (только для первых нескольких групп)
     if (groupName.includes('-25') || groupName.includes('-24')) {
-      const debugPath = path.join(process.cwd(), `debug-${groupName.replace(/[^a-zA-Z0-9]/g, '-')}.html`);
+      const debugDir = getDebugDir();
+      const safeGroupName = groupName.replace(/[^a-zA-Z0-9]/g, '-');
+      const debugPath = path.join(debugDir, `${safeGroupName}.html`);
       fs.writeFileSync(debugPath, $.html(), 'utf-8');
     }
     
@@ -727,7 +776,9 @@ function parseGroupTimetableAlternative($: cheerio.CheerioAPI, groupName: string
   };
   
   // Сохраняем HTML для отладки
-  const debugPath = path.join(process.cwd(), `debug-${groupName}.html`);
+  const debugDir = getDebugDir();
+  const safeGroupName = groupName.replace(/[^a-zA-Z0-9]/g, '-');
+  const debugPath = path.join(debugDir, `${safeGroupName}.html`);
   fs.writeFileSync(debugPath, $.html(), 'utf-8');
   console.log(`💾 HTML сохранен для отладки: ${debugPath}`);
   
@@ -760,12 +811,13 @@ export function getAllGroupsFromFile(): Group[] {
       for (const degreeKey in format) {
         const degreeGroups = format[degreeKey];
         if (Array.isArray(degreeGroups)) {
-          // Добавляем информацию о факультете, форме обучения и степени
+          // Добавляем информацию о факультете, форме обучения, степени и курсе
           const enrichedGroups = degreeGroups.map((group: Group) => ({
             ...group,
             faculty: facultyKey,
             studyFormat: formatKey,
-            degree: degreeKey
+            degree: degreeKey,
+            course: getCourseFromGroupName(group.value)
           }));
           groups.push(...enrichedGroups);
         }

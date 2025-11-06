@@ -50,10 +50,11 @@ async function processGroups(groups: Group[]) {
       const schedule = await parseGroupTimetable(group.ссылка, group.value);
       
       if (schedule) {
-        // Получаем информацию о факультете, форме обучения и степени
+        // Получаем информацию о факультете, форме обучения, степени и курсе
         const faculty = group.faculty || 'Неизвестный факультет';
         const studyFormat = group.studyFormat || 'очная';
         const degree = group.degree || 'Бакалавриат';
+        const course = group.course || null;
         
         // Инициализируем структуру, если она еще не существует
         if (!timetableData.faculties[faculty]) {
@@ -66,10 +67,16 @@ async function processGroups(groups: Group[]) {
           timetableData.faculties[faculty][studyFormat][degree] = {};
         }
         
+        // Если курс не определен, используем "0" как значение по умолчанию
+        const courseKey = course !== null ? course.toString() : '0';
+        if (!timetableData.faculties[faculty][studyFormat][degree][courseKey]) {
+          timetableData.faculties[faculty][studyFormat][degree][courseKey] = {};
+        }
+        
         // Добавляем расписание группы
-        timetableData.faculties[faculty][studyFormat][degree][group.value] = schedule;
+        timetableData.faculties[faculty][studyFormat][degree][courseKey][group.value] = schedule;
         successCount++;
-        console.log(`  ✅ Расписание для ${group.value} успешно получено\n`);
+        console.log(`  ✅ Расписание для ${group.value} успешно получено (курс: ${course || 'не определен'})\n`);
       } else {
         errorCount++;
         console.log(`  ❌ Ошибка при получении расписания для ${group.value}\n`);

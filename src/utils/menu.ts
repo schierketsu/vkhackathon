@@ -8,14 +8,16 @@ export function getMainMenu(): InlineKeyboard {
   return Keyboard.inlineKeyboard([
     [
       Keyboard.button.callback('📅 Расписание', 'menu:schedule'),
-      Keyboard.button.callback('🎉 События', 'menu:events')
+      Keyboard.button.callback('👨‍🏫 Преподаватели', 'menu:teachers')
     ],
     [
-      Keyboard.button.callback('⏰ Дедлайны', 'menu:deadlines'),
-      Keyboard.button.callback('⚙️ Настройки', 'menu:settings')
+      Keyboard.button.callback('🎉 Мероприятия', 'menu:events'),
+      Keyboard.button.callback('⏰ Дедлайны', 'menu:deadlines')
     ],
     [
-      Keyboard.button.callback('📖 Помощь', 'menu:help')
+      Keyboard.button.callback('📱 В приложение', 'menu:app'),
+      Keyboard.button.callback('❔', 'menu:help'),
+      Keyboard.button.callback('⚙️', 'menu:settings')
     ]
   ]);
 }
@@ -29,7 +31,7 @@ export function getSettingsMenu(): InlineKeyboard {
     ],
     [
       Keyboard.button.callback('🔔 Уведомления', 'menu:notifications'),
-      Keyboard.button.callback('📢 События', 'menu:events_subscribe')
+      Keyboard.button.callback('📢 Мероприятия', 'menu:events_subscribe')
     ],
     [
       Keyboard.button.callback('◀️ Назад', 'menu:main')

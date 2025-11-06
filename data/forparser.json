@@ -163,5 +163,766 @@
             {"value": "ОЗФИ-МГ-01-23 ВИ ИОиКП", "name": "gr8132", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8132"}
           ]
         }
-      }
+      },
+  "Факультет Историко-географический ": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "ИГФ-11-25 (ИМО)", "name": "gr9778", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9778"},
+        {"value": "ИГФ-11-25 (ИР)", "name": "gr9710", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9710"},
+        {"value": "ИГФ-11-25ин (ИМО)", "name": "gr9947", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9947"},
+        {"value": "ИГФ-21-25 Г", "name": "gr9320", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9320"},
+        {"value": "ИГФ-21-25 СЭГ", "name": "gr9323", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9323"},
+        {"value": "ИГФ-21-25 ФГиЛ", "name": "gr9321", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9321"},
+        {"value": "ИГФ-23-25", "name": "gr9324", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9324"},
+        {"value": "ИГФ-32-25 (АМ)", "name": "gr9712", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9712"},
+        {"value": "ИГФ-32-25 (ОДК)", "name": "gr9779", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9779"},
+        {"value": "ИГФ-41-25", "name": "gr9325", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9325"},
+        {"value": "ИГФ-51-25", "name": "gr9326", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9326"},
+        {"value": "ИГФ-71-25", "name": "gr9714", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9714"},
+        {"value": "ИГФ-71-25ин", "name": "gr9918", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9918"},
+        {"value": "ИГФ-11-24 (ИМО)", "name": "gr8714", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8714"},
+        {"value": "ИГФ-11-24 (ИР)", "name": "gr8713", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8713"},
+        {"value": "ИГФ-11-24ин (ИМО)", "name": "gr9186", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9186"},
+        {"value": "ИГФ-11-24ин (ИР)", "name": "gr9212", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9212"},
+        {"value": "ИГФ-21-24 Г", "name": "gr8695", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8695"},
+        {"value": "ИГФ-21-24 ФГиЛ", "name": "gr8696", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8696"},
+        {"value": "ИГФ-21-24 ЭиСГ", "name": "gr8697", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8697"},
+        {"value": "ИГФ-23-24", "name": "gr8698", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8698"},
+        {"value": "ИГФ-32-24 (АМ)", "name": "gr8716", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8716"},
+        {"value": "ИГФ-32-24 (ОДК)", "name": "gr8717", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8717"},
+        {"value": "ИГФ-32-24ин (АМ)", "name": "gr9197", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9197"},
+        {"value": "ИГФ-41-24", "name": "gr8699", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8699"},
+        {"value": "ИГФ-51-24", "name": "gr8700", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8700"},
+        {"value": "ИГФ-71-24", "name": "gr8715", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8715"},
+        {"value": "ИГФ-11-23 (ИР)", "name": "gr8248", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8248"},
+        {"value": "ИГФ-11-23ин (ИР)", "name": "gr8474", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8474"},
+        {"value": "ИГФ-21-23 Г", "name": "gr8165", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8165"},
+        {"value": "ИГФ-21-23 ФГиЛ", "name": "gr8166", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8166"},
+        {"value": "ИГФ-21-23 ЭиСГ", "name": "gr8167", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8167"},
+        {"value": "ИГФ-23-23", "name": "gr8168", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8168"},
+        {"value": "ИГФ-32-23", "name": "gr8249", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8249"},
+        {"value": "ИГФ-32-23 ин", "name": "gr8477", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8477"},
+        {"value": "ИГФ-41-23", "name": "gr8169", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8169"},
+        {"value": "ИГФ-51-23", "name": "gr8170", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8170"},
+        {"value": "ИГФ-71-23", "name": "gr8250", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8250"},
+        {"value": "ИГФ-11-22 (ИР)", "name": "gr7570", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7570"},
+        {"value": "ИГФ-11-22ин (ИР)", "name": "gr7839", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7839"},
+        {"value": "ИГФ-21-22 Г", "name": "gr7327", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7327"},
+        {"value": "ИГФ-21-22 ФГиЛ", "name": "gr7328", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7328"},
+        {"value": "ИГФ-21-22 ЭиСГ", "name": "gr7329", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7329"},
+        {"value": "ИГФ-23-22", "name": "gr7330", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7330"},
+        {"value": "ИГФ-32-22", "name": "gr7571", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7571"},
+        {"value": "ИГФ-41-22", "name": "gr7331", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7331"},
+        {"value": "ИГФ-42-22", "name": "gr7572", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7572"},
+        {"value": "ИГФ-51-22", "name": "gr7332", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7332"},
+        {"value": "ИГФ-71-22", "name": "gr7569", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7569"}
+      ],
+      "Магистратура": [
+        {"value": "ИГФМ-01-25", "name": "gr9327", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9327"},
+        {"value": "ИГФМ-02-25 (ДИС)", "name": "gr9722", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9722"},
+        {"value": "ИГФМ-02-25 (НКАИ)", "name": "gr9780", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9780"},
+        {"value": "ИГФМ-01-24", "name": "gr8701", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8701"},
+        {"value": "ИГФМ-02-24 (ДИС)", "name": "gr8719", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8719"},
+        {"value": "ИГФМ-02-24 (НКАИ)", "name": "gr8718", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8718"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗИГФ-11-25 (ИР)", "name": "gr9834", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9834"},
+        {"value": "ОЗИГФ-11-25(ИМО)", "name": "gr9943", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9943"},
+        {"value": "ОЗИГФ-32-25 (АМ)", "name": "gr9835", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9835"},
+        {"value": "ОЗИГФ-41-25", "name": "gr9843", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9843"},
+        {"value": "ОЗИГФ-51-25", "name": "gr9864", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9864"},
+        {"value": "ОЗИГФ-71-25", "name": "gr9842", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9842"},
+        {"value": "ОЗИГФ-71-24", "name": "gr9145", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9145"},
+        {"value": "ОЗИГФ-11-23 (ИР)", "name": "gr8413", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8413"},
+        {"value": "ОЗИГФ-41-23", "name": "gr8365", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8365"},
+        {"value": "ОЗИГФ-51-23", "name": "gr8366", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8366"},
+        {"value": "ОЗИГФ-71-23", "name": "gr8414", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8414"},
+        {"value": "ОЗИГФ-11-22", "name": "gr7896", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7896"},
+        {"value": "ОЗИГФ-42-22", "name": "gr7815", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7815"},
+        {"value": "ОЗИГФ-71-22", "name": "gr7573", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7573"},
+        {"value": "ОЗИГФ-11-21 (ИР)", "name": "gr7136", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7136"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗИГФМ-01-25", "name": "gr9894", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9894"},
+        {"value": "ОЗИГФМ-02-25 (ДИС)", "name": "gr9917", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9917"},
+        {"value": "ОЗИГФМ-02-23 (НКАИ)", "name": "gr8420", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8420"}
+      ]
+    }
+  },
+  "Факультет Машиностроительный": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "МС-11-25", "name": "gr9319", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9319"},
+        {"value": "МС-11-25-ин", "name": "gr9919", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9919"},
+        {"value": "МС-33-25", "name": "gr9416", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9416"},
+        {"value": "МС-11-24", "name": "gr8978", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8978"},
+        {"value": "МС-33-24", "name": "gr8982", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8982"},
+        {"value": "МС-11-23", "name": "gr8069", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8069"},
+        {"value": "МС-11-23-ин", "name": "gr8259", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8259"},
+        {"value": "МС-11-22", "name": "gr7336", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7336"},
+        {"value": "МС-11-22-ин", "name": "gr7736", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7736"},
+        {"value": "МС-21-22", "name": "gr7337", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7337"}
+      ],
+      "Магистратура": [
+        {"value": "ММС-11-25", "name": "gr9424", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9424"},
+        {"value": "ММС-12-25", "name": "gr9426", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9426"},
+        {"value": "ММС-14-25", "name": "gr9431", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9431"},
+        {"value": "ММС-11-24", "name": "gr8986", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8986"},
+        {"value": "ММС-12-24", "name": "gr8983", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8983"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗМС-11-25", "name": "gr9832", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9832"},
+        {"value": "ОЗМС-11-24", "name": "gr9210", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9210"},
+        {"value": "ОЗМС-11-23", "name": "gr8262", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8262"},
+        {"value": "ОЗМС-11-22", "name": "gr7850", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7850"},
+        {"value": "ОЗМС-23-22", "name": "gr7852", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7852"},
+        {"value": "ОЗМС-33-22", "name": "gr7854", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7854"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗММС-12-25", "name": "gr9895", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9895"},
+        {"value": "ОЗММС-14-25", "name": "gr9948", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9948"},
+        {"value": "ОЗММС-12-24", "name": "gr8985", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8985"}
+      ]
+    }
+  },
+  "Факультет Прикладной математики, физики и информационных технологий": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "ФМ-10-25", "name": "gr9495", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9495"},
+        {"value": "ФМ-11-25", "name": "gr9496", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9496"},
+        {"value": "ФМ-12-25", "name": "gr9498", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9498"},
+        {"value": "ФМ-12-25 ин", "name": "gr9500", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9500"},
+        {"value": "ФМ-14-25", "name": "gr9499", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9499"},
+        {"value": "ФМ-21-25", "name": "gr9501", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9501"},
+        {"value": "ФМ-21-25 ин", "name": "gr9586", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9586"},
+        {"value": "ФМ-10-24", "name": "gr9054", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9054"},
+        {"value": "ФМ-10-24ин", "name": "gr9065", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9065"},
+        {"value": "ФМ-11-24", "name": "gr9055", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9055"},
+        {"value": "ФМ-12-24", "name": "gr9056", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9056"},
+        {"value": "ФМ-12-24ин", "name": "gr9067", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9067"},
+        {"value": "ФМ-14-24", "name": "gr9057", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9057"},
+        {"value": "ФМ-21-24", "name": "gr9058", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9058"},
+        {"value": "ФМ-21-24ин", "name": "gr9068", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9068"},
+        {"value": "ФМ-10-23", "name": "gr8393", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8393"},
+        {"value": "ФМ-10-23ин", "name": "gr8392", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8392"},
+        {"value": "ФМ-11-23", "name": "gr8391", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8391"},
+        {"value": "ФМ-12-23", "name": "gr8394", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8394"},
+        {"value": "ФМ-12-23ин", "name": "gr8395", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8395"},
+        {"value": "ФМ-14-23", "name": "gr8396", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8396"},
+        {"value": "ФМ-21-23", "name": "gr8397", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8397"},
+        {"value": "ФМ-21-23ин", "name": "gr8398", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8398"},
+        {"value": "ФМ-11-22", "name": "gr7618", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7618"},
+        {"value": "ФМ-11-22ин", "name": "gr7623", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7623"},
+        {"value": "ФМ-12-22", "name": "gr7619", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7619"},
+        {"value": "ФМ-12-22ин", "name": "gr7624", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7624"},
+        {"value": "ФМ-21-22", "name": "gr7620", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7620"},
+        {"value": "ФМ-21-22ин", "name": "gr7642", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7642"}
+      ],
+      "Магистратура": [
+        {"value": "ФММ-01-25_1", "name": "gr9587", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9587"},
+        {"value": "ФММ-01-25_2", "name": "gr9588", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9588"},
+        {"value": "ФММ-01-24_1", "name": "gr9059", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9059"},
+        {"value": "ФММ-01-24_2", "name": "gr9060", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9060"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗФМ-10-25", "name": "gr9879", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9879"},
+        {"value": "ОЗФМ-12-25", "name": "gr9875", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9875"},
+        {"value": "ОЗФМ-21-25", "name": "gr9878", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9878"},
+        {"value": "ОЗФМ-11-24", "name": "gr9158", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9158"},
+        {"value": "ОЗФМ-12-24", "name": "gr9159", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9159"},
+        {"value": "ОЗФМ-10-23", "name": "gr8456", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8456"},
+        {"value": "ОЗФМ-12-23", "name": "gr8457", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8457"},
+        {"value": "ОЗФМ-11-22", "name": "gr7625", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7625"},
+        {"value": "ОЗФМ-12-22", "name": "gr7814", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7814"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗФММ-01-25_1", "name": "gr9881", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9881"},
+        {"value": "ОЗФММ-01-24_1", "name": "gr9160", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9160"}
+      ]
+    }
+  },
+  "Факультет Радиоэлектроники и автоматики": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "РЭА-11-25", "name": "gr9421", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9421"},
+        {"value": "РЭА-41-25", "name": "gr9422", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9422"},
+        {"value": "РЭА-42-25", "name": "gr9425", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9425"},
+        {"value": "РЭА-11-24", "name": "gr8706", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8706"},
+        {"value": "РЭА-41-24", "name": "gr8744", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8744"},
+        {"value": "РЭА-42-24", "name": "gr8745", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8745"},
+        {"value": "РЭА-11-23", "name": "gr8154", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8154"},
+        {"value": "РЭА-41-23", "name": "gr8152", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8152"},
+        {"value": "РЭА-42-23", "name": "gr8153", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8153"},
+        {"value": "РЭА-11-22", "name": "gr7383", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7383"},
+        {"value": "РЭА-31-22", "name": "gr7384", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7384"},
+        {"value": "РЭА-41-22", "name": "gr7385", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7385"},
+        {"value": "РЭА-42-22", "name": "gr7386", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7386"}
+      ],
+      "Специалитет": [
+        {"value": "РЭА-51-25", "name": "gr9432", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9432"},
+        {"value": "РЭА-51-24", "name": "gr8707", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8707"},
+        {"value": "РЭА-51-23", "name": "gr8158", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8158"},
+        {"value": "РЭА-51-20", "name": "gr6223", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6223"}
+      ],
+      "Магистратура": [
+        {"value": "РМГ-01-25/1101", "name": "gr9437", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9437"},
+        {"value": "РМГ-01-25/1104", "name": "gr9438", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9438"},
+        {"value": "РМГ-01-25/2704", "name": "gr9439", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9439"},
+        {"value": "РМГ-01-24/1101", "name": "gr8708", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8708"},
+        {"value": "РМГ-01-24/1104", "name": "gr8709", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8709"},
+        {"value": "РМГ-01-24/2704", "name": "gr8710", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8710"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗ РЭА-11-25", "name": "gr9829", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9829"},
+        {"value": "ОЗ РЭА-41-25", "name": "gr9937", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9937"},
+        {"value": "ОЗ РЭА-11-22", "name": "gr7392", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7392"},
+        {"value": "ОЗ РЭА-31-22", "name": "gr7393", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7393"},
+        {"value": "ОЗ РЭА-42-22", "name": "gr7394", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7394"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗ РМГ-01-24/2704", "name": "gr9137", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9137"}
+      ]
+    }
+  },
+  "Факультет Русской и чувашской филологии и журналистики": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "ПР-21-25", "name": "gr9358", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9358"},
+        {"value": "ФЖ-21-25", "name": "gr9458", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9458"},
+        {"value": "ФЖ-22-25", "name": "gr9460", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9460"},
+        {"value": "ФР-11-25", "name": "gr9356", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9356"},
+        {"value": "ФР-11-25-Ин", "name": "gr9940", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9940"},
+        {"value": "ФЧ-31-25", "name": "gr9419", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9419"},
+        {"value": "ПР-21-24", "name": "gr8872", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8872"},
+        {"value": "ФЖ-21-24", "name": "gr8795", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8795"},
+        {"value": "ФЖ-22-24", "name": "gr8796", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8796"},
+        {"value": "ФР-11-24", "name": "gr8869", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8869"},
+        {"value": "ФЧ-31-24", "name": "gr8870", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8870"},
+        {"value": "ПР-21-23", "name": "gr7980", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7980"},
+        {"value": "ФЖ-21-23", "name": "gr7979", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7979"},
+        {"value": "ФЖ-22-23", "name": "gr7986", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7986"},
+        {"value": "ФР-11-23", "name": "gr7977", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7977"},
+        {"value": "ФЧ-31-23", "name": "gr7978", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7978"},
+        {"value": "ПР-21-22", "name": "gr7613", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7613"},
+        {"value": "ПР-22-22", "name": "gr7614", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7614"},
+        {"value": "ФЖ-21-22", "name": "gr7637", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7637"},
+        {"value": "ФЖ-22-22", "name": "gr7638", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7638"},
+        {"value": "ФР-11-22", "name": "gr7611", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7611"},
+        {"value": "ФР-11-22-Ин", "name": "gr7767", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7767"},
+        {"value": "ФЧ-31-22", "name": "gr7616", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7616"},
+        {"value": "ПР-21-21", "name": "gr6888", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6888"},
+        {"value": "ПР-22-21", "name": "gr6889", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6889"}
+      ],
+      "Магистратура": [
+        {"value": "ФРМ-11-25", "name": "gr9362", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9362"},
+        {"value": "ФЖМ-31-24", "name": "gr8819", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8819"},
+        {"value": "ФРМ-01-24", "name": "gr8877", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8877"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗПР-21-25", "name": "gr9359", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9359"},
+        {"value": "ОЗФЖ-23-25", "name": "gr9461", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9461"},
+        {"value": "ОЗФЖ-24-25", "name": "gr9462", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9462"},
+        {"value": "ОЗФР-11-25", "name": "gr9357", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9357"},
+        {"value": "ОЗФЖ-23-24", "name": "gr8798", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8798"},
+        {"value": "ОЗФЖ-24-24", "name": "gr8797", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8797"},
+        {"value": "ОЗФР-11-24", "name": "gr8873", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8873"},
+        {"value": "ОЗПР-21-23", "name": "gr7983", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7983"},
+        {"value": "ОЗФЖ-23-23", "name": "gr7987", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7987"},
+        {"value": "ОЗФЖ-24-23", "name": "gr7988", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7988"},
+        {"value": "ОЗФР-11-23", "name": "gr7982", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7982"},
+        {"value": "ОЗФЖ-23-22", "name": "gr7639", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7639"},
+        {"value": "ОЗФЖ-24-22", "name": "gr7640", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7640"},
+        {"value": "ОЗФР-11-22", "name": "gr7612", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7612"},
+        {"value": "ОЗФЧ-31-22", "name": "gr7617", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7617"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗФЖМ-33-25", "name": "gr9464", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9464"},
+        {"value": "ОЗФРМ-11-25", "name": "gr9363", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9363"},
+        {"value": "ОЗФЖМ-33-24", "name": "gr8820", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8820"}
+      ]
+    }
+  },
+  "Факультет Строительный": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "С-11-25", "name": "gr9704", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9704"},
+        {"value": "С-11-25ин", "name": "gr9887", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9887"},
+        {"value": "С-21-25", "name": "gr9705", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9705"},
+        {"value": "С-31-25", "name": "gr9706", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9706"},
+        {"value": "С-51-25", "name": "gr9707", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9707"},
+        {"value": "С-61-25", "name": "gr9708", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9708"},
+        {"value": "C-11-24", "name": "gr8988", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8988"},
+        {"value": "C-21-24", "name": "gr8989", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8989"},
+        {"value": "C-31-24", "name": "gr8990", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8990"},
+        {"value": "C-51-24", "name": "gr8991", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8991"},
+        {"value": "С-11-24ин", "name": "gr9189", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9189"},
+        {"value": "С-31-24ин", "name": "gr9232", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9232"},
+        {"value": "С-61-24", "name": "gr8995", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8995"},
+        {"value": "С-11-23", "name": "gr8200", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8200"},
+        {"value": "С-11-23ин", "name": "gr8201", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8201"},
+        {"value": "С-21-23", "name": "gr8202", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8202"},
+        {"value": "С-21-23ин", "name": "gr8212", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8212"},
+        {"value": "С-31-23", "name": "gr8203", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8203"},
+        {"value": "С-61-23", "name": "gr8206", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8206"},
+        {"value": "С-11-22", "name": "gr7534", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7534"},
+        {"value": "С-21-22", "name": "gr7535", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7535"},
+        {"value": "С-21-22ин", "name": "gr7838", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7838"},
+        {"value": "С-31-22", "name": "gr7536", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7536"},
+        {"value": "С-61-22", "name": "gr7537", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7537"}
+      ],
+      "Специалитет": [
+        {"value": "С-41-20", "name": "gr6154", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6154"}
+      ],
+      "Магистратура": [
+        {"value": "СМ-01-25", "name": "gr9709", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9709"},
+        {"value": "СМ-02-25", "name": "gr9711", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9711"},
+        {"value": "СМ-01-24", "name": "gr8992", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8992"},
+        {"value": "СМ-02-24", "name": "gr8993", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8993"},
+        {"value": "СМ-02-24ин", "name": "gr9231", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9231"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗС-11-25 (ПГС 4,6 года)", "name": "gr9715", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9715"},
+        {"value": "ОЗС-21-25 (ПЗ 4,6 года)", "name": "gr9720", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9720"},
+        {"value": "ОЗС-21-25 (ТГВ 4,6 года)", "name": "gr9718", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9718"},
+        {"value": "ОЗС-22-25 (ПЗ 3 года)", "name": "gr9721", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9721"},
+        {"value": "ОЗС-22-25 (ТГВ 3 года)", "name": "gr9719", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9719"},
+        {"value": "ОЗС-31-25 (ПГС 3 года)", "name": "gr9716", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9716"},
+        {"value": "ОЗС-41-25 (ПГС 3 года)", "name": "gr9717", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9717"},
+        {"value": "ОЗС-61-25", "name": "gr9713", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9713"},
+        {"value": "ОЗС-11-24 (ПГС 4,6 года)", "name": "gr8997", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8997"},
+        {"value": "ОЗС-21-24 (ПЗ 4,6 года)", "name": "gr9000", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9000"},
+        {"value": "ОЗС-21-24 (ТГВ 4,6 года)", "name": "gr9001", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9001"},
+        {"value": "ОЗС-22-24 (ПЗ 3 года)", "name": "gr9002", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9002"},
+        {"value": "ОЗС-22-24 (ТГВ 3 года)", "name": "gr9003", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9003"},
+        {"value": "ОЗС-31-24 (ПГС 3 года)", "name": "gr9004", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9004"},
+        {"value": "ОЗС-41-24 (ПГС 3 года)", "name": "gr9005", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9005"},
+        {"value": "ОЗС-61-24", "name": "gr8994", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8994"},
+        {"value": "ОЗС-11-23 (ПГС 4,6 года)", "name": "gr8230", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8230"},
+        {"value": "ОЗС-21-23 (ТГВ 4,6 года)", "name": "gr8231", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8231"},
+        {"value": "ОЗС-22-23 (ПЗ 3 года)", "name": "gr8235", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8235"},
+        {"value": "ОЗС-22-23 (ТГВ 3 года)", "name": "gr8234", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8234"},
+        {"value": "ОЗС-31-23 (ПГС 3 года)", "name": "gr8233", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8233"},
+        {"value": "ОЗС-41-23 ( ПГС 3 года)", "name": "gr8421", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8421"},
+        {"value": "ОЗС-61-23", "name": "gr8207", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8207"},
+        {"value": "ОЗС-11-22 (4,6 ПГС)", "name": "gr7662", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7662"},
+        {"value": "ОЗС-21-22 (4,6 ТГВ)", "name": "gr7894", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7894"},
+        {"value": "ОЗС-41-22(3,6-ПГС)", "name": "gr7666", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7666"},
+        {"value": "ОЗС-61-22", "name": "gr7538", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7538"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗСМ-01-25", "name": "gr9867", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9867"},
+        {"value": "ОЗСМ-02-25", "name": "gr9959", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9959"},
+        {"value": "ОЗСМ-01-24у", "name": "gr9791", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9791"},
+        {"value": "ОЗСМ-02-24", "name": "gr9194", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9194"},
+        {"value": "ОЗСМ-02-24у", "name": "gr9794", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9794"},
+        {"value": "ОЗСМ-02-23", "name": "gr8211", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8211"}
+      ]
+    }
+  },
+  "Факультет Управления и социальных технологий": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "УП-16-25", "name": "gr9607", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9607"},
+        {"value": "УП-16-25 (У)", "name": "gr9979", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9979"},
+        {"value": "УП-16-25 ин", "name": "gr9980", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9980"},
+        {"value": "УП-17-25 ин", "name": "gr9981", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9981"},
+        {"value": "УП-31-25", "name": "gr9602", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9602"},
+        {"value": "УП-41-25", "name": "gr9600", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9600"},
+        {"value": "УП-41-25 ин", "name": "gr9882", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9882"},
+        {"value": "УП-51-25", "name": "gr9605", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9605"},
+        {"value": "УП-51-25 ин", "name": "gr9606", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9606"},
+        {"value": "УП-16-24", "name": "gr8948", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8948"},
+        {"value": "УП-31-24", "name": "gr8946", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8946"},
+        {"value": "УП-41-24", "name": "gr8945", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8945"},
+        {"value": "УП-51-24", "name": "gr8947", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8947"},
+        {"value": "УП-51-24 ин", "name": "gr9168", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9168"},
+        {"value": "УП-16-23", "name": "gr8140", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8140"},
+        {"value": "УП-31-23", "name": "gr8142", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8142"},
+        {"value": "УП-41-23", "name": "gr8143", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8143"},
+        {"value": "УП-51-23", "name": "gr8144", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8144"},
+        {"value": "УП-51-23 ин", "name": "gr8411", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8411"},
+        {"value": "УП-16-22", "name": "gr7435", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7435"},
+        {"value": "УП-31-22", "name": "gr7438", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7438"},
+        {"value": "УП-41-22", "name": "gr7437", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7437"},
+        {"value": "УП-51-22", "name": "gr7439", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7439"},
+        {"value": "УП-16-21", "name": "gr6896", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6896"},
+        {"value": "УП-31-21", "name": "gr6895", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6895"},
+        {"value": "УП-51-21", "name": "gr6894", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6894"}
+      ],
+      "Специалитет": [
+        {"value": "УП-21-25", "name": "gr9610", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9610"},
+        {"value": "УП-22-25", "name": "gr9861", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9861"},
+        {"value": "УП-21-24", "name": "gr8950", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8950"},
+        {"value": "УП-21-23", "name": "gr8141", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8141"},
+        {"value": "УП-21-23 ин", "name": "gr8401", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8401"},
+        {"value": "УП-22-23 (У)", "name": "gr8569", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8569"},
+        {"value": "УП-21-22", "name": "gr7436", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7436"},
+        {"value": "УП-21-21", "name": "gr6897", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6897"},
+        {"value": "УП-21-21 ин", "name": "gr7071", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7071"},
+        {"value": "УП-22-21 (У)", "name": "gr7259", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7259"},
+        {"value": "УП-21-20", "name": "gr6118", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6118"},
+        {"value": "УП-21-20 ин", "name": "gr8494", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8494"},
+        {"value": "УП-22-20 (У)", "name": "gr6709", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6709"}
+      ],
+      "Магистратура": [
+        {"value": "МУП-01-25", "name": "gr9616", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9616"},
+        {"value": "МУП-03-25", "name": "gr9612", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9612"},
+        {"value": "МУП-03-25 ин", "name": "gr9897", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9897"},
+        {"value": "МУП-04-25", "name": "gr9611", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9611"},
+        {"value": "МУП-05-25", "name": "gr9804", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9804"},
+        {"value": "МУП-07-25 ин", "name": "gr9953", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9953"},
+        {"value": "МУП-01-24", "name": "gr8953", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8953"},
+        {"value": "МУП-03-24", "name": "gr8952", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8952"},
+        {"value": "МУП-04-24", "name": "gr8951", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8951"},
+        {"value": "МУП-01-23", "name": "gr8146", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8146"},
+        {"value": "МУП-03-23", "name": "gr8147", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8147"},
+        {"value": "МУП-04-23", "name": "gr8145", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8145"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗУП-16-25", "name": "gr9609", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9609"},
+        {"value": "ОЗУП-17-25", "name": "gr9961", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9961"},
+        {"value": "ОЗУП-31-25", "name": "gr9603", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9603"},
+        {"value": "ОЗУП-41-25", "name": "gr9601", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9601"},
+        {"value": "ОЗУП-16-24", "name": "gr8949", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8949"},
+        {"value": "ОЗУП-41-24", "name": "gr9240", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9240"},
+        {"value": "ОЗУП-16-23", "name": "gr8148", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8148"},
+        {"value": "ОЗУП-41-23", "name": "gr8150", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8150"},
+        {"value": "ОЗУП-51-23", "name": "gr9968", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9968"},
+        {"value": "ОЗУП-16-22", "name": "gr7442", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7442"},
+        {"value": "ОЗУП-31-22", "name": "gr7864", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7864"},
+        {"value": "ОЗУП-41-22", "name": "gr7865", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7865"},
+        {"value": "ОЗУП-51-22", "name": "gr7588", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7588"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗМУП-01-25", "name": "gr9908", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9908"},
+        {"value": "ОЗМУП-03-25", "name": "gr9614", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9614"},
+        {"value": "ОЗМУП-04-25", "name": "gr9898", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9898"},
+        {"value": "ОЗМУП-05-25", "name": "gr9954", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9954"},
+        {"value": "ОЗМУП-07-25", "name": "gr9619", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9619"},
+        {"value": "ОЗМУП-03-24", "name": "gr9270", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9270"},
+        {"value": "ОЗМУП-07-24", "name": "gr9132", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9132"}
+      ]
+    }
+  },
+  "Факультет Химико-фармацевтический": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "Х-11-25 (АХиХЭ)", "name": "gr9333", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9333"},
+        {"value": "Х-12-25 (ОиБХ)", "name": "gr9334", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9334"},
+        {"value": "Х-12-25 (ХВС)", "name": "gr9335", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9335"},
+        {"value": "Х-21-25 (ЭИ)", "name": "gr9338", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9338"},
+        {"value": "Х-31-25 (ХТПиК)", "name": "gr9337", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9337"},
+        {"value": "Х-31-25 (ХТСОНиНП)", "name": "gr9336", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9336"},
+        {"value": "Х-11-24 (АХиХЭ)", "name": "gr8762", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8762"},
+        {"value": "Х-12-24 (ОиБХ)", "name": "gr8765", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8765"},
+        {"value": "Х-12-24 (ХВС)", "name": "gr8767", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8767"},
+        {"value": "Х-21-24 (ЭИ)", "name": "gr8777", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8777"},
+        {"value": "Х-31-24 (ХТПиК)", "name": "gr8775", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8775"},
+        {"value": "Х-31-24 (ХТСОНиНП)", "name": "gr8774", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8774"},
+        {"value": "Х-11-23 (АХиХЭ)", "name": "gr8103", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8103"},
+        {"value": "Х-12-23 (ОиБХ)", "name": "gr8104", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8104"},
+        {"value": "Х-12-23 (ХВС)", "name": "gr8105", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8105"},
+        {"value": "Х-21-23 (ЭИ)", "name": "gr8108", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8108"},
+        {"value": "Х-31-23 (ХТПиК)", "name": "gr8107", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8107"},
+        {"value": "Х-31-23 (ХТСОНиНП)", "name": "gr8106", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8106"},
+        {"value": "Х-11-22 (АХ)", "name": "gr7398", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7398"},
+        {"value": "Х-11-22(ОиБХ)", "name": "gr7399", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7399"},
+        {"value": "Х-12-22(ХВС)", "name": "gr7400", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7400"},
+        {"value": "Х-21-22 (ЭИ)", "name": "gr7403", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7403"},
+        {"value": "Х-31-22(ХТПК)", "name": "gr7402", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7402"},
+        {"value": "Х-31-22(ХТСОННП)", "name": "gr7401", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7401"}
+      ],
+      "Прикладной бакалавриат": [
+        {"value": "Х-31-20(ТиПП)", "name": "gr6192", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6192"}
+      ],
+      "Специалитет": [
+        {"value": "Х-41-25 (ОиВФД)", "name": "gr9339", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9339"},
+        {"value": "Х-41-25 ин (ОиВФД)", "name": "gr9340", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9340"},
+        {"value": "Х-41-25 ус (ОиВФД)", "name": "gr9965", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9965"},
+        {"value": "Х-44-25 ан (ОиВФД)", "name": "gr9341", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9341"},
+        {"value": "Х-45-25ан", "name": "gr9952", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9952"},
+        {"value": "Х-51-25 (МХиФА)", "name": "gr9423", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9423"},
+        {"value": "Х-41-24 (ОиВФД)", "name": "gr8779", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8779"},
+        {"value": "Х-41-24 ин (ОиВФД)", "name": "gr8781", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8781"},
+        {"value": "Х-44-24 ан (ОиВФД)", "name": "gr8782", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8782"},
+        {"value": "Х-45-24 ан (ОиВФД)", "name": "gr9286", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9286"},
+        {"value": "Х-41-23 (ОиВФД)", "name": "gr8110", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8110"},
+        {"value": "Х-41-23ин", "name": "gr8111", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8111"},
+        {"value": "Х-44-23ан", "name": "gr8112", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8112"},
+        {"value": "Х-45-23ан", "name": "gr8596", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8596"},
+        {"value": "Х-51-23 (МХиФА)", "name": "gr8109", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8109"},
+        {"value": "Х-41-22 (ОиВФД)", "name": "gr7404", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7404"},
+        {"value": "Х-44-22 ан", "name": "gr7406", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7406"},
+        {"value": "Х-41-21 (ОиВФД)", "name": "gr6902", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6902"},
+        {"value": "Х-42-21 (ОиВФД)", "name": "gr6903", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6903"},
+        {"value": "Х-44-21 (АН)", "name": "gr6904", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6904"},
+        {"value": "Х-42-19 (ОиВФД)", "name": "gr5643", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/5643"}
+      ],
+      "Магистратура": [
+        {"value": "ХМ-01-25 (ОХ)", "name": "gr9342", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9342"},
+        {"value": "ХМ-01-25 (ХиФП)", "name": "gr9343", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9343"},
+        {"value": "ХМ-01-25 (ХЭПиТС)", "name": "gr9344", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9344"},
+        {"value": "ХМ-01-24 (ОХ)", "name": "gr8783", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8783"},
+        {"value": "ХМ-01-24 (ХиФП)", "name": "gr8784", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8784"},
+        {"value": "ХМ-01-24 (ХЭПиТС)", "name": "gr8785", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8785"},
+        {"value": "ХМ-02-24 (ПХТ)", "name": "gr8788", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8788"}
+      ],
+      "СПО": [
+        {"value": "ХФ-01-25", "name": "gr9346", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9346"},
+        {"value": "ХФ-02-25", "name": "gr9727", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9727"},
+        {"value": "ХФ-01-24", "name": "gr8790", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8790"},
+        {"value": "ХФ-02-24", "name": "gr8791", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8791"},
+        {"value": "ХФ-01-23", "name": "gr8120", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8120"},
+        {"value": "ХФ-02-23", "name": "gr8121", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8121"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗХ-11-25 (АХиХЭ)", "name": "gr9869", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9869"},
+        {"value": "ОЗХ-12-25 (ОиБХ)", "name": "gr9870", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9870"},
+        {"value": "ОЗХ-12-25 (ХВС)", "name": "gr9871", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9871"},
+        {"value": "ОЗХ-11-24 (АХиХЭ)", "name": "gr9302", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9302"},
+        {"value": "ОЗХ-11-23 (АХиХЭ)", "name": "gr8440", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8440"},
+        {"value": "ОЗХ-31-22 (ХТСОННХП)", "name": "gr7417", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7417"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗХМ-01-25 (ОХ)", "name": "gr9911", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9911"},
+        {"value": "ОЗХМ-01-25 (ХЭПиТС)", "name": "gr9912", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9912"},
+        {"value": "ОЗХМ-02-25 (ПХТ)", "name": "gr9889", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9889"},
+        {"value": "ОЗХМ-01-24 (ОХ)", "name": "gr8787", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8787"},
+        {"value": "ОЗХМ-01-24 (ХЭПиТС)", "name": "gr8786", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8786"},
+        {"value": "ОЗХМ-02-24 (ПХТ)", "name": "gr8789", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8789"}
+      ]
+    }
+  },
+  "Факультет Энергетики и электротехники": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "ЭТ-41-25", "name": "gr9730", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9730"},
+        {"value": "ЭТ-41-25ин", "name": "gr9975", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9975"},
+        {"value": "ЭТ-51-25", "name": "gr9731", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9731"},
+        {"value": "ЭЭ-11-25", "name": "gr9729", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9729"},
+        {"value": "ЭЭ-31-25", "name": "gr9745", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9745"},
+        {"value": "ЭЭ-41-25", "name": "gr9746", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9746"},
+        {"value": "ЭТ-41-24", "name": "gr9007", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9007"},
+        {"value": "ЭТ-52-24", "name": "gr9008", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9008"},
+        {"value": "ЭЭ-11-24", "name": "gr9009", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9009"},
+        {"value": "ЭЭ-31-24", "name": "gr9006", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9006"},
+        {"value": "ЭЭ-41-24", "name": "gr9010", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9010"},
+        {"value": "ЭЭ-41-24ин", "name": "gr9148", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9148"},
+        {"value": "ЭТ-51-23 (ЭиА)", "name": "gr8478", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8478"},
+        {"value": "ЭЭ-11-23", "name": "gr8416", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8416"},
+        {"value": "ЭЭ-31-23", "name": "gr8417", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8417"},
+        {"value": "ЭЭ-41-23", "name": "gr8419", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8419"},
+        {"value": "ЭТ-21-22", "name": "gr7681", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7681"},
+        {"value": "ЭТ-51-22 (ЭиА)", "name": "gr7682", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7682"},
+        {"value": "ЭТ-51-22 (ЭХиСПОиУ)", "name": "gr7844", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7844"},
+        {"value": "ЭТ-52-22", "name": "gr7685", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7685"},
+        {"value": "ЭЭ-11-22", "name": "gr7687", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7687"},
+        {"value": "ЭЭ-21-22", "name": "gr7688", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7688"},
+        {"value": "ЭЭ-22-22", "name": "gr7689", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7689"},
+        {"value": "ЭЭ-31-22", "name": "gr7690", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7690"},
+        {"value": "ЭЭ-31-22ин", "name": "gr7705", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7705"},
+        {"value": "ЭЭ-41-22", "name": "gr7691", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7691"},
+        {"value": "ЭЭ-41-22ин", "name": "gr7719", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7719"}
+      ],
+      "Магистратура": [
+        {"value": "МЭЭТ-01-25 (АЭМКиС)", "name": "gr9732", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9732"},
+        {"value": "МЭЭТ-01-25 (ОТЭМПЭ)", "name": "gr9733", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9733"},
+        {"value": "МЭЭТ-01-25 (УЭРЭТУЭКиС)", "name": "gr9734", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9734"},
+        {"value": "МЭЭТ-01-25 (ЭАУиРЭ)", "name": "gr9735", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9735"},
+        {"value": "МЭЭТ-02-25 (АЭ)", "name": "gr9736", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9736"},
+        {"value": "МЭЭТ-02-25 (ИСЭ)", "name": "gr9748", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9748"},
+        {"value": "МЭЭТ-02-25 (ЦЭСиС)", "name": "gr9737", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9737"},
+        {"value": "МЭЭТ-03-25", "name": "gr9738", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9738"},
+        {"value": "МЭЭТ-04-25", "name": "gr9747", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9747"},
+        {"value": "МЭЭТ-01-24 (АЭМКиС)", "name": "gr9015", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9015"},
+        {"value": "МЭЭТ-01-24 (ОТЭМПЭ)", "name": "gr9013", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9013"},
+        {"value": "МЭЭТ-01-24 (УЭРЭТУЭКиС)", "name": "gr9016", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9016"},
+        {"value": "МЭЭТ-01-24 (ЭАУиРЭ)", "name": "gr9014", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9014"},
+        {"value": "МЭЭТ-02-24 (АЭ)", "name": "gr9011", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9011"},
+        {"value": "МЭЭТ-02-24 (ЦЭСиС)", "name": "gr9012", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9012"},
+        {"value": "МЭЭТ-03-24", "name": "gr9017", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9017"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗЭТ-41-25", "name": "gr9913", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9913"},
+        {"value": "ОЗЭЭ-31-25", "name": "gr9859", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9859"},
+        {"value": "ОЗЭТ-51-23 (ЭиА)", "name": "gr8518", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8518"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗМЭЭТ-04-25", "name": "gr9906", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9906"},
+        {"value": "ОЗМЭЭТ-01-24 (УЭРЭТУЭКиС)", "name": "gr9155", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9155"},
+        {"value": "ОЗМЭЭТ-02-24 (ЦЭСиС)", "name": "gr9156", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9156"},
+        {"value": "ОЗМЭЭТ-04-24 (МвЭиЭ)", "name": "gr9053", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9053"}
+      ]
+    }
+  },
+  "Факультет Юридический": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "ЮФ-11-25", "name": "gr9480", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9480"},
+        {"value": "ЮФ-11-25ин", "name": "gr9896", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9896"},
+        {"value": "ЮФ-11-25ус", "name": "gr9850", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9850"},
+        {"value": "ЮФ-12-25", "name": "gr9481", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9481"},
+        {"value": "ЮФ-13-25", "name": "gr9482", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9482"},
+        {"value": "ЮФ-11-24", "name": "gr8844", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8844"},
+        {"value": "ЮФ-12-24", "name": "gr8845", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8845"},
+        {"value": "ЮФ-13-24", "name": "gr8846", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8846"},
+        {"value": "ЮФ-14-24ус", "name": "gr9161", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9161"},
+        {"value": "ЮФ-11-23", "name": "gr8213", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8213"},
+        {"value": "ЮФ-11-23ин", "name": "gr8480", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8480"},
+        {"value": "ЮФ-12-23", "name": "gr8214", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8214"},
+        {"value": "ЮФ-12-23ус", "name": "gr8537", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8537"},
+        {"value": "ЮФ-13-23", "name": "gr8215", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8215"},
+        {"value": "ЮФ-13-23ус", "name": "gr8538", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8538"},
+        {"value": "ЮФ-14-23", "name": "gr8445", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8445"},
+        {"value": "ЮФ-11-22", "name": "gr7678", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7678"},
+        {"value": "ЮФ-11-22ин", "name": "gr7701", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7701"},
+        {"value": "ЮФ-12-22", "name": "gr7679", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7679"},
+        {"value": "ЮФ-13-22", "name": "gr7680", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7680"}
+      ],
+      "Специалитет": [
+        {"value": "ЮФ-71-25", "name": "gr9487", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9487"},
+        {"value": "ЮФ-71-25ус", "name": "gr9928", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9928"},
+        {"value": "ЮФ-71-25ус(3г.)", "name": "gr9854", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9854"},
+        {"value": "ЮФ-72-25", "name": "gr9488", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9488"},
+        {"value": "ЮФ-73-25", "name": "gr9595", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9595"},
+        {"value": "ЮФ-71-24", "name": "gr8851", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8851"},
+        {"value": "ЮФ-71-24ус", "name": "gr9164", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9164"},
+        {"value": "ЮФ-72-24", "name": "gr8852", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8852"},
+        {"value": "ЮФ-72-24ус", "name": "gr9163", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9163"},
+        {"value": "ЮФ-71-23", "name": "gr8216", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8216"},
+        {"value": "ЮФ-72-23", "name": "gr8217", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8217"},
+        {"value": "ЮФ-72-23ус", "name": "gr8539", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8539"},
+        {"value": "ЮФ-71-22", "name": "gr7686", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7686"},
+        {"value": "ЮФ-72-22", "name": "gr7693", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7693"},
+        {"value": "ЮФ-71-21", "name": "gr6909", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6909"},
+        {"value": "ЮФ-72-21", "name": "gr6910", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6910"}
+      ],
+      "Магистратура": [
+        {"value": "ЮФ-01-25", "name": "gr9491", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9491"},
+        {"value": "ЮФ-02-25(ВШЭ)", "name": "gr9494", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9494"},
+        {"value": "ЮФ-01-24", "name": "gr8855", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8855"},
+        {"value": "ЮФ-02-24(ВШЭ)", "name": "gr8856", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8856"}
+      ],
+      "СПО": [
+        {"value": "Ю-11-25", "name": "gr9332", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9332"},
+        {"value": "Ю-91-25", "name": "gr9328", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9328"},
+        {"value": "Ю-92-25", "name": "gr9329", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9329"},
+        {"value": "Ю-93-25", "name": "gr9330", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9330"},
+        {"value": "Ю-94-25", "name": "gr9331", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9331"},
+        {"value": "СЮР-091-24", "name": "gr8806", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8806"},
+        {"value": "СЮР-092-24", "name": "gr8807", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8807"},
+        {"value": "СЮР-093-24", "name": "gr8808", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8808"},
+        {"value": "СЮР-094-24", "name": "gr8809", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8809"},
+        {"value": "СЮР-11-24", "name": "gr8810", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8810"},
+        {"value": "СЮР-091-23", "name": "gr8812", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8812"},
+        {"value": "СЮР-092-23", "name": "gr8813", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8813"},
+        {"value": "СЮР-093-23", "name": "gr8814", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8814"},
+        {"value": "СЮР-094-23", "name": "gr8815", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8815"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗЮФ-11-25", "name": "gr9484", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9484"},
+        {"value": "ОЗЮФ-11-25ус", "name": "gr9944", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9944"},
+        {"value": "ОЗЮФ-12-25", "name": "gr9485", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9485"},
+        {"value": "ОЗЮФ-12-25ус", "name": "gr9852", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9852"},
+        {"value": "ОЗЮФ-13-25", "name": "gr9486", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9486"},
+        {"value": "ОЗЮФ-13-25ус(2г.)", "name": "gr9931", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9931"},
+        {"value": "ОЗЮФ-21-25д", "name": "gr9849", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9849"},
+        {"value": "ОЗЮФ-22-25дУС", "name": "gr9903", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9903"},
+        {"value": "ОЗЮФ-11-24", "name": "gr8848", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8848"},
+        {"value": "ОЗЮФ-12-24", "name": "gr8849", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8849"},
+        {"value": "ОЗЮФ-13-24", "name": "gr8850", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8850"},
+        {"value": "ОЗЮФ-14-24ус", "name": "gr9162", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9162"},
+        {"value": "ОЗЮФ-21-24д", "name": "gr8859", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8859"},
+        {"value": "ОЗЮФ-21-24дУС", "name": "gr9261", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9261"},
+        {"value": "ОЗЮФ-11-23", "name": "gr8218", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8218"},
+        {"value": "ОЗЮФ-11-23ус", "name": "gr8557", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8557"},
+        {"value": "ОЗЮФ-12-23", "name": "gr8219", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8219"},
+        {"value": "ОЗЮФ-12-23ус", "name": "gr8533", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8533"},
+        {"value": "ОЗЮФ-13-23", "name": "gr8220", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8220"},
+        {"value": "ОЗЮФ-13-23ус", "name": "gr8534", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8534"},
+        {"value": "ОЗЮФ-14-23", "name": "gr8448", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8448"},
+        {"value": "ОЗЮФ-11-22", "name": "gr7695", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7695"},
+        {"value": "ОЗЮФ-12-22", "name": "gr7696", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7696"},
+        {"value": "ОЗЮФ-12-22у", "name": "gr9798", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9798"},
+        {"value": "ОЗЮФ-13-22", "name": "gr7697", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7697"},
+        {"value": "ОЗЮФ-13-22у", "name": "gr9799", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9799"}
+      ],
+      "Специалитет": [
+        {"value": "ОЗЮФ-71-25", "name": "gr9489", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9489"},
+        {"value": "ОЗЮФ-71-25д(3г.)", "name": "gr9860", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9860"},
+        {"value": "ОЗЮФ-71-25ус(3г.)", "name": "gr9856", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9856"},
+        {"value": "ОЗЮФ-71-25ус(4г.)", "name": "gr9942", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9942"},
+        {"value": "ОЗЮФ-72-25", "name": "gr9490", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9490"},
+        {"value": "ОЗЮФ-72-25д(3г.)", "name": "gr9863", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9863"},
+        {"value": "ОЗЮФ-72-25ус(3г.)", "name": "gr9857", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9857"},
+        {"value": "ОЗЮФ-72-25ус(4г.)", "name": "gr9930", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9930"},
+        {"value": "ОЗЮФ-71-24", "name": "gr8853", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8853"},
+        {"value": "ОЗЮФ-71-24ус", "name": "gr9165", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9165"},
+        {"value": "ОЗЮФ-72-24", "name": "gr8854", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8854"},
+        {"value": "ОЗЮФ-72-24ус", "name": "gr9166", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9166"},
+        {"value": "ОЗЮФ-71-23", "name": "gr8221", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8221"},
+        {"value": "ОЗЮФ-71-23ус", "name": "gr8535", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8535"},
+        {"value": "ОЗЮФ-72-23", "name": "gr8222", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8222"},
+        {"value": "ОЗЮФ-71-22", "name": "gr7698", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7698"},
+        {"value": "ОЗЮФ-71-22ус", "name": "gr7750", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7750"},
+        {"value": "ОЗЮФ-72-22", "name": "gr7699", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7699"},
+        {"value": "ОЗЮФ-72-22ус", "name": "gr7749", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/7749"},
+        {"value": "ОЗЮФ-71-21", "name": "gr6914", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6914"},
+        {"value": "ОЗЮФ-72-21", "name": "gr6915", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6915"},
+        {"value": "ОЗЮФ-72-20", "name": "gr6188", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/6188"}
+      ],
+      "Магистратура": [
+        {"value": "ОЗЮФ-01-25", "name": "gr9493", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9493"},
+        {"value": "ОЗЮФ-01-24", "name": "gr8858", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8858"}
+      ]
+    }
+  },
+  "Факультет Высшая инженерная школа": {
+    "очная": {
+      "Бакалавриат": [
+        {"value": "ВИШ-11-25", "name": "gr9590", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9590"},
+        {"value": "ВИШ-12-25", "name": "gr9591", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9591"},
+        {"value": "ВИШ-13-25", "name": "gr9592", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9592"},
+        {"value": "ВИШ-14-25", "name": "gr9593", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9593"},
+        {"value": "ВИШ-15-25", "name": "gr9594", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9594"},
+        {"value": "ВИШ-11-24", "name": "gr8821", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8821"},
+        {"value": "ВИШ-12-24", "name": "gr8822", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8822"},
+        {"value": "ВИШ-13-24", "name": "gr8823", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8823"},
+        {"value": "ВИШ-14-24", "name": "gr8824", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8824"},
+        {"value": "ВИШ-15-24", "name": "gr8826", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8826"},
+        {"value": "ВИШ-11-23 (ЭиЭА)", "name": "gr8541", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8541"},
+        {"value": "ВИШ-11-23(РЗиАЭС)", "name": "gr8265", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8265"},
+        {"value": "ВИШ-12-23", "name": "gr8524", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8524"},
+        {"value": "ВИШ-13-23", "name": "gr8526", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8526"},
+        {"value": "ВИШ-14-23", "name": "gr8268", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/8268"}
+      ]
+    },
+    "очно-заочная": {
+      "Бакалавриат": [
+        {"value": "ОЗВИШ-11-25", "name": "gr9828", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9828"},
+        {"value": "ОЗВИШ-12-25", "name": "gr9827", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9827"},
+        {"value": "ОЗВИШ-15-25", "name": "gr9830", "ссылка": "https://tt.chuvsu.ru/index/grouptt/gr/9830"}
+      ]
+    }
   }
+}

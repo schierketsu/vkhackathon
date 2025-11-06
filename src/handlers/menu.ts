@@ -16,6 +16,7 @@ import { getActiveDeadlines, formatDeadlines } from '../utils/deadlines';
 import { getUser, toggleNotifications, toggleEventsSubscription, updateUserGroup, updateUserSubgroup } from '../utils/users';
 import { getConfig } from '../utils/config';
 import { getMainMenu, getSettingsMenu, getScheduleMenu, getScheduleMainMenu, getDeadlinesMenu, getEventsMenu } from '../utils/menu';
+import { formatFacultyName } from '../utils/formatters';
 
 export function setupMenuHandlers(bot: any) {
   // Главное меню
@@ -198,7 +199,7 @@ export function setupMenuHandlers(bot: any) {
     });
   });
 
-  // События
+  // Мероприятия
   bot.action('menu:events', async (ctx: Context) => {
     const events = getUpcomingEvents(7);
     const text = formatEvents(events);
@@ -207,6 +208,26 @@ export function setupMenuHandlers(bot: any) {
       message: {
         text: text,
         attachments: [getEventsMenu()]
+      }
+    });
+  });
+
+  // Преподаватели
+  bot.action('menu:teachers', async (ctx: Context) => {
+    await ctx.answerOnCallback({
+      message: {
+        text: '👨‍🏫 Преподаватели\n\nРаздел в разработке.',
+        attachments: [getMainMenu()]
+      }
+    });
+  });
+
+  // В приложение
+  bot.action('menu:app', async (ctx: Context) => {
+    await ctx.answerOnCallback({
+      message: {
+        text: '📱 В приложение\n\nРаздел в разработке.',
+        attachments: [getMainMenu()]
       }
     });
   });
@@ -258,7 +279,7 @@ export function setupMenuHandlers(bot: any) {
     message += `👥 Группа: ${user.group_name || 'не указана'}\n`;
     message += `🔢 Подгруппа: ${user.subgroup !== null && user.subgroup !== undefined ? user.subgroup : 'не указана'}\n`;
     message += `🔔 Уведомления: ${user.notifications_enabled ? '✅ Включены' : '❌ Выключены'}\n`;
-    message += `📢 Подписка на события: ${user.events_subscribed ? '✅ Включена' : '❌ Выключена'}\n\n`;
+    message += `📢 Подписка на мероприятия: ${user.events_subscribed ? '✅ Включена' : '❌ Выключена'}\n\n`;
     message += `Выберите настройку:`;
     
     await ctx.answerOnCallback({
@@ -287,7 +308,7 @@ export function setupMenuHandlers(bot: any) {
     }
     
     const buttons = faculties.map(faculty => 
-      [Keyboard.button.callback(faculty, `select_faculty:${faculty}`)]
+      [Keyboard.button.callback(formatFacultyName(faculty), `select_faculty:${faculty}`)]
     );
     buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:settings')]);
     
@@ -492,7 +513,7 @@ export function setupMenuHandlers(bot: any) {
       `  /group — выбрать группу\n` +
       `  /subgroup — выбрать подгруппу\n\n` +
       `🎉 Мероприятия:\n` +
-      `  /events — ближайшие события\n` +
+      `  /events — ближайшие мероприятия\n` +
       `  /subscribe — подписка на уведомления\n\n` +
       `⏰ Дедлайны:\n` +
       `  /deadlines — список активных дедлайнов\n` +

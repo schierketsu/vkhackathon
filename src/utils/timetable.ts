@@ -51,7 +51,9 @@ export interface TimetableData {
     [facultyName: string]: {
       [studyFormat: string]: {
         [degree: string]: {
-          [groupName: string]: WeekSchedule;
+          [course: string]: {
+            [groupName: string]: WeekSchedule;
+          };
         };
       };
     };
@@ -70,25 +72,25 @@ const dayNames: { [key: string]: string } = {
 };
 
 // Определение четности недели относительно начала семестра
+// 1-я неделя начинается с 1 сентября (нечетная), 2-я неделя - четная и т.д.
 export function getWeekParity(date: Date, semesterStart: Date): 'odd' | 'even' {
-  // Находим начало недели (понедельник) для обеих дат
-  const dateWeekStart = getWeekStart(date);
-  const semesterWeekStart = getWeekStart(semesterStart);
+  // Получаем номер недели (1-я неделя = 1 сентября)
+  const weekNumber = getWeekNumber(date);
   
-  // Разница в миллисекундах
-  const diffMs = dateWeekStart.getTime() - semesterWeekStart.getTime();
-  // Разница в неделях
-  const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
-  
-  // Если разница четная - нечетная неделя, если нечетная - четная
-  return diffWeeks % 2 === 0 ? 'odd' : 'even';
+  // Нечетные номера недель (1, 3, 5...) = odd, четные (2, 4, 6...) = even
+  return weekNumber % 2 === 1 ? 'odd' : 'even';
 }
 
 function getWeekStart(date: Date): Date {
   const d = new Date(date);
   const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Понедельник = 1
-  return new Date(d.setDate(diff));
+  // Понедельник = 1, воскресенье = 0
+  // Если воскресенье (0), то отнимаем 6 дней, иначе отнимаем (day - 1) дней
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const result = new Date(d);
+  result.setDate(diff);
+  result.setHours(0, 0, 0, 0);
+  return result;
 }
 
 function getDayOfWeek(date: Date): string {
@@ -116,6 +118,25 @@ function findGroupSchedule(timetableData: TimetableData, groupName: string): Wee
   if (timetableData.faculties) {
     for (const facultyName in timetableData.faculties) {
       const faculty = timetableData.faculties[facultyName];
+      for (const studyFormat in faculty) {
+        const format = faculty[studyFormat];
+        for (const degree in format) {
+          const degreeCourses = format[degree];
+          for (const course in degreeCourses) {
+            const courseGroups = degreeCourses[course];
+            if (courseGroups[groupName]) {
+              return courseGroups[groupName];
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Обратная совместимость со старой структурой (без курсов)
+  if ((timetableData as any).faculties) {
+    for (const facultyName in (timetableData as any).faculties) {
+      const faculty = (timetableData as any).faculties[facultyName];
       for (const studyFormat in faculty) {
         const format = faculty[studyFormat];
         for (const degree in format) {
@@ -149,7 +170,7 @@ export function getTodaySchedule(group: string, subgroup?: number | null): DaySc
   
   const today = new Date();
   const config = getConfig();
-  const semesterStart = new Date(config.semester_start || '2024-09-01');
+  const semesterStart = new Date(config.semester_start || '2025-09-01');
   const weekParity = getWeekParity(today, semesterStart);
   const dayName = getDayOfWeek(today);
   
@@ -186,7 +207,7 @@ export function getTomorrowSchedule(group: string, subgroup?: number | null): Da
   tomorrow.setDate(tomorrow.getDate() + 1);
   
   const config = getConfig();
-  const semesterStart = new Date(config.semester_start || '2024-09-01');
+  const semesterStart = new Date(config.semester_start || '2025-09-01');
   const weekParity = getWeekParity(tomorrow, semesterStart);
   const dayName = getDayOfWeek(tomorrow);
   
@@ -221,7 +242,7 @@ function getWeekScheduleFromDate(group: string, startDate: Date, subgroup?: numb
   }
   
   const config = getConfig();
-  const semesterStart = new Date(config.semester_start || '2024-09-01');
+  const semesterStart = new Date(config.semester_start || '2025-09-01');
   const weekSchedule: DaySchedule[] = [];
   
   for (let i = 0; i < 7; i++) {
@@ -257,10 +278,53 @@ export function getWeekSchedule(group: string, subgroup?: number | null): DaySch
   return getWeekScheduleFromDate(group, today, subgroup);
 }
 
-// Получить расписание на текущую неделю (начиная с сегодня)
+// Получить номер недели относительно начала семестра (1 неделя начинается с 1 сентября)
+export function getWeekNumber(date: Date): number {
+  const config = getConfig();
+  const semesterStart = new Date(config.semester_start || '2025-09-01');
+  semesterStart.setHours(0, 0, 0, 0);
+  
+  // Находим понедельник недели, в которую попадает дата
+  const dateWeekStart = getWeekStart(date);
+  dateWeekStart.setHours(0, 0, 0, 0);
+  
+  // Находим понедельник 1-й недели
+  // Если 1 сентября - понедельник, то это начало 1-й недели
+  // Если нет, то понедельник 1-й недели - это следующий понедельник после 1 сентября
+  const semesterDayOfWeek = semesterStart.getDay(); // 0 = воскресенье, 1 = понедельник
+  let firstWeekMonday: Date;
+  
+  if (semesterDayOfWeek === 1) {
+    // 1 сентября - понедельник, это начало 1-й недели
+    firstWeekMonday = new Date(semesterStart);
+  } else if (semesterDayOfWeek === 0) {
+    // 1 сентября - воскресенье, понедельник 1-й недели - следующий день (2 сентября)
+    firstWeekMonday = new Date(semesterStart);
+    firstWeekMonday.setDate(semesterStart.getDate() + 1);
+  } else {
+    // 1 сентября - вторник-суббота, понедельник 1-й недели - следующий понедельник
+    const daysUntilMonday = 8 - semesterDayOfWeek;
+    firstWeekMonday = new Date(semesterStart);
+    firstWeekMonday.setDate(semesterStart.getDate() + daysUntilMonday);
+  }
+  firstWeekMonday.setHours(0, 0, 0, 0);
+  
+  // Разница в миллисекундах
+  const diffMs = dateWeekStart.getTime() - firstWeekMonday.getTime();
+  // Разница в неделях (начиная с 1)
+  // Если дата раньше начала семестра, возвращаем 1
+  const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
+  
+  return diffWeeks > 0 ? diffWeeks : 1;
+}
+
+// Получить расписание на текущую неделю (начиная с понедельника текущей недели)
 export function getCurrentWeekSchedule(group: string, subgroup?: number | null): DaySchedule[] {
   const today = new Date();
-  return getWeekScheduleFromDate(group, today, subgroup);
+  // Находим понедельник текущей недели
+  const weekStart = getWeekStart(today);
+  weekStart.setHours(0, 0, 0, 0);
+  return getWeekScheduleFromDate(group, weekStart, subgroup);
 }
 
 // Получить расписание на следующую неделю (начиная с понедельника следующей недели)
@@ -358,7 +422,40 @@ export function getDegreesForFacultyAndFormat(facultyName: string, studyFormat: 
   return Object.keys(timetableData.faculties[facultyName][studyFormat]);
 }
 
-// Получить список групп для факультета, формы обучения и степени
+// Получить список курсов для факультета, формы обучения и степени
+export function getCoursesForFacultyFormatDegree(facultyName: string, studyFormat: string, degree: string): number[] {
+  const timetableData = loadTimetableData();
+  if (!timetableData || !timetableData.faculties || 
+      !timetableData.faculties[facultyName] || 
+      !timetableData.faculties[facultyName][studyFormat] ||
+      !timetableData.faculties[facultyName][studyFormat][degree]) {
+    return [];
+  }
+  
+  // Получаем все ключи курсов и преобразуем в числа, сортируем
+  const courses = Object.keys(timetableData.faculties[facultyName][studyFormat][degree])
+    .map(c => parseInt(c))
+    .filter(c => !isNaN(c) && c > 0)
+    .sort((a, b) => a - b);
+  
+  return courses;
+}
+
+// Получить список групп для факультета, формы обучения, степени и курса
+export function getGroupsForFacultyFormatDegreeCourse(facultyName: string, studyFormat: string, degree: string, course: number): string[] {
+  const timetableData = loadTimetableData();
+  if (!timetableData || !timetableData.faculties || 
+      !timetableData.faculties[facultyName] || 
+      !timetableData.faculties[facultyName][studyFormat] ||
+      !timetableData.faculties[facultyName][studyFormat][degree] ||
+      !timetableData.faculties[facultyName][studyFormat][degree][course.toString()]) {
+    return [];
+  }
+  
+  return Object.keys(timetableData.faculties[facultyName][studyFormat][degree][course.toString()]);
+}
+
+// Получить список групп для факультета, формы обучения и степени (для обратной совместимости)
 export function getGroupsForFacultyFormatDegree(facultyName: string, studyFormat: string, degree: string): string[] {
   const timetableData = loadTimetableData();
   if (!timetableData || !timetableData.faculties || 
@@ -368,7 +465,22 @@ export function getGroupsForFacultyFormatDegree(facultyName: string, studyFormat
     return [];
   }
   
-  return Object.keys(timetableData.faculties[facultyName][studyFormat][degree]);
+  // Проверяем новую структуру с курсами
+  const degreeData = timetableData.faculties[facultyName][studyFormat][degree];
+  if (typeof degreeData === 'object' && !Array.isArray(degreeData)) {
+    // Если это объект с курсами
+    const allGroups: string[] = [];
+    for (const courseKey in degreeData) {
+      const courseGroups = degreeData[courseKey];
+      if (typeof courseGroups === 'object' && !Array.isArray(courseGroups)) {
+        allGroups.push(...Object.keys(courseGroups));
+      }
+    }
+    return allGroups;
+  }
+  
+  // Обратная совместимость со старой структурой
+  return Object.keys(degreeData);
 }
 
 // Получить список доступных подгрупп для группы
@@ -416,8 +528,19 @@ export function getAvailableGroups(): string[] {
       for (const studyFormat in faculty) {
         const format = faculty[studyFormat];
         for (const degree in format) {
-          const degreeGroups = format[degree];
-          groups.push(...Object.keys(degreeGroups));
+          const degreeData = format[degree];
+          // Проверяем, есть ли курсы в структуре
+          if (typeof degreeData === 'object' && !Array.isArray(degreeData)) {
+            for (const courseKey in degreeData) {
+              const courseGroups = degreeData[courseKey];
+              if (typeof courseGroups === 'object' && !Array.isArray(courseGroups)) {
+                groups.push(...Object.keys(courseGroups));
+              }
+            }
+          } else {
+            // Обратная совместимость
+            groups.push(...Object.keys(degreeData));
+          }
         }
       }
     }

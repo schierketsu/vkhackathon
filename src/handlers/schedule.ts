@@ -8,12 +8,15 @@ import {
   getAvailableFaculties,
   getStudyFormatsForFaculty,
   getDegreesForFacultyAndFormat,
+  getCoursesForFacultyFormatDegree,
+  getGroupsForFacultyFormatDegreeCourse,
   getGroupsForFacultyFormatDegree,
   getAvailableSubgroups
 } from '../utils/timetable';
 import { getUser, createUser, updateUserGroup, updateUserSubgroup } from '../utils/users';
 import { getConfig } from '../utils/config';
 import { getScheduleMenu, getMainMenu, getSettingsMenu } from '../utils/menu';
+import { formatFacultyName, formatCourseButton, formatCourseNumber } from '../utils/formatters';
 
 export function setupScheduleHandlers(bot: any) {
   const config = getConfig();
@@ -123,7 +126,7 @@ export function setupScheduleHandlers(bot: any) {
     }
     
     const buttons = faculties.map((faculty: string) => 
-      [Keyboard.button.callback(faculty, `select_faculty:${faculty}`)]
+      [Keyboard.button.callback(formatFacultyName(faculty), `select_faculty:${faculty}`)]
     );
     
     let message = `📋 Выберите факультет:\n\n`;
@@ -192,7 +195,7 @@ export function setupScheduleHandlers(bot: any) {
     
     await ctx.answerOnCallback({
       message: {
-        text: `📋 Выберите форму обучения:\n\nФакультет: ${facultyName}`,
+        text: `📋 Выберите форму обучения:\n\nФакультет: ${formatFacultyName(facultyName)}`,
         attachments: [Keyboard.inlineKeyboard(buttons)]
       }
     });
@@ -226,7 +229,7 @@ export function setupScheduleHandlers(bot: any) {
     
     await ctx.answerOnCallback({
       message: {
-        text: `📋 Выберите степень:\n\nФакультет: ${facultyName}\nФорма обучения: ${studyFormat}`,
+        text: `📋 Выберите степень:\n\nФакультет: ${formatFacultyName(facultyName)}\nФорма обучения: ${studyFormat}`,
         attachments: [Keyboard.inlineKeyboard(buttons)]
       }
     });
@@ -244,8 +247,43 @@ export function setupScheduleHandlers(bot: any) {
       });
     }
     
-    // Получаем группы для факультета, формы обучения и степени
-    const groups = getGroupsForFacultyFormatDegree(facultyName, studyFormat, degree);
+    // Получаем курсы для факультета, формы обучения и степени
+    const courses = getCoursesForFacultyFormatDegree(facultyName, studyFormat, degree);
+    
+    if (courses.length === 0) {
+      return ctx.answerOnCallback({
+        notification: 'Курсы не найдены'
+      });
+    }
+    
+    const buttons = courses.map((course: number) => 
+      [Keyboard.button.callback(formatCourseButton(course), `select_course:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}:${encodeURIComponent(degree)}:${course}`)]
+    );
+    buttons.push([Keyboard.button.callback('◀️ Назад', `select_format:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}`)]);
+
+    await ctx.answerOnCallback({
+      message: {
+        text: `📋 Выберите курс:\n\nФакультет: ${formatFacultyName(facultyName)}\nФорма обучения: ${studyFormat}\nУровень обучения: ${degree}`,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    });
+  });
+
+  // Обработчик выбора курса
+  bot.action(/select_course:(.+):(.+):(.+):(\d+)/, async (ctx: Context) => {
+    const facultyName = decodeURIComponent(ctx.match?.[1] || '');
+    const studyFormat = decodeURIComponent(ctx.match?.[2] || '');
+    const degree = decodeURIComponent(ctx.match?.[3] || '');
+    const course = parseInt(ctx.match?.[4] || '0');
+    
+    if (!facultyName || !studyFormat || !degree || isNaN(course)) {
+      return ctx.answerOnCallback({
+        notification: 'Ошибка при выборе курса'
+      });
+    }
+    
+    // Получаем группы для факультета, формы обучения, степени и курса
+    const groups = getGroupsForFacultyFormatDegreeCourse(facultyName, studyFormat, degree, course);
     
     if (groups.length === 0) {
       return ctx.answerOnCallback({
@@ -257,27 +295,39 @@ export function setupScheduleHandlers(bot: any) {
     const buttons: any[][] = [];
     for (let i = 0; i < groups.length; i += 2) {
       const row = groups.slice(i, i + 2).map((group: string) => 
-        Keyboard.button.callback(group, `select_group:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}:${encodeURIComponent(degree)}:${encodeURIComponent(group)}`)
+        Keyboard.button.callback(group, `select_group:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}:${encodeURIComponent(degree)}:${course}:${encodeURIComponent(group)}`)
       );
       buttons.push(row);
     }
-    buttons.push([Keyboard.button.callback('◀️ Назад', `select_format:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}`)]);
+    buttons.push([Keyboard.button.callback('◀️ Назад', `select_degree:${encodeURIComponent(facultyName)}:${encodeURIComponent(studyFormat)}:${encodeURIComponent(degree)}`)]);
     
     await ctx.answerOnCallback({
       message: {
-        text: `📋 Выберите группу:\n\nФакультет: ${facultyName}\nФорма обучения: ${studyFormat}\nСтепень: ${degree}`,
+        text: `📋 Выберите группу:\n\nФакультет: ${formatFacultyName(facultyName)}\nФорма обучения: ${studyFormat}\nУровень обучения: ${degree}\nКурс: ${formatCourseNumber(course)}`,
         attachments: [Keyboard.inlineKeyboard(buttons)]
       }
     });
   });
 
   // Обработчик выбора группы (финальный шаг)
-  bot.action(/select_group:(.+):(.+):(.+):(.+)/, async (ctx: Context) => {
+  // Поддерживает как старую структуру (4 параметра), так и новую (5 параметров с курсом)
+  bot.action(/select_group:(.+):(.+):(.+):(.+)(?::(.+))?/, async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     const facultyName = decodeURIComponent(ctx.match?.[1] || '');
     const studyFormat = decodeURIComponent(ctx.match?.[2] || '');
     const degree = decodeURIComponent(ctx.match?.[3] || '');
-    const groupName = decodeURIComponent(ctx.match?.[4] || '');
+    const fourthParam = decodeURIComponent(ctx.match?.[4] || '');
+    const fifthParam = ctx.match?.[5] ? decodeURIComponent(ctx.match[5]) : null;
+    
+    let groupName: string;
+    
+    // Если есть 5-й параметр, значит это новая структура с курсом
+    if (fifthParam) {
+      groupName = fifthParam;
+    } else {
+      // Старая структура без курса (обратная совместимость)
+      groupName = fourthParam;
+    }
     
     if (!groupName) {
       return ctx.answerOnCallback({
@@ -331,7 +381,7 @@ export function setupScheduleHandlers(bot: any) {
     }
     
     const buttons = faculties.map((faculty: string) => 
-      [Keyboard.button.callback(faculty, `select_faculty:${faculty}`)]
+      [Keyboard.button.callback(formatFacultyName(faculty), `select_faculty:${faculty}`)]
     );
     
     let message = `📋 Выберите факультет:\n\n`;

@@ -4,7 +4,7 @@
   "deadlines_enabled": true,
   "events_source": "data/events.json",
   "timetable_source": "data/timetable.json",
-  "semester_start": "2024-09-01",
+  "semester_start": "2025-09-01",
   "notifications": {
     "morning_time": "08:00",
     "evening_time": "20:00",

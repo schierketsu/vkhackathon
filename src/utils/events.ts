@@ -87,10 +87,10 @@ function parseDate(dateStr: string): Date {
 
 export function formatEvents(events: Event[]): string {
   if (events.length === 0) {
-    return '🎓 Событий на ближайшее время не запланировано.';
+    return '🎓 Мероприятий на ближайшее время не запланировано.';
   }
   
-  let text = '🎓 Ближайшие события:\n\n';
+  let text = '🎓 Ближайшие мероприятия:\n\n';
   
   events.forEach(event => {
     const dateParts = event.date.split('.');
