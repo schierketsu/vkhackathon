@@ -1,0 +1,16 @@
+:root {
+  /* Кастомная цветовая палитра */
+  --color-primary: #3C35F2;
+  --color-accent: #2980F2;
+  
+  /* Градиенты */
+  --gradient-primary: linear-gradient(135deg, #3C35F2 0%, #2980F2 100%);
+  --gradient-accent: linear-gradient(135deg, #3C35F2 0%, #2980F2 100%);
+  
+  /* Для использования в компонентах */
+  --custom-accent: var(--color-primary);
+  --custom-accent-hover: var(--color-accent);
+  --custom-border: var(--color-accent);
+  --custom-highlight: var(--color-accent);
+}
+

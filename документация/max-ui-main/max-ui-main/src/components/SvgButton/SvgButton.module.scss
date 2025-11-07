@@ -1,0 +1,23 @@
+@use '../../styles/shared-mixins/reset-clickable';
+
+.SvgButton {
+  @include reset-clickable.resetClickable;
+
+  color: var(--icon-tertiary);
+  line-height: 0;
+  display: flex;
+
+  &:not(:disabled) {
+    cursor: pointer;
+
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        color: var(--states-icon-hovered-tertiary);
+      }
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}

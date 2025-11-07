@@ -1,0 +1,86 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+body {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  background: transparent;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Переопределение цветов MAX UI для использования кастомной палитры */
+:root {
+  --accent-primary: var(--color-primary, #3C35F2);
+  --accent-primary-hover: var(--color-accent, #2980F2);
+}
+
+/* Стили для использования кастомных цветов */
+.custom-accent {
+  color: var(--color-primary);
+}
+
+.custom-accent-bg {
+  background: var(--color-primary);
+}
+
+.custom-gradient {
+  background: var(--gradient-primary);
+}
+
+.custom-border-accent {
+  border-color: var(--color-accent);
+}
+
+.custom-text-accent {
+  color: var(--color-accent);
+}
+
+/* Скругление углов для всех кнопок */
+button,
+[role="button"],
+[class*="Button"] {
+  border-radius: 12px !important;
+}
+
+/* Скрытие scrollbar для горизонтальной прокрутки дат */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
