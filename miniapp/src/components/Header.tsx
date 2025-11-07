@@ -134,8 +134,8 @@ function Header() {
       }}
     >
       <Flex align="center" gap={12} style={{ flex: 1, alignItems: 'center' }}>
-        {/* Условный рендеринг: кнопка назад или аватарка */}
-        {showBackButton ? renderBackButton() : renderAvatar()}
+        {/* Кнопка назад (если не главная страница) */}
+        {showBackButton && renderBackButton()}
         
         {/* Заголовок страницы */}
         <Typography.Title style={{
@@ -153,8 +153,9 @@ function Header() {
         </Typography.Title>
       </Flex>
       
-      {/* Пустой блок справа для симметрии */}
-      <div style={{ width: 40, flexShrink: 0 }} />
+      {/* Аватарка справа (только на главной странице) */}
+      {!showBackButton && renderAvatar()}
+      {showBackButton && <div style={{ width: 40, flexShrink: 0 }} />}
     </Flex>
   );
 }

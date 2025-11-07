@@ -82,14 +82,26 @@ function MainMenu() {
         data = await api.getTomorrowSchedule();
       } else {
         // Для других дат нужно получить недельное расписание и выбрать нужный день
-        const weekSchedule = await api.getWeekSchedule();
         const targetDate = new Date();
         targetDate.setDate(targetDate.getDate() + selectedDate);
-        // Формат даты: DD.MM.YYYY, но может быть и DD.MM
-        const dateStrWithYear = targetDate.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const dateStrWithoutYear = targetDate.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+        targetDate.setHours(0, 0, 0, 0);
+        
+        // Вычисляем начало недели для нужной даты (понедельник)
+        const dayOfWeek = targetDate.getDay();
+        const daysUntilMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+        const weekStart = new Date(targetDate);
+        weekStart.setDate(targetDate.getDate() + daysUntilMonday);
+        weekStart.setHours(0, 0, 0, 0);
+        
+        // Получаем недельное расписание для нужной недели
+        const weekSchedule = await api.getWeekSchedule(weekStart);
+        
+        // Форматируем дату в формате DD.MM.YYYY
+        const dateStr = `${String(targetDate.getDate()).padStart(2, '0')}.${String(targetDate.getMonth() + 1).padStart(2, '0')}.${targetDate.getFullYear()}`;
+        
+        // Ищем нужный день в расписании
         data = Array.isArray(weekSchedule) 
-          ? weekSchedule.find(day => day.date === dateStrWithYear || day.date === dateStrWithoutYear) || null 
+          ? weekSchedule.find(day => day.date === dateStr) || null 
           : null;
       }
       setSchedule(data);
@@ -248,7 +260,8 @@ function MainMenu() {
             fontFamily: 'system-ui, -apple-system, sans-serif',
             display: 'flex',
             alignItems: 'center',
-            gap: 8
+            gap: 8,
+            flexWrap: 'wrap'
           }}>
             {lessonType && (
               <span style={{ 
@@ -263,9 +276,11 @@ function MainMenu() {
               </span>
             )}
             <span>{roomDisplay}</span>
-            {lesson.subgroup !== null && lesson.subgroup !== undefined && (
-              <span> {lesson.subgroup} подгруппа</span>
-            )}
+            <span style={{ color: '#999999' }}>
+              {lesson.subgroup !== null && lesson.subgroup !== undefined 
+                ? `${lesson.subgroup} подгруппа`
+                : 'Общая пара'}
+            </span>
           </div>
         </Flex>
       </div>
@@ -396,7 +411,7 @@ function MainMenu() {
                             color: 'var(--text-secondary)',
                             fontSize: 14
                           }}>
-                            Нет занятий
+                            Выходной день! 🥳
                           </Typography.Body>
                         </Flex>
                       </CellSimple>

@@ -1,16 +1,19 @@
 import { Bot, Keyboard } from '@maxhub/max-bot-api';
+import express from 'express';
+import cors from 'cors';
 import { initDatabase } from './utils/database';
 import { setupScheduleHandlers } from './handlers/schedule';
 import { setupEventsHandlers } from './handlers/events';
 import { setupDeadlinesHandlers } from './handlers/deadlines';
 import { setupMenuHandlers } from './handlers/menu';
 import { setupTeachersHandlers } from './handlers/teachers';
-import { searchTeachers, getTeacherScheduleForDate, formatTeacherSchedule, isFavoriteTeacher, getAllTeachers } from './utils/teachers';
+import { searchTeachers, getTeacherScheduleForDate, formatTeacherSchedule, isFavoriteTeacher, getAllTeachers, getTeacherWeekSchedule, getFavoriteTeachers, addFavoriteTeacher, removeFavoriteTeacher } from './utils/teachers';
 import { getTeacherSearchMenu, getTeachersMenu, getTeacherScheduleMenu, getMainMenu } from './utils/menu';
 import { startScheduler, setBotApi } from './utils/scheduler';
-import { createUser, getUser } from './utils/users';
-import { getTodaySchedule, formatSchedule } from './utils/timetable';
+import { createUser, getUser, updateUserGroup, toggleNotifications, toggleEventsSubscription } from './utils/users';
+import { getTodaySchedule, getTomorrowSchedule, getCurrentWeekSchedule, getWeekScheduleFromDate, getWeekNumber, getGroupsStructure, getAvailableSubgroups, formatSchedule } from './utils/timetable';
 import { getUpcomingEvents, formatEvents } from './utils/events';
+import { getActiveDeadlines, addDeadline, deleteDeadline } from './utils/deadlines';
 import 'dotenv/config';
 
 // Токен бота из переменной окружения или захардкоженный
@@ -21,6 +24,275 @@ const bot = new Bot(BOT_TOKEN);
 
 // Инициализация базы данных
 initDatabase();
+
+// Настройка Express API сервера для мини-приложения
+const app = express();
+const API_PORT = process.env.API_PORT ? parseInt(process.env.API_PORT) : 3001;
+
+app.use(cors());
+app.use(express.json());
+
+// API Routes для мини-приложения
+
+// Расписание
+app.get('/api/schedule/today', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    const user = getUser(userId) || createUser(userId);
+    
+    if (!user || !user.group_name) {
+      return res.status(400).json({ error: 'Группа не указана' });
+    }
+
+    const schedule = getTodaySchedule(user.group_name, user.subgroup);
+    if (!schedule) {
+      return res.status(404).json({ error: 'Расписание не найдено' });
+    }
+    res.json(schedule);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/schedule/tomorrow', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    const user = getUser(userId) || createUser(userId);
+    
+    if (!user || !user.group_name) {
+      return res.status(400).json({ error: 'Группа не указана' });
+    }
+
+    const schedule = getTomorrowSchedule(user.group_name, user.subgroup);
+    if (!schedule) {
+      return res.status(404).json({ error: 'Расписание не найдено' });
+    }
+    res.json(schedule);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/schedule/week', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    const user = getUser(userId) || createUser(userId);
+    
+    if (!user || !user.group_name) {
+      return res.status(400).json({ error: 'Группа не указана' });
+    }
+
+    // Если указана дата начала недели, используем её
+    const weekStartParam = req.query.weekStart as string;
+    if (weekStartParam) {
+      const weekStart = new Date(weekStartParam);
+      const schedule = getWeekScheduleFromDate(user.group_name, weekStart, user.subgroup);
+      return res.json(schedule);
+    }
+
+    // Иначе возвращаем текущую неделю
+    const schedule = getCurrentWeekSchedule(user.group_name, user.subgroup);
+    res.json(schedule);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// События
+app.get('/api/events', (req, res) => {
+  try {
+    const days = parseInt(req.query.days as string) || 7;
+    const events = getUpcomingEvents(days);
+    res.json(events);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/events/subscription', (req, res) => {
+  try {
+    const { userId, subscribed } = req.body;
+    toggleEventsSubscription(userId, subscribed);
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Дедлайны
+app.get('/api/deadlines', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    const deadlines = getActiveDeadlines(userId);
+    res.json(deadlines);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/deadlines', (req, res) => {
+  try {
+    const { userId, title, dueDate, description } = req.body;
+    const deadline = addDeadline(userId, title, dueDate, description);
+    res.status(201).json(deadline);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/deadlines/:id', (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const userId = req.query.userId as string;
+    const success = deleteDeadline(id, userId);
+    res.json({ success });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/deadlines/notifications', (req, res) => {
+  try {
+    const { userId, enabled } = req.body;
+    toggleNotifications(userId, enabled);
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Преподаватели
+app.get('/api/teachers', (req, res) => {
+  try {
+    const teachers = getAllTeachers();
+    res.json(teachers.map(name => ({ name })));
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/teachers/search', (req, res) => {
+  try {
+    const query = req.query.query as string;
+    const teachers = searchTeachers(query);
+    res.json(teachers.map(name => ({ name })));
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/teachers/favorites', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    const favorites = getFavoriteTeachers(userId);
+    res.json(favorites.map(name => ({ name })));
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/teachers/favorites', (req, res) => {
+  try {
+    const { userId, teacherName } = req.body;
+    const success = addFavoriteTeacher(userId, teacherName);
+    res.json({ success });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/teachers/favorites', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    const teacherName = req.query.teacherName as string;
+    const success = removeFavoriteTeacher(userId, teacherName);
+    res.json({ success });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Расписание преподавателя на неделю
+app.get('/api/teachers/week-schedule', (req, res) => {
+  try {
+    const teacherName = req.query.teacherName as string;
+    const weekStart = req.query.weekStart as string; // ISO date string
+    
+    if (!teacherName) {
+      return res.status(400).json({ error: 'Не указано имя преподавателя' });
+    }
+
+    const startDate = weekStart ? new Date(weekStart) : new Date();
+    // Если дата не указана, находим понедельник текущей недели
+    if (!weekStart) {
+      const dayOfWeek = startDate.getDay();
+      const daysUntilMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      startDate.setDate(startDate.getDate() + daysUntilMonday);
+      startDate.setHours(0, 0, 0, 0);
+    }
+
+    const schedule = getTeacherWeekSchedule(teacherName, startDate);
+    res.json(schedule);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Пользователь
+app.get('/api/user', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    const user = getUser(userId) || createUser(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+    res.json(user);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/user/group', (req, res) => {
+  try {
+    const { userId, groupName, subgroup } = req.body;
+    updateUserGroup(userId, groupName, subgroup);
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/groups', (req, res) => {
+  try {
+    const structure = getGroupsStructure();
+    res.json(structure);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/groups/subgroups', (req, res) => {
+  try {
+    const groupName = req.query.groupName as string;
+    if (!groupName) {
+      return res.status(400).json({ error: 'Не указано имя группы' });
+    }
+    const subgroups = getAvailableSubgroups(groupName);
+    res.json({ subgroups });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/week/current', (req, res) => {
+  try {
+    const today = new Date();
+    const weekNumber = getWeekNumber(today);
+    res.json({ weekNumber });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Настройка API для планировщика
 setBotApi({
@@ -264,9 +536,15 @@ bot.catch((error, ctx) => {
   }
 });
 
-// Запуск бота
+// Запуск бота и API сервера
 async function main() {
   try {
+    // Запускаем Express API сервер
+    app.listen(API_PORT, () => {
+      console.log(`🌐 API сервер запущен на порту ${API_PORT}`);
+      console.log(`📡 API доступен по адресу: http://localhost:${API_PORT}/api`);
+    });
+    
     console.log('🚀 Запуск бота...');
     console.log('🔍 Проверка подключения к API...');
     
@@ -279,7 +557,7 @@ async function main() {
     
     console.log('🔄 Запуск long polling...');
     console.log('⏳ Ожидание обновлений...');
-    console.log('✨ Бот готов к работе!');
+    console.log('✨ Бот и API сервер готовы к работе!');
     
     // Запускаем polling
     await bot.start();

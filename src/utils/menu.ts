@@ -15,6 +15,9 @@ export function getMainMenu(): InlineKeyboard {
       Keyboard.button.callback('⏰ Дедлайны', 'menu:deadlines')
     ],
     [
+      Keyboard.button.callback('📱 В приложение', 'menu:open_app')
+    ],
+    [
       Keyboard.button.callback('❔', 'menu:help'),
       Keyboard.button.callback('⚙️', 'menu:settings')
     ]

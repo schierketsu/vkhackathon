@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, Grid, CellSimple, CellList, Typography, Button, Switch, Flex } from '@maxhub/max-ui';
+import { Container, Grid, CellSimple, CellList, Typography, Switch, Flex, Spinner } from '@maxhub/max-ui';
 import api, { Event, User } from '../api/client';
 
 function EventsPage() {
-  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,31 +38,12 @@ function EventsPage() {
     }
   };
 
-  const formatDate = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
   return (
-    <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
-      <Grid gap={20} cols={1}>
-        <div style={{ paddingLeft: 'var(--spacing-size-xl, 16px)', paddingRight: 'var(--spacing-size-xl, 16px)' }}>
-          <Typography.Title style={{ 
-            fontSize: 24, 
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            marginBottom: 24
-          }}>
-            Мероприятия
-          </Typography.Title>
-        </div>
-
+    <div style={{ flex: 1, paddingTop: 16, paddingBottom: 20, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ paddingLeft: 'var(--spacing-size-xl, 16px)', paddingRight: 'var(--spacing-size-xl, 16px)', marginBottom: 20 }}>
+        {/* Переключатель уведомлений */}
         {user && (
-          <CellList mode="island" filled style={{ marginBottom: 16 }}>
+          <CellList mode="island" filled>
             <CellSimple
               after={
                 <Switch
@@ -77,105 +56,133 @@ function EventsPage() {
             />
           </CellList>
         )}
+      </div>
 
-        {loading ? (
-          <div style={{ paddingLeft: 'var(--spacing-size-xl, 16px)', paddingRight: 'var(--spacing-size-xl, 16px)' }}>
-            <Flex justify="center" align="center" style={{ padding: '60px 0', minHeight: 200 }}>
-              <Flex direction="column" align="center" gap={12}>
-                <Typography.Body style={{ color: 'var(--text-secondary)' }}>
-                  Загрузка...
-                </Typography.Body>
+      {/* Белый контейнер с мероприятиями - на всю ширину */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: 20,
+        padding: '18px',
+        marginTop: 8,
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+            {loading ? (
+              <Flex justify="center" style={{ padding: '20px 0' }}>
+                <Spinner size={20} />
               </Flex>
-            </Flex>
-          </div>
-        ) : events.length === 0 ? (
-          <CellList mode="island" filled>
-            <CellSimple>
-              <Flex align="center" justify="center" style={{ padding: '40px 0' }}>
-                <Flex direction="column" align="center" gap={8}>
-                  <Typography.Body variant="medium" style={{ 
-                    fontSize: 48,
-                    opacity: 0.3
-                  }}>
-                    🎉
-                  </Typography.Body>
-                  <Typography.Body variant="small" style={{ 
-                    color: 'var(--text-secondary)',
-                    fontSize: 14
-                  }}>
-                    Нет предстоящих мероприятий
-                  </Typography.Body>
-                </Flex>
-              </Flex>
-            </CellSimple>
-          </CellList>
-        ) : (
-          <CellList mode="island" filled style={{ gap: 12 }}>
-            {events.map((event, index) => (
-              <CellSimple 
-                key={index}
-                style={{
-                  borderLeft: '3px solid #2980F2',
-                }}
-              >
-                <Flex direction="column" gap={10}>
-                  <Typography.Body variant="medium" style={{ 
-                    fontWeight: 600,
-                    fontSize: 16,
-                    lineHeight: 1.4
-                  }}>
-                    {event.title}
-                  </Typography.Body>
-                  <Flex direction="column" gap={6}>
-                    <Flex align="center" gap={8}>
-                      <Typography.Body variant="small" style={{ 
+            ) : events.length === 0 ? (
+              <div>
+                <CellList mode="island" filled>
+                  <CellSimple>
+                    <Flex align="center" justify="center" style={{ padding: '20px 0' }}>
+                      <Typography.Body variant="small" style={{
                         color: 'var(--text-secondary)',
-                        fontSize: 13
+                        fontSize: 14
                       }}>
-                        📅
-                      </Typography.Body>
-                      <Typography.Body variant="small" style={{ 
-                        color: 'var(--text-secondary)',
-                        fontSize: 13,
-                        fontWeight: 500
-                      }}>
-                        {formatDate(event.date)}
+                        Нет предстоящих мероприятий
                       </Typography.Body>
                     </Flex>
-                    {event.location && (
-                      <Flex align="center" gap={8}>
-                        <Typography.Body variant="small" style={{ 
-                          color: 'var(--text-secondary)',
-                          fontSize: 13
-                        }}>
-                          📍
-                        </Typography.Body>
-                        <Typography.Body variant="small" style={{ 
-                          color: 'var(--text-secondary)',
-                          fontSize: 13
-                        }}>
-                          {event.location}
-                        </Typography.Body>
-                      </Flex>
-                    )}
-                    {event.description && (
-                      <Typography.Body variant="small" style={{ 
-                        color: 'var(--text-secondary)',
-                        fontSize: 13,
-                        lineHeight: 1.5,
-                        marginTop: 4
+                  </CellSimple>
+                </CellList>
+              </div>
+            ) : (
+              <div>
+                {events.map((event, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      marginBottom: index < events.length - 1 ? 12 : 0,
+                      backgroundColor: '#EFEFEF',
+                      borderRadius: 10,
+                      padding: '12px 16px',
+                      display: 'flex',
+                      gap: 12,
+                      alignItems: 'flex-start'
+                    }}
+                  >
+                    {/* Синий квадрат-заглушка */}
+                    <div
+                      style={{
+                        width: 80,
+                        height: 80,
+                        backgroundColor: '#2980F2',
+                        borderRadius: 10,
+                        flexShrink: 0
+                      }}
+                    />
+
+                    {/* Информация о мероприятии */}
+                    <div
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 8,
+                        minWidth: 0
+                      }}
+                    >
+                      <Typography.Body variant="medium" style={{
+                        fontWeight: 600,
+                        fontSize: 16,
+                        lineHeight: 1.4,
+                        color: '#333333'
                       }}>
-                        {event.description}
+                        {event.title}
                       </Typography.Body>
-                    )}
-                  </Flex>
-                </Flex>
-              </CellSimple>
-            ))}
-          </CellList>
-        )}
-      </Grid>
-    </Container>
+                      <Flex direction="column" gap={4}>
+                        <Flex align="center" gap={6}>
+                          <Typography.Body variant="small" style={{
+                            color: '#666666',
+                            fontSize: 13
+                          }}>
+                            📅
+                          </Typography.Body>
+                          <Typography.Body variant="small" style={{
+                            color: '#666666',
+                            fontSize: 13
+                          }}>
+                            {new Date(event.date).toLocaleDateString('ru-RU', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric'
+                            })}
+                          </Typography.Body>
+                        </Flex>
+                        {event.location && (
+                          <Flex align="center" gap={6}>
+                            <Typography.Body variant="small" style={{
+                              color: '#666666',
+                              fontSize: 13
+                            }}>
+                              📍
+                            </Typography.Body>
+                            <Typography.Body variant="small" style={{
+                              color: '#666666',
+                              fontSize: 13
+                            }}>
+                              {event.location}
+                            </Typography.Body>
+                          </Flex>
+                        )}
+                        {event.description && (
+                          <Typography.Body variant="small" style={{
+                            color: '#666666',
+                            fontSize: 13,
+                            lineHeight: 1.5,
+                            marginTop: 4
+                          }}>
+                            {event.description}
+                          </Typography.Body>
+                        )}
+                      </Flex>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+      </div>
+    </div>
   );
 }
 

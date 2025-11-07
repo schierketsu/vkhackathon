@@ -7,6 +7,7 @@ function SchedulePage() {
   const navigate = useNavigate();
   const [schedule, setSchedule] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showWeekPicker, setShowWeekPicker] = useState(false);
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
     // Находим понедельник текущей недели
     const today = new Date();
@@ -48,6 +49,82 @@ function SchedulePage() {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
     return `${day}.${month}`;
+  };
+
+  const getWeekStart = (date: Date): Date => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    const result = new Date(d);
+    result.setDate(diff);
+    result.setHours(0, 0, 0, 0);
+    return result;
+  };
+
+  const getWeekNumber = (date: Date): number => {
+    // Начало семестра - 1 сентября
+    const semesterStart = new Date(new Date().getFullYear(), 8, 1); // 8 = сентябрь (0-indexed)
+    semesterStart.setHours(0, 0, 0, 0);
+    
+    const dateWeekStart = getWeekStart(date);
+    dateWeekStart.setHours(0, 0, 0, 0);
+    
+    const semesterDayOfWeek = semesterStart.getDay();
+    let firstWeekMonday: Date;
+    
+    if (semesterDayOfWeek === 1) {
+      firstWeekMonday = new Date(semesterStart);
+    } else if (semesterDayOfWeek === 0) {
+      firstWeekMonday = new Date(semesterStart);
+      firstWeekMonday.setDate(semesterStart.getDate() + 1);
+    } else {
+      const daysUntilMonday = 8 - semesterDayOfWeek;
+      firstWeekMonday = new Date(semesterStart);
+      firstWeekMonday.setDate(semesterStart.getDate() + daysUntilMonday);
+    }
+    firstWeekMonday.setHours(0, 0, 0, 0);
+    
+    const diffMs = dateWeekStart.getTime() - firstWeekMonday.getTime();
+    const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
+    
+    return diffWeeks > 0 ? diffWeeks : 1;
+  };
+
+  const getAvailableWeeks = () => {
+    const weeks: Array<{ number: number; startDate: Date; label: string }> = [];
+    
+    // Начало семестра - 1 сентября
+    const semesterStart = new Date(new Date().getFullYear(), 8, 1); // 8 = сентябрь (0-indexed)
+    semesterStart.setHours(0, 0, 0, 0);
+    
+    const semesterDayOfWeek = semesterStart.getDay();
+    let firstWeekMonday: Date;
+    
+    if (semesterDayOfWeek === 1) {
+      firstWeekMonday = new Date(semesterStart);
+    } else if (semesterDayOfWeek === 0) {
+      firstWeekMonday = new Date(semesterStart);
+      firstWeekMonday.setDate(semesterStart.getDate() + 1);
+    } else {
+      const daysUntilMonday = 8 - semesterDayOfWeek;
+      firstWeekMonday = new Date(semesterStart);
+      firstWeekMonday.setDate(semesterStart.getDate() + daysUntilMonday);
+    }
+    firstWeekMonday.setHours(0, 0, 0, 0);
+    
+    // Генерируем 16 недель семестра
+    for (let i = 0; i < 16; i++) {
+      const weekStart = new Date(firstWeekMonday);
+      weekStart.setDate(firstWeekMonday.getDate() + i * 7);
+      const weekNumber = i + 1;
+      weeks.push({
+        number: weekNumber,
+        startDate: weekStart,
+        label: `${weekNumber} неделя с ${formatWeekDate(weekStart)}`
+      });
+    }
+    
+    return weeks;
   };
 
   const formatDayDate = (dateStr: string): string => {
@@ -240,43 +317,45 @@ function SchedulePage() {
             fontSize: 18,
             fontWeight: 700,
             color: '#000000',
-            marginBottom: 12,
+            marginBottom: 0,
             marginTop: 0
           }}>
             {fullDayText}
           </Typography.Title>
 
           {/* Карточки занятий */}
-          {daySchedule.lessons.length === 0 ? (
-            <div style={{
-              backgroundColor: '#EFEFEF',
-              borderRadius: 10,
-              padding: '20px 16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12
-            }}>
-              <span style={{ fontSize: 24 }}>🎒</span>
-              <Flex direction="column" gap={4}>
-                <Typography.Body variant="medium" style={{
-                  fontSize: 16,
-                  fontWeight: 400,
-                  color: '#333333'
-                }}>
-                  Нет занятий
-                </Typography.Body>
-                <Typography.Body variant="small" style={{
-                  fontSize: 14,
-                  fontWeight: 400,
-                  color: '#999999'
-                }}>
-                  Занятий нет
-                </Typography.Body>
-              </Flex>
-            </div>
-          ) : (
-            daySchedule.lessons.map((lesson, index) => renderLesson(lesson, index))
-          )}
+          <div style={{ marginTop: 20 }}>
+            {daySchedule.lessons.length === 0 ? (
+              <div style={{
+                backgroundColor: '#EFEFEF',
+                borderRadius: 10,
+                padding: '20px 16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12
+              }}>
+                <span style={{ fontSize: 24 }}>🎒</span>
+                <Flex direction="column" gap={4}>
+                  <Typography.Body variant="medium" style={{
+                    fontSize: 16,
+                    fontWeight: 400,
+                    color: '#333333'
+                  }}>
+                    Нет занятий
+                  </Typography.Body>
+                  <Typography.Body variant="small" style={{
+                    fontSize: 14,
+                    fontWeight: 400,
+                    color: '#999999'
+                  }}>
+                    Занятий нет
+                  </Typography.Body>
+                </Flex>
+              </div>
+            ) : (
+              daySchedule.lessons.map((lesson, index) => renderLesson(lesson, index))
+            )}
+          </div>
         </div>
       </div>
     );
@@ -308,7 +387,34 @@ function SchedulePage() {
                 }}>
                   {isCurrentWeek() ? 'Текущая неделя' : 'Неделя'} с {formatWeekDate(currentWeekStart)}
                 </Typography.Body>
-                <span style={{ fontSize: 16, color: '#666666' }}>›</span>
+                <button
+                  onClick={() => setShowWeekPicker(!showWeekPicker)}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    border: 'none',
+                    backgroundColor: '#F5F5F5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    fontSize: 16,
+                    color: '#666666',
+                    padding: 0
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#E8E8E8';
+                    e.currentTarget.style.transform = 'scale(1.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#F5F5F5';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  ›
+                </button>
               </Flex>
               <Typography.Body variant="small" style={{
                 fontSize: 14,
@@ -319,53 +425,117 @@ function SchedulePage() {
               </Typography.Body>
             </Flex>
             <Flex gap={8}>
-              <Button
-                mode="tertiary"
-                size="small"
+              <button
                 onClick={() => navigateWeek('prev')}
                 style={{
-                  minWidth: 40,
-                  height: 40,
-                  padding: 0,
-                  fontSize: 18
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  border: 'none',
+                  backgroundColor: '#F5F5F5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontSize: 20,
+                  color: '#000000',
+                  fontWeight: 400,
+                  padding: 0
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#E8E8E8';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#F5F5F5';
+                  e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                ‹
-              </Button>
-              <Button
-                mode="tertiary"
-                size="small"
+                ←
+              </button>
+              <button
                 onClick={() => navigateWeek('next')}
                 style={{
-                  minWidth: 40,
-                  height: 40,
-                  padding: 0,
-                  fontSize: 18
+                  width: 44,
+                  height: 44,
+                  borderRadius: 12,
+                  border: 'none',
+                  backgroundColor: '#F5F5F5',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontSize: 20,
+                  color: '#000000',
+                  fontWeight: 400,
+                  padding: 0
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#E8E8E8';
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#F5F5F5';
+                  e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                ›
-              </Button>
+                →
+              </button>
             </Flex>
           </Flex>
-
-          {/* Статус обновления (заглушка) */}
-          <div style={{
-            backgroundColor: '#E8F5E9',
-            borderRadius: 8,
-            padding: '10px 12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8
-          }}>
-            <span style={{ fontSize: 16, color: '#4CAF50' }}>✓</span>
-            <Typography.Body variant="small" style={{
-              fontSize: 14,
-              fontWeight: 400,
-              color: '#4CAF50'
+          
+          {/* Выпадающее меню выбора недели */}
+          {showWeekPicker && (
+            <div style={{
+              marginTop: 12,
+              backgroundColor: '#FFFFFF',
+              borderRadius: 16,
+              border: '1px solid #E8E8E8',
+              maxHeight: 300,
+              overflowY: 'auto',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
             }}>
-              Обновлено 1 ч. назад
-            </Typography.Body>
-          </div>
+              {getAvailableWeeks().map((week, index) => {
+                const isSelected = week.startDate.getTime() === currentWeekStart.getTime();
+                return (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      setCurrentWeekStart(week.startDate);
+                      setShowWeekPicker(false);
+                    }}
+                    style={{
+                      padding: '14px 16px',
+                      cursor: 'pointer',
+                      backgroundColor: isSelected ? '#F0F7FF' : 'transparent',
+                      borderBottom: index < getAvailableWeeks().length - 1 ? '1px solid #F5F5F5' : 'none',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.backgroundColor = '#F5F5F5';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
+                  >
+                    <Typography.Body variant="medium" style={{
+                      fontSize: 15,
+                      fontWeight: isSelected ? 600 : 400,
+                      color: isSelected ? '#2980F2' : '#000000'
+                    }}>
+                      {week.label}
+                    </Typography.Body>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Расписание */}

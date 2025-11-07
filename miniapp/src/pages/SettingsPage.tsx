@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, CellHeader, Typography, Button, Switch, Flex } from '@maxhub/max-ui';
 import api, { User } from '../api/client';
+import { formatFacultyName } from '../utils/formatters';
 
 interface GroupsStructure {
   faculties: Array<{
@@ -134,48 +135,46 @@ function SettingsPage() {
             <CellList mode="island" header={<CellHeader>Группа и подгруппа</CellHeader>}>
               <CellSimple
                 onClick={handleOpenGroupSelector}
-                style={{ padding: '14px 16px' }}
+                style={{ padding: '16px' }}
               >
-                <Flex align="center" gap={12}>
-                  <Typography.Body variant="medium" style={{ fontSize: 20 }}>
-                    🎓
-                  </Typography.Body>
-                  <Flex direction="column" gap={4} style={{ flex: 1 }}>
-                    <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
+                <Flex align="center" justify="space-between" style={{ width: '100%' }}>
+                  <Flex direction="column" gap={6} style={{ flex: 1 }}>
+                    <Typography.Body variant="medium" style={{ 
+                      fontWeight: 600,
+                      fontSize: 16,
+                      color: '#000000'
+                    }}>
                       Группа
                     </Typography.Body>
                     <Typography.Body variant="small" style={{ 
-                      color: user.group_name ? 'var(--text-secondary)' : 'var(--text-negative)',
-                      fontSize: 13
+                      color: user.group_name ? '#666666' : '#FF3B30',
+                      fontSize: 14
                     }}>
                       {user.group_name || 'Не указана'}
                     </Typography.Body>
                   </Flex>
-                  <Typography.Body variant="small" style={{ 
-                    color: 'var(--text-secondary)',
-                    fontSize: 18
-                  }}>
-                    {user.group_name ? '✓' : '⚠️'}
-                  </Typography.Body>
+                  <img 
+                    src="/edit.svg" 
+                    alt="Изменить"
+                    style={{
+                      width: 20,
+                      height: 20,
+                      objectFit: 'contain'
+                    }}
+                  />
                 </Flex>
               </CellSimple>
 
               {user.group_name && (
-                <CellSimple style={{ padding: '14px 16px' }}>
+                <CellSimple style={{ padding: '16px' }}>
                   <Flex direction="column" gap={12}>
-                    <Flex direction="column" gap={6}>
-                      <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
-                        👥 Подгруппа
-                      </Typography.Body>
-                      <Typography.Body variant="small" style={{ 
-                        color: 'var(--text-secondary)',
-                        fontSize: 13
-                      }}>
-                        {user.subgroup !== null && user.subgroup !== undefined
-                          ? `Текущая: Подгруппа ${user.subgroup}`
-                          : 'Текущая: Общая'}
-                      </Typography.Body>
-                    </Flex>
+                    <Typography.Body variant="medium" style={{ 
+                      fontWeight: 600,
+                      fontSize: 16,
+                      color: '#000000'
+                    }}>
+                      Подгруппа
+                    </Typography.Body>
                     <Flex gap={8} wrap="wrap">
                       {[null, 1, 2].map((sub) => (
                         <Button
@@ -185,7 +184,8 @@ function SettingsPage() {
                           size="s"
                           style={{ 
                             fontWeight: user.subgroup === sub ? 600 : 500,
-                            padding: '8px 14px'
+                            padding: '10px 16px',
+                            minWidth: 100
                           }}
                         >
                           {sub === null ? 'Общая' : `Подгруппа ${sub}`}
@@ -198,14 +198,17 @@ function SettingsPage() {
             </CellList>
 
             {showGroupSelector && groupsStructure && (
-              <CellList mode="island" header={<CellHeader>Выбор группы</CellHeader>}>
+              <CellList mode="island" header={
+                <CellHeader>
+                  {selectionStep === 'faculty' && 'Выберите факультет'}
+                  {selectionStep === 'format' && 'Выберите форму обучения'}
+                  {selectionStep === 'degree' && 'Выберите степень'}
+                  {selectionStep === 'course' && 'Выберите курс'}
+                  {selectionStep === 'group' && 'Выберите группу'}
+                </CellHeader>
+              }>
                 {selectionStep === 'faculty' && (
                   <>
-                    <CellSimple style={{ padding: '14px 16px' }}>
-                      <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
-                        Выберите факультет:
-                      </Typography.Body>
-                    </CellSimple>
                     {groupsStructure.faculties.map((faculty, idx) => (
                       <CellSimple
                         key={idx}
@@ -213,42 +216,43 @@ function SettingsPage() {
                           setSelectedFaculty(faculty.name);
                           setSelectionStep('format');
                         }}
-                        style={{ padding: '14px 16px' }}
+                        style={{ padding: '16px' }}
                       >
-                        <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
-                          {faculty.name}
+                        <Typography.Body variant="medium" style={{ 
+                          fontWeight: 500,
+                          fontSize: 16,
+                          color: '#000000'
+                        }}>
+                          {formatFacultyName(faculty.name)}
                         </Typography.Body>
                       </CellSimple>
                     ))}
-                    <CellSimple 
-                      onClick={() => setShowGroupSelector(false)}
-                      style={{ padding: '14px 16px' }}
-                    >
-                      <Typography.Body variant="medium" style={{ 
-                        color: 'var(--text-secondary)',
-                        fontWeight: 500
-                      }}>
-                        Отмена
-                      </Typography.Body>
-                    </CellSimple>
+                    <Flex gap={8} style={{ padding: '16px' }}>
+                      <div
+                        onClick={() => setShowGroupSelector(false)}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#FF3B30',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Отмена
+                        </Typography.Body>
+                      </div>
+                    </Flex>
                   </>
                 )}
 
                 {selectionStep === 'format' && selectedFaculty && (
                   <>
-                    <CellSimple 
-                      onClick={() => setSelectionStep('faculty')}
-                      style={{ padding: '14px 16px' }}
-                    >
-                      <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
-                        ← Назад
-                      </Typography.Body>
-                    </CellSimple>
-                    <CellSimple style={{ padding: '14px 16px' }}>
-                      <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
-                        Выберите форму обучения:
-                      </Typography.Body>
-                    </CellSimple>
                     {groupsStructure.faculties
                       .find(f => f.name === selectedFaculty)
                       ?.formats.map((format, idx) => (
@@ -258,31 +262,62 @@ function SettingsPage() {
                             setSelectedFormat(format.name);
                             setSelectionStep('degree');
                           }}
-                          style={{ padding: '14px 16px' }}
+                          style={{ padding: '16px' }}
                         >
-                          <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
+                          <Typography.Body variant="medium" style={{ 
+                            fontWeight: 500,
+                            fontSize: 16,
+                            color: '#000000'
+                          }}>
                             {format.name}
                           </Typography.Body>
                         </CellSimple>
                       ))}
+                    <Flex gap={8} style={{ padding: '16px' }}>
+                      <div
+                        onClick={() => setSelectionStep('faculty')}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#2980F2',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Назад
+                        </Typography.Body>
+                      </div>
+                      <div
+                        onClick={() => setShowGroupSelector(false)}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#FF3B30',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Отмена
+                        </Typography.Body>
+                      </div>
+                    </Flex>
                   </>
                 )}
 
                 {selectionStep === 'degree' && selectedFaculty && selectedFormat && (
                   <>
-                    <CellSimple 
-                      onClick={() => setSelectionStep('format')}
-                      style={{ padding: '14px 16px' }}
-                    >
-                      <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
-                        ← Назад
-                      </Typography.Body>
-                    </CellSimple>
-                    <CellSimple style={{ padding: '14px 16px' }}>
-                      <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
-                        Выберите степень:
-                      </Typography.Body>
-                    </CellSimple>
                     {groupsStructure.faculties
                       .find(f => f.name === selectedFaculty)
                       ?.formats.find(f => f.name === selectedFormat)
@@ -298,31 +333,62 @@ function SettingsPage() {
                               setSelectionStep('group');
                             }
                           }}
-                          style={{ padding: '14px 16px' }}
+                          style={{ padding: '16px' }}
                         >
-                          <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
+                          <Typography.Body variant="medium" style={{ 
+                            fontWeight: 500,
+                            fontSize: 16,
+                            color: '#000000'
+                          }}>
                             {degree.name}
                           </Typography.Body>
                         </CellSimple>
                       ))}
+                    <Flex gap={8} style={{ padding: '16px' }}>
+                      <div
+                        onClick={() => setSelectionStep('format')}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#2980F2',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Назад
+                        </Typography.Body>
+                      </div>
+                      <div
+                        onClick={() => setShowGroupSelector(false)}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#FF3B30',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Отмена
+                        </Typography.Body>
+                      </div>
+                    </Flex>
                   </>
                 )}
 
                 {selectionStep === 'course' && selectedFaculty && selectedFormat && selectedDegree && (
                   <>
-                    <CellSimple 
-                      onClick={() => setSelectionStep('degree')}
-                      style={{ padding: '14px 16px' }}
-                    >
-                      <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
-                        ← Назад
-                      </Typography.Body>
-                    </CellSimple>
-                    <CellSimple style={{ padding: '14px 16px' }}>
-                      <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
-                        Выберите курс:
-                      </Typography.Body>
-                    </CellSimple>
                     {groupsStructure.faculties
                       .find(f => f.name === selectedFaculty)
                       ?.formats.find(f => f.name === selectedFormat)
@@ -334,41 +400,62 @@ function SettingsPage() {
                             setSelectedCourse(course.number);
                             setSelectionStep('group');
                           }}
-                          style={{ padding: '14px 16px' }}
+                          style={{ padding: '16px' }}
                         >
-                          <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
+                          <Typography.Body variant="medium" style={{ 
+                            fontWeight: 500,
+                            fontSize: 16,
+                            color: '#000000'
+                          }}>
                             {course.number} курс
                           </Typography.Body>
                         </CellSimple>
                       ))}
+                    <Flex gap={8} style={{ padding: '16px' }}>
+                      <div
+                        onClick={() => setSelectionStep('degree')}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#2980F2',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Назад
+                        </Typography.Body>
+                      </div>
+                      <div
+                        onClick={() => setShowGroupSelector(false)}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#FF3B30',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Отмена
+                        </Typography.Body>
+                      </div>
+                    </Flex>
                   </>
                 )}
 
                 {selectionStep === 'group' && selectedFaculty && selectedFormat && selectedDegree && (
                   <>
-                    <CellSimple 
-                      onClick={() => {
-                        const degree = groupsStructure.faculties
-                          .find(f => f.name === selectedFaculty)
-                          ?.formats.find(f => f.name === selectedFormat)
-                          ?.degrees.find(d => d.name === selectedDegree);
-                        if (degree?.courses && degree.courses.length > 0) {
-                          setSelectionStep('course');
-                        } else {
-                          setSelectionStep('degree');
-                        }
-                      }}
-                      style={{ padding: '14px 16px' }}
-                    >
-                      <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
-                        ← Назад
-                      </Typography.Body>
-                    </CellSimple>
-                    <CellSimple style={{ padding: '14px 16px' }}>
-                      <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
-                        Выберите группу:
-                      </Typography.Body>
-                    </CellSimple>
                     {(() => {
                       const degree = groupsStructure.faculties
                         .find(f => f.name === selectedFaculty)
@@ -383,14 +470,68 @@ function SettingsPage() {
                         <CellSimple
                           key={idx}
                           onClick={() => handleGroupSelect(group)}
-                          style={{ padding: '14px 16px' }}
+                          style={{ padding: '16px' }}
                         >
-                          <Typography.Body variant="medium" style={{ fontWeight: 500 }}>
+                          <Typography.Body variant="medium" style={{ 
+                            fontWeight: 500,
+                            fontSize: 16,
+                            color: '#000000'
+                          }}>
                             {group}
                           </Typography.Body>
                         </CellSimple>
                       ));
                     })()}
+                    <Flex gap={8} style={{ padding: '16px' }}>
+                      <div
+                        onClick={() => {
+                          const degree = groupsStructure.faculties
+                            .find(f => f.name === selectedFaculty)
+                            ?.formats.find(f => f.name === selectedFormat)
+                            ?.degrees.find(d => d.name === selectedDegree);
+                          if (degree?.courses && degree.courses.length > 0) {
+                            setSelectionStep('course');
+                          } else {
+                            setSelectionStep('degree');
+                          }
+                        }}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#2980F2',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Назад
+                        </Typography.Body>
+                      </div>
+                      <div
+                        onClick={() => setShowGroupSelector(false)}
+                        style={{ 
+                          flex: 1,
+                          padding: '12px 16px',
+                          textAlign: 'center',
+                          cursor: 'pointer',
+                          borderRadius: 8,
+                          backgroundColor: '#F5F5F5'
+                        }}
+                      >
+                        <Typography.Body variant="medium" style={{ 
+                          color: '#FF3B30',
+                          fontWeight: 500,
+                          fontSize: 16
+                        }}>
+                          Отмена
+                        </Typography.Body>
+                      </div>
+                    </Flex>
                   </>
                 )}
               </CellList>

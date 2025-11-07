@@ -230,7 +230,7 @@ export function getTomorrowSchedule(group: string, subgroup?: number | null): Da
 }
 
 // Получить расписание на неделю начиная с указанной даты
-function getWeekScheduleFromDate(group: string, startDate: Date, subgroup?: number | null): DaySchedule[] {
+export function getWeekScheduleFromDate(group: string, startDate: Date, subgroup?: number | null): DaySchedule[] {
   const timetableData = loadTimetableData();
   if (!timetableData) {
     return [];
@@ -606,4 +606,73 @@ export function getAvailableGroups(): string[] {
   }
   
   return groups;
+}
+
+// Получить структуру групп для API (для выбора группы в мини-приложении)
+export function getGroupsStructure(): any {
+  const timetableData = loadTimetableData();
+  if (!timetableData || !timetableData.faculties) {
+    return { faculties: [] };
+  }
+  
+  const structure: any = {
+    faculties: []
+  };
+  
+  for (const facultyName in timetableData.faculties) {
+    const faculty = timetableData.faculties[facultyName];
+    const facultyData: any = {
+      name: facultyName,
+      formats: []
+    };
+    
+    for (const studyFormat in faculty) {
+      const format = faculty[studyFormat];
+      const formatData: any = {
+        name: studyFormat,
+        degrees: []
+      };
+      
+      for (const degree in format) {
+        const degreeData = format[degree];
+        const degreeInfo: any = {
+          name: degree
+        };
+        
+        // Проверяем, есть ли курсы в структуре
+        if (typeof degreeData === 'object' && !Array.isArray(degreeData)) {
+          const courses: any[] = [];
+          for (const courseKey in degreeData) {
+            const courseNum = parseInt(courseKey);
+            if (!isNaN(courseNum)) {
+              const courseGroups = degreeData[courseKey];
+              if (typeof courseGroups === 'object' && !Array.isArray(courseGroups)) {
+                courses.push({
+                  number: courseNum,
+                  groups: Object.keys(courseGroups)
+                });
+              }
+            }
+          }
+          if (courses.length > 0) {
+            degreeInfo.courses = courses;
+          } else {
+            // Если нет курсов, но есть группы напрямую
+            degreeInfo.groups = Object.keys(degreeData);
+          }
+        } else {
+          // Обратная совместимость - без курсов
+          degreeInfo.groups = Object.keys(degreeData);
+        }
+        
+        formatData.degrees.push(degreeInfo);
+      }
+      
+      facultyData.formats.push(formatData);
+    }
+    
+    structure.faculties.push(facultyData);
+  }
+  
+  return structure;
 }

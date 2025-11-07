@@ -30,6 +30,22 @@ export function setupMenuHandlers(bot: any) {
     });
   });
 
+  // Открыть приложение
+  bot.action('menu:open_app', async (ctx: Context) => {
+    const appUrl = 'http://localhost:3000/';
+    const message = `📱 Мини-приложение\n\n` +
+      `🔗 Ссылка для открытия:\n` +
+      `${appUrl}\n\n` +
+      `💡 Скопируйте ссылку выше и откройте в браузере.\n\n` +
+      `⚠️ Убедитесь, что мини-приложение запущено:\n` +
+      `cd miniapp\n` +
+      `npm run dev`;
+    
+    await ctx.reply(message, {
+      attachments: [getMainMenu()]
+    });
+  });
+
   // Меню расписания (главное)
   bot.action('menu:schedule', async (ctx: Context) => {
     if (!ctx.user) return;
