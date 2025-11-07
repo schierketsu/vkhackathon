@@ -67,16 +67,7 @@ function TeachersPage() {
     <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
       <Grid gap={20} cols={1}>
         <div style={{ paddingLeft: 'var(--spacing-size-xl, 16px)', paddingRight: 'var(--spacing-size-xl, 16px)' }}>
-          <Typography.Title style={{ 
-            fontSize: 24, 
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            marginBottom: 0
-          }}>
-            Преподаватели
-          </Typography.Title>
-
-          <Flex gap={10} wrap="wrap" style={{ marginTop: 20, marginBottom: 0 }}>
+          <Flex gap={10} wrap="wrap" style={{ marginTop: 0, marginBottom: 0 }}>
           <Button
             mode={!showFavorites ? 'primary' : 'secondary'}
             onClick={() => setShowFavorites(false)}
@@ -124,16 +115,20 @@ function TeachersPage() {
           <CellList mode="island" filled>
             <CellSimple>
               <Flex align="center" justify="center" style={{ padding: '40px 0' }}>
-                <Flex direction="column" align="center" gap={8}>
+                <Flex direction="column" align="center" gap={16}>
                   <Typography.Body variant="medium" style={{ 
                     fontSize: 48,
-                    opacity: 0.3
+                    opacity: 0.3,
+                    lineHeight: 1,
+                    margin: 0
                   }}>
                     ⭐
                   </Typography.Body>
                   <Typography.Body variant="small" style={{ 
                     color: 'var(--text-secondary)',
-                    fontSize: 14
+                    fontSize: 14,
+                    textAlign: 'center',
+                    margin: 0
                   }}>
                     Нет избранных преподавателей
                   </Typography.Body>
@@ -145,16 +140,20 @@ function TeachersPage() {
           <CellList mode="island" filled>
             <CellSimple>
               <Flex align="center" justify="center" style={{ padding: '40px 0' }}>
-                <Flex direction="column" align="center" gap={8}>
+                <Flex direction="column" align="center" gap={16}>
                   <Typography.Body variant="medium" style={{ 
                     fontSize: 48,
-                    opacity: 0.3
+                    opacity: 0.3,
+                    lineHeight: 1,
+                    margin: 0
                   }}>
                     👨‍🏫
                   </Typography.Body>
                   <Typography.Body variant="small" style={{ 
                     color: 'var(--text-secondary)',
-                    fontSize: 14
+                    fontSize: 14,
+                    textAlign: 'center',
+                    margin: 0
                   }}>
                     Введите имя для поиска
                   </Typography.Body>

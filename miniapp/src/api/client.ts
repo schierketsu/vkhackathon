@@ -209,6 +209,33 @@ export const api = {
     const response = await apiClient.get('/week/current');
     return response.data;
   },
+
+  // Практика
+  getPracticeInstitutions: async (): Promise<{ institutions: Array<{ name: string; faculties: Array<{ name: string }> }> }> => {
+    const response = await apiClient.get('/practice/institutions');
+    return response.data;
+  },
+
+  getPracticeCompanies: async (institution: string, faculty: string): Promise<Array<{
+    id: string;
+    name: string;
+    description?: string;
+    location?: string;
+    tags: string[];
+  }>> => {
+    const response = await apiClient.get('/practice/companies', {
+      params: { institution, faculty },
+    });
+    return response.data;
+  },
+
+  getPracticeTags: async (institution?: string, faculty?: string): Promise<{ tags: string[] }> => {
+    const params: any = {};
+    if (institution) params.institution = institution;
+    if (faculty) params.faculty = faculty;
+    const response = await apiClient.get('/practice/tags', { params });
+    return response.data;
+  },
 };
 
 export default api;

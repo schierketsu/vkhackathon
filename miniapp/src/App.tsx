@@ -11,6 +11,7 @@ import TeacherDetailPage from './pages/TeacherDetailPage';
 import SettingsPage from './pages/SettingsPage';
 import ServicesPage from './pages/ServicesPage';
 import ProfilePage from './pages/ProfilePage';
+import PracticePage from './pages/PracticePage';
 
 function AppContent() {
   const location = useLocation();
@@ -19,20 +20,23 @@ function AppContent() {
   const showBottomNav = ['/', '/services', '/profile'].includes(location.pathname);
 
   return (
-    <Panel mode="secondary" style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden', position: 'relative', backgroundColor: '#F5F5F5', paddingBottom: showBottomNav ? '80px' : '0' }}>
+    <Panel mode="secondary" style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden', position: 'relative', backgroundColor: '#F5F5F5', paddingBottom: showBottomNav ? '80px' : '0', gap: 0, margin: 0 }}>
       <Header />
-      <Routes>
-        <Route path="/" element={<MainMenu />} />
-        <Route path="/schedule" element={<SchedulePage />} />
-        <Route path="/events" element={<EventsPage />} />
-        <Route path="/deadlines" element={<DeadlinesPage />} />
-        <Route path="/teachers" element={<TeachersPage />} />
-        <Route path="/teachers/:teacherName" element={<TeacherDetailPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', margin: 0, padding: 0 }}>
+        <Routes>
+          <Route path="/" element={<MainMenu />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/events" element={<EventsPage />} />
+          <Route path="/deadlines" element={<DeadlinesPage />} />
+          <Route path="/teachers" element={<TeachersPage />} />
+          <Route path="/teachers/:teacherName" element={<TeacherDetailPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/practice" element={<PracticePage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
       {showBottomNav && <BottomNavigation />}
     </Panel>
   );

@@ -19,6 +19,7 @@ function Header() {
     '/deadlines': 'Дедлайны',
     '/teachers': 'Преподаватели',
     '/profile': 'Профиль',
+    '/practice': 'Практика',
   };
 
   /**
@@ -126,7 +127,7 @@ function Header() {
       style={{
         padding: '12px var(--spacing-size-xl, 16px)',
         background: '#F5F5F5',
-        borderBottom: '1px solid var(--background-surface-ground)',
+        borderBottom: 'none',
         position: 'sticky',
         top: 0,
         zIndex: 100,

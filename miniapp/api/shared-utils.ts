@@ -757,6 +757,164 @@ export function getAvailableGroups(): string[] {
   return groups;
 }
 
+// Загрузка данных из forparser.json для страницы практики
+function loadForParserData() {
+  // Пробуем разные пути в зависимости от того, где запущен сервер
+  const possiblePaths = [
+    path.join(__dirname, '../../data/forparser.json'),
+    path.join(process.cwd(), 'data/forparser.json'),
+    path.join(process.cwd(), 'miniapp/api/../../data/forparser.json'),
+  ];
+
+  for (const forParserPath of possiblePaths) {
+    if (fs.existsSync(forParserPath)) {
+      try {
+        const content = fs.readFileSync(forParserPath, 'utf-8');
+        console.log('Загружен forparser.json из:', forParserPath);
+        return JSON.parse(content);
+      } catch (error) {
+        console.error('Ошибка загрузки forparser.json из', forParserPath, ':', error);
+      }
+    }
+  }
+
+  console.error('Файл forparser.json не найден. Проверенные пути:', possiblePaths);
+  return null;
+}
+
+// Загрузка данных о компаниях для практики
+function loadPracticeCompaniesData() {
+  // Пробуем разные пути в зависимости от того, где запущен сервер
+  const possiblePaths = [
+    path.join(__dirname, '../../data/practice-companies.json'),
+    path.join(process.cwd(), 'data/practice-companies.json'),
+    path.join(process.cwd(), 'miniapp/api/../../data/practice-companies.json'),
+  ];
+
+  for (const practiceCompaniesPath of possiblePaths) {
+    if (fs.existsSync(practiceCompaniesPath)) {
+      try {
+        const content = fs.readFileSync(practiceCompaniesPath, 'utf-8');
+        console.log('Загружен practice-companies.json из:', practiceCompaniesPath);
+        return JSON.parse(content);
+      } catch (error) {
+        console.error('Ошибка загрузки practice-companies.json из', practiceCompaniesPath, ':', error);
+      }
+    }
+  }
+
+  console.error('Файл practice-companies.json не найден. Проверенные пути:', possiblePaths);
+  return null;
+}
+
+// Получение структуры учебных заведений и факультетов для страницы практики
+export function getPracticeInstitutionsStructure() {
+  const practiceCompaniesData = loadPracticeCompaniesData();
+  if (!practiceCompaniesData) {
+    return { institutions: [] };
+  }
+
+  const structure: any = {
+    institutions: []
+  };
+
+  // Структура: { "ЧувГУ им. И. Н. Ульянова": { "Факультет": [компании] } }
+  for (const institutionName in practiceCompaniesData) {
+    const institution = practiceCompaniesData[institutionName];
+    const institutionData: any = {
+      name: institutionName,
+      faculties: []
+    };
+
+    for (const facultyName in institution) {
+      const faculty = institution[facultyName];
+      // Проверяем, что это массив компаний (факультет)
+      if (Array.isArray(faculty)) {
+        institutionData.faculties.push({
+          name: facultyName
+        });
+      }
+    }
+
+    structure.institutions.push(institutionData);
+  }
+
+  return structure;
+}
+
+// Получение компаний для выбранного учебного заведения и факультета
+export function getPracticeCompanies(institutionName: string, facultyName: string) {
+  const practiceCompaniesData = loadPracticeCompaniesData();
+  if (!practiceCompaniesData) {
+    return [];
+  }
+
+  if (
+    practiceCompaniesData[institutionName] &&
+    practiceCompaniesData[institutionName][facultyName]
+  ) {
+    return practiceCompaniesData[institutionName][facultyName];
+  }
+
+  return [];
+}
+
+// Получение всех уникальных тегов для фильтрации (для всего университета)
+export function getAllPracticeTags() {
+  const practiceCompaniesData = loadPracticeCompaniesData();
+  if (!practiceCompaniesData) {
+    return [];
+  }
+
+  const tagsSet = new Set<string>();
+
+  for (const institutionName in practiceCompaniesData) {
+    const institution = practiceCompaniesData[institutionName];
+    for (const facultyName in institution) {
+      const companies = institution[facultyName];
+      if (Array.isArray(companies)) {
+        for (const company of companies) {
+          if (company.tags && Array.isArray(company.tags)) {
+            for (const tag of company.tags) {
+              tagsSet.add(tag);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return Array.from(tagsSet).sort();
+}
+
+// Получение тегов для конкретного факультета
+export function getPracticeTagsForFaculty(institutionName: string, facultyName: string) {
+  const practiceCompaniesData = loadPracticeCompaniesData();
+  if (!practiceCompaniesData) {
+    return [];
+  }
+
+  const tagsSet = new Set<string>();
+
+  if (
+    practiceCompaniesData[institutionName] &&
+    practiceCompaniesData[institutionName][facultyName]
+  ) {
+    const companies = practiceCompaniesData[institutionName][facultyName];
+    if (Array.isArray(companies)) {
+      for (const company of companies) {
+        if (company.tags && Array.isArray(company.tags)) {
+          for (const tag of company.tags) {
+            tagsSet.add(tag);
+          }
+        }
+      }
+    }
+  }
+
+  return Array.from(tagsSet).sort();
+}
+
 export function getGroupsStructure() {
   const timetableData = loadTimetableDataFromFile();
   if (!timetableData || !timetableData.faculties) {

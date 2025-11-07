@@ -101,22 +101,13 @@ function DeadlinesPage() {
     <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
       <Grid gap={20} cols={1}>
         <div style={{ paddingLeft: 'var(--spacing-size-xl, 16px)', paddingRight: 'var(--spacing-size-xl, 16px)' }}>
-          <Typography.Title style={{ 
-            fontSize: 24, 
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            marginBottom: 0
-          }}>
-            Дедлайны
-          </Typography.Title>
-
           <Button 
             onClick={() => setShowAddForm(!showAddForm)} 
             mode={showAddForm ? 'secondary' : 'primary'}
             style={{ 
               fontWeight: 600,
               padding: '12px 20px',
-              marginTop: 20
+              marginTop: 0
             }}
           >
             {showAddForm ? '✕ Отмена' : '+ Добавить дедлайн'}
@@ -189,16 +180,20 @@ function DeadlinesPage() {
           <CellList mode="island" filled>
             <CellSimple>
               <Flex align="center" justify="center" style={{ padding: '40px 0' }}>
-                <Flex direction="column" align="center" gap={8}>
+                <Flex direction="column" align="center" gap={16}>
                   <Typography.Body variant="medium" style={{ 
                     fontSize: 48,
-                    opacity: 0.3
+                    opacity: 0.3,
+                    lineHeight: 1,
+                    margin: 0
                   }}>
                     ⏰
                   </Typography.Body>
                   <Typography.Body variant="small" style={{ 
                     color: 'var(--text-secondary)',
-                    fontSize: 14
+                    fontSize: 14,
+                    textAlign: 'center',
+                    margin: 0
                   }}>
                     Нет активных дедлайнов
                   </Typography.Body>

@@ -24,6 +24,10 @@ import {
   getWeekNumber,
   getTeacherWeekSchedule,
   getWeekScheduleFromDate,
+  getPracticeInstitutionsStructure,
+  getPracticeCompanies,
+  getAllPracticeTags,
+  getPracticeTagsForFaculty,
 } from './shared-utils';
 
 const app = express();
@@ -249,6 +253,63 @@ app.get('/api/groups', (req, res) => {
     const structure = getGroupsStructure();
     res.json(structure);
   } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Практика
+app.get('/api/practice/institutions', (req, res) => {
+  console.log('[API] GET /api/practice/institutions');
+  try {
+    const structure = getPracticeInstitutionsStructure();
+    console.log('[API] Структура загружена:', structure);
+    res.json(structure);
+  } catch (error: any) {
+    console.error('[API] Ошибка получения структуры:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/practice/companies', (req, res) => {
+  console.log('[API] GET /api/practice/companies', req.query);
+  try {
+    const institutionName = req.query.institution as string;
+    const facultyName = req.query.faculty as string;
+    
+    if (!institutionName || !facultyName) {
+      return res.status(400).json({ error: 'Не указано учебное заведение или факультет' });
+    }
+
+    const companies = getPracticeCompanies(institutionName, facultyName);
+    console.log('[API] Найдено компаний:', companies.length);
+    res.json(companies);
+  } catch (error: any) {
+    console.error('[API] Ошибка получения компаний:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/practice/tags', (req, res) => {
+  console.log('[API] GET /api/practice/tags', req.query);
+  try {
+    const institutionName = req.query.institution as string;
+    const facultyName = req.query.faculty as string;
+    
+    let tags: string[];
+    
+    // Если указаны institution и faculty, возвращаем теги только для этого факультета
+    if (institutionName && facultyName) {
+      tags = getPracticeTagsForFaculty(institutionName, facultyName);
+      console.log(`[API] Найдено тегов для ${institutionName} -> ${facultyName}:`, tags.length);
+    } else {
+      // Иначе возвращаем все теги
+      tags = getAllPracticeTags();
+      console.log('[API] Найдено всех тегов:', tags.length);
+    }
+    
+    res.json({ tags });
+  } catch (error: any) {
+    console.error('[API] Ошибка получения тегов:', error);
     res.status(500).json({ error: error.message });
   }
 });

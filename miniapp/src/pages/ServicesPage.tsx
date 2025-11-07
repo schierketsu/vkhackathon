@@ -25,7 +25,7 @@ function ServicesPage() {
     },
     {
       id: 'references',
-      title: 'Справки и запросы',
+      title: 'Дедлайны',
       icon: '/дедлайн.png',
       path: '/deadlines',
     },
@@ -36,9 +36,21 @@ function ServicesPage() {
       path: '#',
     },
     {
+      id: 'practice',
+      title: 'Практика',
+      icon: '/практика.png',
+      path: '/practice',
+    },
+    {
       id: 'contacts',
       title: 'Контакты',
       icon: '/звонки.png',
+      path: '#',
+    },
+    {
+      id: 'certificates',
+      title: 'Справки',
+      icon: '/справки.png',
       path: '#',
     }
   ];
