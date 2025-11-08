@@ -12,15 +12,22 @@ export default defineConfig({
   optimizeDeps: {
     include: ['@maxhub/max-ui'],
     exclude: [],
+    force: true,
   },
   server: {
     port: 3000,
+    hmr: {
+      overlay: true,
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
       },
     },
+  },
+  build: {
+    sourcemap: true,
   },
 });
 

@@ -22,7 +22,23 @@ interface DaySchedule {
 }
 
 interface TimetableData {
-  faculties: {
+  institutions?: {
+    [institutionName: string]: {
+      faculties: {
+        [facultyName: string]: {
+          [studyFormat: string]: {
+            [degree: string]: {
+              [course: string]: {
+                [groupName: string]: any;
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+  // Обратная совместимость со старой структурой
+  faculties?: {
     [facultyName: string]: {
       [studyFormat: string]: {
         [degree: string]: {
@@ -57,11 +73,19 @@ function createTables() {
       user_id TEXT PRIMARY KEY,
       group_name TEXT,
       subgroup INTEGER,
+      institution_name TEXT,
       notifications_enabled INTEGER DEFAULT 1,
       events_subscribed INTEGER DEFAULT 1,
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
   `);
+
+  // Добавляем поле institution_name, если его нет (для существующих БД)
+  try {
+    db.exec('ALTER TABLE users ADD COLUMN institution_name TEXT');
+  } catch (e) {
+    // Колонка уже существует, игнорируем
+  }
 
   // Таблица дедлайнов
   db.exec(`
@@ -101,6 +125,7 @@ export interface User {
   user_id: string;
   group_name: string | null;
   subgroup: number | null;
+  institution_name: string | null;
   notifications_enabled: number;
   events_subscribed: number;
   created_at: string;
@@ -118,20 +143,27 @@ export function createUser(userId: string): User {
   if (!database) throw new Error('База данных не инициализирована');
   
   const stmt = database.prepare(`
-    INSERT INTO users (user_id, group_name, subgroup, notifications_enabled, events_subscribed)
-    VALUES (?, ?, ?, 1, 1)
+    INSERT INTO users (user_id, group_name, subgroup, institution_name, notifications_enabled, events_subscribed)
+    VALUES (?, ?, ?, ?, 1, 1)
     ON CONFLICT(user_id) DO UPDATE SET user_id = user_id
   `);
-  stmt.run(userId, null, null);
+  stmt.run(userId, null, null, null);
   
   return getUser(userId)!;
 }
 
-export function updateUserGroup(userId: string, groupName: string, subgroup?: number | null): void {
+export function updateUserGroup(userId: string, groupName: string, subgroup?: number | null, institutionName?: string | null): void {
   const database = getDatabase();
   if (!database) return;
-  const stmt = database.prepare('UPDATE users SET group_name = ?, subgroup = ? WHERE user_id = ?');
-  stmt.run(groupName, subgroup || null, userId);
+  const stmt = database.prepare('UPDATE users SET group_name = ?, subgroup = ?, institution_name = ? WHERE user_id = ?');
+  stmt.run(groupName, subgroup || null, institutionName || null, userId);
+}
+
+export function updateUserInstitution(userId: string, institutionName: string | null): void {
+  const database = getDatabase();
+  if (!database) return;
+  const stmt = database.prepare('UPDATE users SET institution_name = ? WHERE user_id = ?');
+  stmt.run(institutionName, userId);
 }
 
 export function toggleNotifications(userId: string, enabled: boolean): void {
@@ -375,6 +407,31 @@ function formatDate(date: Date): string {
 }
 
 function findGroupSchedule(timetableData: TimetableData, groupName: string): WeekSchedule | null {
+  // Проверяем новую структуру с учебными заведениями
+  if (timetableData.institutions) {
+    for (const institutionName in timetableData.institutions) {
+      const institution = timetableData.institutions[institutionName];
+      if (institution.faculties) {
+        for (const facultyName in institution.faculties) {
+          const faculty = institution.faculties[facultyName];
+          for (const studyFormat in faculty) {
+            const format = faculty[studyFormat];
+            for (const degree in format) {
+              const degreeCourses = format[degree];
+              for (const course in degreeCourses) {
+                const courseGroups = degreeCourses[course];
+                if (courseGroups[groupName]) {
+                  return courseGroups[groupName];
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Обратная совместимость со старой структурой с факультетами
   if (timetableData.faculties) {
     for (const facultyName in timetableData.faculties) {
       const faculty = timetableData.faculties[facultyName];
@@ -401,8 +458,10 @@ function findGroupSchedule(timetableData: TimetableData, groupName: string): Wee
         const format = faculty[studyFormat];
         for (const degree in format) {
           const degreeGroups = format[degree];
-          if (degreeGroups[groupName]) {
-            return degreeGroups[groupName];
+          if (typeof degreeGroups === 'object' && !Array.isArray(degreeGroups)) {
+            if (degreeGroups[groupName]) {
+              return degreeGroups[groupName];
+            }
           }
         }
       }
@@ -598,12 +657,51 @@ export function getCurrentWeekSchedule(groupName: string, subgroup: number | nul
 
 // Функции для получения списка групп и структуры данных
 
-export function getAvailableFaculties(): string[] {
+export function getAvailableInstitutions(): string[] {
   const timetableData = loadTimetableDataFromFile();
-  if (!timetableData || !timetableData.faculties) {
+  if (!timetableData) {
     return [];
   }
-  return Object.keys(timetableData.faculties);
+  
+  if (timetableData.institutions) {
+    return Object.keys(timetableData.institutions);
+  }
+  
+  return [];
+}
+
+export function getAvailableFaculties(institutionName?: string): string[] {
+  const timetableData = loadTimetableDataFromFile();
+  if (!timetableData) {
+    return [];
+  }
+  
+  const faculties: string[] = [];
+  
+  // Проверяем новую структуру с учебными заведениями
+  if (timetableData.institutions) {
+    if (institutionName) {
+      const institution = timetableData.institutions[institutionName];
+      if (institution && institution.faculties) {
+        return Object.keys(institution.faculties);
+      }
+    } else {
+      for (const instName in timetableData.institutions) {
+        const institution = timetableData.institutions[instName];
+        if (institution.faculties) {
+          faculties.push(...Object.keys(institution.faculties));
+        }
+      }
+      return faculties;
+    }
+  }
+  
+  // Обратная совместимость со старой структурой
+  if (timetableData.faculties) {
+    return Object.keys(timetableData.faculties);
+  }
+  
+  return [];
 }
 
 export function getStudyFormatsForFaculty(facultyName: string): string[] {
@@ -915,66 +1013,151 @@ export function getPracticeTagsForFaculty(institutionName: string, facultyName: 
   return Array.from(tagsSet).sort();
 }
 
-export function getGroupsStructure() {
+export function getGroupsStructure(institutionName?: string) {
   const timetableData = loadTimetableDataFromFile();
-  if (!timetableData || !timetableData.faculties) {
-    return { faculties: [] };
+  if (!timetableData) {
+    return { institutions: [] };
   }
   
-  const structure: any = {
-    faculties: []
-  };
-  
-  for (const facultyName in timetableData.faculties) {
-    const faculty = timetableData.faculties[facultyName];
-    const facultyData: any = {
-      name: facultyName,
-      formats: []
+  // Проверяем новую структуру с учебными заведениями
+  if (timetableData.institutions) {
+    const structure: any = {
+      institutions: []
     };
     
-    for (const studyFormat in faculty) {
-      const format = faculty[studyFormat];
-      const formatData: any = {
-        name: studyFormat,
-        degrees: []
+    const institutionsToProcess = institutionName 
+      ? { [institutionName]: timetableData.institutions[institutionName] }
+      : timetableData.institutions;
+    
+    for (const instName in institutionsToProcess) {
+      const institution = institutionsToProcess[instName];
+      const institutionData: any = {
+        name: instName,
+        faculties: []
       };
       
-      for (const degree in format) {
-        const degreeData = format[degree];
-        const degreeInfo: any = {
-          name: degree,
-          courses: []
-        };
-        
-        // Проверяем, есть ли курсы в структуре
-        if (typeof degreeData === 'object' && !Array.isArray(degreeData)) {
-          for (const courseKey in degreeData) {
-            const courseNum = parseInt(courseKey);
-            if (!isNaN(courseNum)) {
-              const courseGroups = degreeData[courseKey];
-              if (typeof courseGroups === 'object' && !Array.isArray(courseGroups)) {
-                degreeInfo.courses.push({
-                  number: courseNum,
-                  groups: Object.keys(courseGroups)
-                });
+      if (institution.faculties) {
+        for (const facultyName in institution.faculties) {
+          const faculty = institution.faculties[facultyName];
+          const facultyData: any = {
+            name: facultyName,
+            formats: []
+          };
+          
+          for (const studyFormat in faculty) {
+            const format = faculty[studyFormat];
+            const formatData: any = {
+              name: studyFormat,
+              degrees: []
+            };
+            
+            for (const degree in format) {
+              const degreeData = format[degree];
+              const degreeInfo: any = {
+                name: degree
+              };
+              
+              if (typeof degreeData === 'object' && !Array.isArray(degreeData)) {
+                const courses: any[] = [];
+                for (const courseKey in degreeData) {
+                  const courseNum = parseInt(courseKey);
+                  if (!isNaN(courseNum)) {
+                    const courseGroups = degreeData[courseKey];
+                    if (typeof courseGroups === 'object' && !Array.isArray(courseGroups)) {
+                      courses.push({
+                        number: courseNum,
+                        groups: Object.keys(courseGroups)
+                      });
+                    }
+                  }
+                }
+                if (courses.length > 0) {
+                  degreeInfo.courses = courses;
+                } else {
+                  degreeInfo.groups = Object.keys(degreeData);
+                }
+              } else {
+                degreeInfo.groups = Object.keys(degreeData);
               }
+              
+              formatData.degrees.push(degreeInfo);
             }
+            
+            facultyData.formats.push(formatData);
           }
-        } else {
-          // Обратная совместимость - без курсов
-          degreeInfo.groups = Object.keys(degreeData);
+          
+          institutionData.faculties.push(facultyData);
         }
-        
-        formatData.degrees.push(degreeInfo);
       }
       
-      facultyData.formats.push(formatData);
+      structure.institutions.push(institutionData);
     }
     
-    structure.faculties.push(facultyData);
+    return structure;
   }
   
-  return structure;
+  // Обратная совместимость со старой структурой (без institutions)
+  if (timetableData.faculties) {
+    const structure: any = {
+      faculties: []
+    };
+    
+    for (const facultyName in timetableData.faculties) {
+      const faculty = timetableData.faculties[facultyName];
+      const facultyData: any = {
+        name: facultyName,
+        formats: []
+      };
+      
+      for (const studyFormat in faculty) {
+        const format = faculty[studyFormat];
+        const formatData: any = {
+          name: studyFormat,
+          degrees: []
+        };
+        
+        for (const degree in format) {
+          const degreeData = format[degree];
+          const degreeInfo: any = {
+            name: degree
+          };
+          
+          if (typeof degreeData === 'object' && !Array.isArray(degreeData)) {
+            const courses: any[] = [];
+            for (const courseKey in degreeData) {
+              const courseNum = parseInt(courseKey);
+              if (!isNaN(courseNum)) {
+                const courseGroups = degreeData[courseKey];
+                if (typeof courseGroups === 'object' && !Array.isArray(courseGroups)) {
+                  courses.push({
+                    number: courseNum,
+                    groups: Object.keys(courseGroups)
+                  });
+                }
+              }
+            }
+            if (courses.length > 0) {
+              degreeInfo.courses = courses;
+            } else {
+              degreeInfo.groups = Object.keys(degreeData);
+            }
+          } else {
+            degreeInfo.groups = Object.keys(degreeData);
+          }
+          
+          formatData.degrees.push(degreeInfo);
+        }
+        
+        facultyData.formats.push(formatData);
+      }
+      
+      structure.faculties.push(facultyData);
+    }
+    
+    return structure;
+  }
+  
+  return { institutions: [] };
 }
 
 // Извлекает преподавателей из расписания группы
@@ -1004,6 +1187,32 @@ export function getAllTeachers(): string[] {
     const teachers = new Set<string>();
     
     // Проходим по всем группам и извлекаем преподавателей
+    // Проверяем новую структуру с учебными заведениями
+    if (timetable.institutions) {
+      for (const institutionName in timetable.institutions) {
+        const institution = timetable.institutions[institutionName];
+        if (institution.faculties) {
+          for (const facultyName in institution.faculties) {
+            const faculty = institution.faculties[facultyName];
+            for (const studyFormat in faculty) {
+              const format = faculty[studyFormat];
+              for (const degree in format) {
+                const degreeCourses = format[degree];
+                for (const course in degreeCourses) {
+                  const courseGroups = degreeCourses[course];
+                  for (const groupName in courseGroups) {
+                    const groupSchedule = courseGroups[groupName];
+                    extractTeachersFromSchedule(groupSchedule, teachers);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Обратная совместимость со старой структурой
     if (timetable.faculties) {
       for (const facultyName in timetable.faculties) {
         const faculty = timetable.faculties[facultyName];

@@ -33,6 +33,13 @@ export function initDatabase() {
     // Колонка уже существует, игнорируем
   }
 
+  // Добавляем поле institution_name, если его нет (для существующих БД)
+  try {
+    db.exec('ALTER TABLE users ADD COLUMN institution_name TEXT');
+  } catch (e) {
+    // Колонка уже существует, игнорируем
+  }
+
   // Таблица дедлайнов
   db.exec(`
     CREATE TABLE IF NOT EXISTS deadlines (

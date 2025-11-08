@@ -6,6 +6,7 @@ import {
   getNextWeekSchedule, 
   formatSchedule,
   getAvailableFaculties,
+  getAvailableInstitutions,
   getStudyFormatsForFaculty,
   getDegreesForFacultyAndFormat,
   getGroupsForFacultyFormatDegree,
@@ -13,7 +14,7 @@ import {
 } from '../utils/timetable';
 import { getUpcomingEvents, formatEvents } from '../utils/events';
 import { getActiveDeadlines, formatDeadlines } from '../utils/deadlines';
-import { getUser, toggleNotifications, toggleEventsSubscription, updateUserGroup, updateUserSubgroup } from '../utils/users';
+import { getUser, toggleNotifications, toggleEventsSubscription, updateUserGroup, updateUserSubgroup, updateUserInstitution } from '../utils/users';
 import { getConfig } from '../utils/config';
 import { getMainMenu, getSettingsMenu, getScheduleMenu, getScheduleMainMenu, getDeadlinesMenu, getEventsMenu } from '../utils/menu';
 import { formatFacultyName } from '../utils/formatters';
@@ -274,6 +275,7 @@ export function setupMenuHandlers(bot: any) {
     }
     
     let message = `⚙️ Настройки\n\n`;
+    message += `🏫 Учебное заведение: ${user.institution_name || 'не указано'}\n`;
     message += `👥 Группа: ${user.group_name || 'не указана'}\n`;
     message += `🔢 Подгруппа: ${user.subgroup !== null && user.subgroup !== undefined ? user.subgroup : 'не указана'}\n`;
     message += `🔔 Уведомления: ${user.notifications_enabled ? '✅ Включены' : '❌ Выключены'}\n`;
@@ -288,18 +290,74 @@ export function setupMenuHandlers(bot: any) {
     });
   });
 
+  // Быстрый доступ к выбору учебного заведения из настроек
+  bot.action('menu:institution', async (ctx: Context) => {
+    if (!ctx.user) return;
+    const userId = ctx.user.user_id.toString();
+    const user = getUser(userId);
+    
+    const institutions = getAvailableInstitutions();
+    
+    if (institutions.length === 0) {
+      return ctx.answerOnCallback({
+        message: {
+          text: '❌ Учебные заведения не найдены в расписании.',
+          attachments: [getSettingsMenu()]
+        }
+      });
+    }
+    
+    const buttons = institutions.map(inst => 
+      [Keyboard.button.callback(inst, `select_institution_settings:${encodeURIComponent(inst)}`)]
+    );
+    buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:settings')]);
+    
+    await ctx.answerOnCallback({
+      message: {
+        text: `🏫 Выберите учебное заведение:\n\nТекущее: ${user?.institution_name || 'не указано'}`,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    });
+  });
+
+  // Обработчик выбора учебного заведения из настроек
+  bot.action(/select_institution_settings:(.+)/, async (ctx: Context) => {
+    if (!ctx.user) return;
+    const userId = ctx.user.user_id.toString();
+    const institutionName = decodeURIComponent(ctx.match?.[1] || '');
+    
+    if (!institutionName) {
+      return ctx.answerOnCallback({
+        notification: 'Ошибка при выборе учебного заведения'
+      });
+    }
+    
+    updateUserInstitution(userId, institutionName);
+    
+    await ctx.answerOnCallback({
+      message: {
+        text: `✅ Учебное заведение изменено на ${institutionName}`,
+        attachments: [getSettingsMenu()]
+      }
+    });
+  });
+
   // Быстрый доступ к группе из настроек - начинаем с выбора факультета
   bot.action('menu:group', async (ctx: Context) => {
     if (!ctx.user) return;
     const userId = ctx.user.user_id.toString();
     const user = getUser(userId);
     
-    const faculties = getAvailableFaculties();
+    // Если учебное заведение указано, показываем факультеты только для этого заведения
+    // Иначе показываем все факультеты
+    const faculties = user?.institution_name 
+      ? getAvailableFaculties(user.institution_name)
+      : getAvailableFaculties();
     
     if (faculties.length === 0) {
       return ctx.answerOnCallback({
         message: {
-          text: '❌ Факультеты не найдены в расписании.',
+          text: '❌ Факультеты не найдены в расписании. Попробуйте выбрать учебное заведение.',
           attachments: [getSettingsMenu()]
         }
       });
@@ -310,9 +368,15 @@ export function setupMenuHandlers(bot: any) {
     );
     buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:settings')]);
     
+    let message = `📋 Выберите факультет:\n\n`;
+    if (user?.institution_name) {
+      message += `Учебное заведение: ${user.institution_name}\n`;
+    }
+    message += `Текущая группа: ${user?.group_name || 'не указана'}`;
+    
     await ctx.answerOnCallback({
       message: {
-        text: `📋 Выберите факультет:\n\nТекущая группа: ${user?.group_name || 'не указана'}`,
+        text: message,
         attachments: [Keyboard.inlineKeyboard(buttons)]
       }
     });

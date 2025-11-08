@@ -28,7 +28,10 @@ export function getMainMenu(): InlineKeyboard {
 export function getSettingsMenu(): InlineKeyboard {
   return Keyboard.inlineKeyboard([
     [
-      Keyboard.button.callback('👥 Группа', 'menu:group'),
+      Keyboard.button.callback('🏫 Учебное заведение', 'menu:institution'),
+      Keyboard.button.callback('👥 Группа', 'menu:group')
+    ],
+    [
       Keyboard.button.callback('🔢 Подгруппа', 'menu:subgroup')
     ],
     [

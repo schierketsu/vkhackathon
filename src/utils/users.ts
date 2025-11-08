@@ -4,6 +4,7 @@ export interface User {
   user_id: string;
   group_name: string | null;
   subgroup: number | null;
+  institution_name: string | null;
   notifications_enabled: number;
   events_subscribed: number;
   created_at: string;
@@ -14,21 +15,26 @@ export function getUser(userId: string): User | null {
   return (stmt.get(userId) as User) || null;
 }
 
-export function createUser(userId: string, groupName?: string, subgroup?: number | null): User {
+export function createUser(userId: string, groupName?: string, subgroup?: number | null, institutionName?: string | null): User {
   const stmt = database.prepare(`
-    INSERT INTO users (user_id, group_name, subgroup, notifications_enabled, events_subscribed)
-    VALUES (?, ?, ?, 1, 1)
-    ON CONFLICT(user_id) DO UPDATE SET group_name = ?, subgroup = ?
+    INSERT INTO users (user_id, group_name, subgroup, institution_name, notifications_enabled, events_subscribed)
+    VALUES (?, ?, ?, ?, 1, 1)
+    ON CONFLICT(user_id) DO UPDATE SET group_name = ?, subgroup = ?, institution_name = ?
   `);
   
-  stmt.run(userId, groupName || null, subgroup || null, groupName || null, subgroup || null);
+  stmt.run(userId, groupName || null, subgroup || null, institutionName || null, groupName || null, subgroup || null, institutionName || null);
   
   return getUser(userId)!;
 }
 
-export function updateUserGroup(userId: string, groupName: string, subgroup?: number | null): void {
-  const stmt = database.prepare('UPDATE users SET group_name = ?, subgroup = ? WHERE user_id = ?');
-  stmt.run(groupName, subgroup || null, userId);
+export function updateUserGroup(userId: string, groupName: string, subgroup?: number | null, institutionName?: string | null): void {
+  const stmt = database.prepare('UPDATE users SET group_name = ?, subgroup = ?, institution_name = ? WHERE user_id = ?');
+  stmt.run(groupName, subgroup || null, institutionName || null, userId);
+}
+
+export function updateUserInstitution(userId: string, institutionName: string | null): void {
+  const stmt = database.prepare('UPDATE users SET institution_name = ? WHERE user_id = ?');
+  stmt.run(institutionName, userId);
 }
 
 export function updateUserSubgroup(userId: string, subgroup: number | null): void {

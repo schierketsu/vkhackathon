@@ -55,6 +55,7 @@ export interface User {
   user_id: string;
   group_name: string | null;
   subgroup: number | null;
+  institution_name: string | null;
   notifications_enabled: number;
   events_subscribed: number;
   created_at: string;
@@ -192,16 +193,40 @@ export const api = {
     return response.data;
   },
 
-  updateUserGroup: async (groupName: string, subgroup?: number | null): Promise<void> => {
+  updateUserGroup: async (groupName: string, subgroup?: number | null, institutionName?: string | null): Promise<void> => {
     await apiClient.post('/user/group', {
       userId: getUserId(),
       groupName,
       subgroup,
+      institutionName,
     });
   },
 
-  getAvailableGroups: async (): Promise<any> => {
-    const response = await apiClient.get('/groups');
+  updateUserInstitution: async (institutionName: string | null): Promise<void> => {
+    await apiClient.post('/user/institution', {
+      userId: getUserId(),
+      institutionName,
+    });
+  },
+
+  getAvailableGroups: async (institutionName?: string): Promise<any> => {
+    const params: any = {};
+    if (institutionName) {
+      params.institution = institutionName;
+    }
+    const response = await apiClient.get('/groups', { params });
+    return response.data;
+  },
+
+  getAvailableInstitutions: async (): Promise<{ institutions: string[] }> => {
+    const response = await apiClient.get('/institutions');
+    return response.data;
+  },
+
+  getAvailableSubgroups: async (groupName: string): Promise<{ subgroups: number[] }> => {
+    const response = await apiClient.get('/groups/subgroups', {
+      params: { groupName },
+    });
     return response.data;
   },
 

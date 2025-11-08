@@ -5,7 +5,25 @@ import api, { User } from '../api/client';
 import { formatFacultyName } from '../utils/formatters';
 
 interface GroupsStructure {
-  faculties: Array<{
+  institutions?: Array<{
+    name: string;
+    faculties: Array<{
+      name: string;
+      formats: Array<{
+        name: string;
+        degrees: Array<{
+          name: string;
+          courses?: Array<{
+            number: number;
+            groups: string[];
+          }>;
+          groups?: string[];
+        }>;
+      }>;
+    }>;
+  }>;
+  // Обратная совместимость
+  faculties?: Array<{
     name: string;
     formats: Array<{
       name: string;
@@ -21,15 +39,18 @@ interface GroupsStructure {
   }>;
 }
 
-type SelectionStep = 'faculty' | 'format' | 'degree' | 'course' | 'group';
+type SelectionStep = 'institution' | 'faculty' | 'format' | 'degree' | 'course' | 'group';
 
 function SettingsPage() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [groupsStructure, setGroupsStructure] = useState<GroupsStructure | null>(null);
+  const [institutions, setInstitutions] = useState<string[]>([]);
   const [showGroupSelector, setShowGroupSelector] = useState(false);
+  const [showInstitutionSelector, setShowInstitutionSelector] = useState(false);
   const [selectionStep, setSelectionStep] = useState<SelectionStep>('faculty');
+  const [selectedInstitution, setSelectedInstitution] = useState<string | null>(null);
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null);
   const [selectedDegree, setSelectedDegree] = useState<string | null>(null);
@@ -42,11 +63,16 @@ function SettingsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [userData, groupsData] = await Promise.all([
+      const [userData, institutionsData] = await Promise.all([
         api.getUser(),
-        api.getAvailableGroups(),
+        api.getAvailableInstitutions(),
       ]);
       setUser(userData);
+      setInstitutions(institutionsData.institutions || []);
+      
+      // Если у пользователя есть учебное заведение, загружаем структуру групп для него
+      // Иначе загружаем все группы
+      const groupsData = await api.getAvailableGroups(userData?.institution_name);
       setGroupsStructure(groupsData);
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
@@ -57,7 +83,7 @@ function SettingsPage() {
 
   const handleGroupSelect = async (groupName: string, subgroup?: number | null) => {
     try {
-      await api.updateUserGroup(groupName, subgroup);
+      await api.updateUserGroup(groupName, subgroup, user?.institution_name || null);
       loadData();
       setShowGroupSelector(false);
       resetSelection();
@@ -67,8 +93,25 @@ function SettingsPage() {
     }
   };
 
+  const handleInstitutionSelect = async (institutionName: string | null) => {
+    try {
+      await api.updateUserInstitution(institutionName);
+      loadData();
+      setShowInstitutionSelector(false);
+      // Если выбрано учебное заведение, обновляем структуру групп
+      if (institutionName) {
+        const groupsData = await api.getAvailableGroups(institutionName);
+        setGroupsStructure(groupsData);
+      }
+    } catch (error) {
+      console.error('Ошибка обновления учебного заведения:', error);
+      alert('Ошибка обновления учебного заведения');
+    }
+  };
+
   const resetSelection = () => {
     setSelectionStep('faculty');
+    setSelectedInstitution(null);
     setSelectedFaculty(null);
     setSelectedFormat(null);
     setSelectedDegree(null);
@@ -131,6 +174,39 @@ function SettingsPage() {
   return (
     <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
       <Grid gap={20} cols={1}>
+            <CellList mode="island" header={<CellHeader>Учебное заведение</CellHeader>}>
+              <CellSimple
+                onClick={() => setShowInstitutionSelector(true)}
+                style={{ padding: '16px' }}
+              >
+                <Flex align="center" justify="space-between" style={{ width: '100%' }}>
+                  <Flex direction="column" gap={6} style={{ flex: 1 }}>
+                    <Typography.Body variant="medium" style={{ 
+                      fontWeight: 600,
+                      fontSize: 16,
+                      color: '#000000'
+                    }}>
+                      Учебное заведение
+                    </Typography.Body>
+                    <Typography.Body variant="small" style={{ 
+                      color: user.institution_name ? '#666666' : '#FF3B30',
+                      fontSize: 14
+                    }}>
+                      {user.institution_name || 'Не указано'}
+                    </Typography.Body>
+                  </Flex>
+                  <img 
+                    src="/edit.svg" 
+                    alt="Изменить"
+                    style={{
+                      width: 20,
+                      height: 20,
+                      objectFit: 'contain'
+                    }}
+                  />
+                </Flex>
+              </CellSimple>
+            </CellList>
 
             <CellList mode="island" header={<CellHeader>Группа и подгруппа</CellHeader>}>
               <CellSimple
@@ -197,6 +273,47 @@ function SettingsPage() {
               )}
             </CellList>
 
+            {showInstitutionSelector && (
+              <CellList mode="island" header={<CellHeader>Выберите учебное заведение</CellHeader>}>
+                {institutions.map((institution, idx) => (
+                  <CellSimple
+                    key={idx}
+                    onClick={() => handleInstitutionSelect(institution)}
+                    style={{ padding: '16px' }}
+                  >
+                    <Typography.Body variant="medium" style={{ 
+                      fontWeight: 500,
+                      fontSize: 16,
+                      color: '#000000'
+                    }}>
+                      {institution}
+                    </Typography.Body>
+                  </CellSimple>
+                ))}
+                <Flex gap={8} style={{ padding: '16px' }}>
+                  <div
+                    onClick={() => setShowInstitutionSelector(false)}
+                    style={{ 
+                      flex: 1,
+                      padding: '12px 16px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      borderRadius: 8,
+                      backgroundColor: '#F5F5F5'
+                    }}
+                  >
+                    <Typography.Body variant="medium" style={{ 
+                      color: '#FF3B30',
+                      fontWeight: 500,
+                      fontSize: 16
+                    }}>
+                      Отмена
+                    </Typography.Body>
+                  </div>
+                </Flex>
+              </CellList>
+            )}
+
             {showGroupSelector && groupsStructure && (
               <CellList mode="island" header={
                 <CellHeader>
@@ -209,24 +326,31 @@ function SettingsPage() {
               }>
                 {selectionStep === 'faculty' && (
                   <>
-                    {groupsStructure.faculties.map((faculty, idx) => (
-                      <CellSimple
-                        key={idx}
-                        onClick={() => {
-                          setSelectedFaculty(faculty.name);
-                          setSelectionStep('format');
-                        }}
-                        style={{ padding: '16px' }}
-                      >
-                        <Typography.Body variant="medium" style={{ 
-                          fontWeight: 500,
-                          fontSize: 16,
-                          color: '#000000'
-                        }}>
-                          {formatFacultyName(faculty.name)}
-                        </Typography.Body>
-                      </CellSimple>
-                    ))}
+                    {(() => {
+                      // Поддерживаем как новую структуру с institutions, так и старую с faculties
+                      const faculties = groupsStructure.institutions 
+                        ? groupsStructure.institutions.flatMap(inst => inst.faculties)
+                        : (groupsStructure.faculties || []);
+                      
+                      return faculties.map((faculty, idx) => (
+                        <CellSimple
+                          key={idx}
+                          onClick={() => {
+                            setSelectedFaculty(faculty.name);
+                            setSelectionStep('format');
+                          }}
+                          style={{ padding: '16px' }}
+                        >
+                          <Typography.Body variant="medium" style={{ 
+                            fontWeight: 500,
+                            fontSize: 16,
+                            color: '#000000'
+                          }}>
+                            {formatFacultyName(faculty.name)}
+                          </Typography.Body>
+                        </CellSimple>
+                      ));
+                    })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
                       <div
                         onClick={() => setShowGroupSelector(false)}
@@ -253,9 +377,15 @@ function SettingsPage() {
 
                 {selectionStep === 'format' && selectedFaculty && (
                   <>
-                    {groupsStructure.faculties
-                      .find(f => f.name === selectedFaculty)
-                      ?.formats.map((format, idx) => (
+                    {(() => {
+                      // Поддерживаем как новую структуру с institutions, так и старую с faculties
+                      const faculties = groupsStructure.institutions 
+                        ? groupsStructure.institutions.flatMap(inst => inst.faculties)
+                        : (groupsStructure.faculties || []);
+                      
+                      return faculties
+                        .find(f => f.name === selectedFaculty)
+                        ?.formats.map((format, idx) => (
                         <CellSimple
                           key={idx}
                           onClick={() => {
@@ -272,7 +402,8 @@ function SettingsPage() {
                             {format.name}
                           </Typography.Body>
                         </CellSimple>
-                      ))}
+                      ));
+                    })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
                       <div
                         onClick={() => setSelectionStep('faculty')}
@@ -318,10 +449,16 @@ function SettingsPage() {
 
                 {selectionStep === 'degree' && selectedFaculty && selectedFormat && (
                   <>
-                    {groupsStructure.faculties
-                      .find(f => f.name === selectedFaculty)
-                      ?.formats.find(f => f.name === selectedFormat)
-                      ?.degrees.map((degree, idx) => (
+                    {(() => {
+                      // Поддерживаем как новую структуру с institutions, так и старую с faculties
+                      const faculties = groupsStructure.institutions 
+                        ? groupsStructure.institutions.flatMap(inst => inst.faculties)
+                        : (groupsStructure.faculties || []);
+                      
+                      return faculties
+                        .find(f => f.name === selectedFaculty)
+                        ?.formats.find(f => f.name === selectedFormat)
+                        ?.degrees.map((degree, idx) => (
                         <CellSimple
                           key={idx}
                           onClick={() => {
@@ -343,7 +480,8 @@ function SettingsPage() {
                             {degree.name}
                           </Typography.Body>
                         </CellSimple>
-                      ))}
+                      ));
+                    })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
                       <div
                         onClick={() => setSelectionStep('format')}
@@ -389,11 +527,17 @@ function SettingsPage() {
 
                 {selectionStep === 'course' && selectedFaculty && selectedFormat && selectedDegree && (
                   <>
-                    {groupsStructure.faculties
-                      .find(f => f.name === selectedFaculty)
-                      ?.formats.find(f => f.name === selectedFormat)
-                      ?.degrees.find(d => d.name === selectedDegree)
-                      ?.courses?.map((course, idx) => (
+                    {(() => {
+                      // Поддерживаем как новую структуру с institutions, так и старую с faculties
+                      const faculties = groupsStructure.institutions 
+                        ? groupsStructure.institutions.flatMap(inst => inst.faculties)
+                        : (groupsStructure.faculties || []);
+                      
+                      return faculties
+                        .find(f => f.name === selectedFaculty)
+                        ?.formats.find(f => f.name === selectedFormat)
+                        ?.degrees.find(d => d.name === selectedDegree)
+                        ?.courses?.map((course, idx) => (
                         <CellSimple
                           key={idx}
                           onClick={() => {
@@ -410,7 +554,8 @@ function SettingsPage() {
                             {course.number} курс
                           </Typography.Body>
                         </CellSimple>
-                      ))}
+                      ));
+                    })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
                       <div
                         onClick={() => setSelectionStep('degree')}
@@ -457,7 +602,12 @@ function SettingsPage() {
                 {selectionStep === 'group' && selectedFaculty && selectedFormat && selectedDegree && (
                   <>
                     {(() => {
-                      const degree = groupsStructure.faculties
+                      // Поддерживаем как новую структуру с institutions, так и старую с faculties
+                      const faculties = groupsStructure.institutions 
+                        ? groupsStructure.institutions.flatMap(inst => inst.faculties)
+                        : (groupsStructure.faculties || []);
+                      
+                      const degree = faculties
                         .find(f => f.name === selectedFaculty)
                         ?.formats.find(f => f.name === selectedFormat)
                         ?.degrees.find(d => d.name === selectedDegree);
@@ -485,7 +635,12 @@ function SettingsPage() {
                     <Flex gap={8} style={{ padding: '16px' }}>
                       <div
                         onClick={() => {
-                          const degree = groupsStructure.faculties
+                          // Поддерживаем как новую структуру с institutions, так и старую с faculties
+                          const faculties = groupsStructure.institutions 
+                            ? groupsStructure.institutions.flatMap(inst => inst.faculties)
+                            : (groupsStructure.faculties || []);
+                          
+                          const degree = faculties
                             .find(f => f.name === selectedFaculty)
                             ?.formats.find(f => f.name === selectedFormat)
                             ?.degrees.find(d => d.name === selectedDegree);

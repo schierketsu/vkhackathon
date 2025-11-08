@@ -1,4 +1,4 @@
-import { Bot, Keyboard } from '@maxhub/max-bot-api';
+import { Bot, Keyboard, Context } from '@maxhub/max-bot-api';
 import express from 'express';
 import cors from 'cors';
 import * as fs from 'fs';
@@ -12,8 +12,8 @@ import { setupTeachersHandlers } from './handlers/teachers';
 import { searchTeachers, getTeacherScheduleForDate, formatTeacherSchedule, isFavoriteTeacher, getAllTeachers, getTeacherWeekSchedule, getFavoriteTeachers, addFavoriteTeacher, removeFavoriteTeacher } from './utils/teachers';
 import { getTeacherSearchMenu, getTeachersMenu, getTeacherScheduleMenu, getMainMenu } from './utils/menu';
 import { startScheduler, setBotApi } from './utils/scheduler';
-import { createUser, getUser, updateUserGroup, toggleNotifications, toggleEventsSubscription } from './utils/users';
-import { getTodaySchedule, getTomorrowSchedule, getCurrentWeekSchedule, getWeekScheduleFromDate, getWeekNumber, getGroupsStructure, getAvailableSubgroups, formatSchedule } from './utils/timetable';
+import { createUser, getUser, updateUserGroup, updateUserInstitution, toggleNotifications, toggleEventsSubscription } from './utils/users';
+import { getTodaySchedule, getTomorrowSchedule, getCurrentWeekSchedule, getWeekScheduleFromDate, getWeekNumber, getGroupsStructure, getAvailableSubgroups, getAvailableInstitutions, formatSchedule } from './utils/timetable';
 import { getUpcomingEvents, formatEvents } from './utils/events';
 import { getActiveDeadlines, addDeadline, deleteDeadline } from './utils/deadlines';
 import 'dotenv/config';
@@ -256,9 +256,28 @@ app.get('/api/user', (req, res) => {
 
 app.post('/api/user/group', (req, res) => {
   try {
-    const { userId, groupName, subgroup } = req.body;
-    updateUserGroup(userId, groupName, subgroup);
+    const { userId, groupName, subgroup, institutionName } = req.body;
+    updateUserGroup(userId, groupName, subgroup, institutionName);
     res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/user/institution', (req, res) => {
+  try {
+    const { userId, institutionName } = req.body;
+    updateUserInstitution(userId, institutionName);
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/institutions', (req, res) => {
+  try {
+    const institutions = getAvailableInstitutions();
+    res.json({ institutions });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -266,7 +285,8 @@ app.post('/api/user/group', (req, res) => {
 
 app.get('/api/groups', (req, res) => {
   try {
-    const structure = getGroupsStructure();
+    const institutionName = req.query.institution as string | undefined;
+    const structure = getGroupsStructure(institutionName);
     res.json(structure);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -518,6 +538,58 @@ bot.on('bot_started', async (ctx) => {
   
   const userName = user.name || 'Иван';
   
+  // Если учебное заведение не указано, предлагаем выбрать
+  if (!dbUser.institution_name) {
+    const institutions = getAvailableInstitutions();
+    
+    if (institutions.length === 0) {
+      await ctx.reply(
+        `👋 Привет, ${userName}!\n\n` +
+        'Я ваш помощник в учебе! К сожалению, учебные заведения не найдены.',
+        {
+          attachments: [getMainMenu()]
+        }
+      );
+      return;
+    }
+    
+    const buttons = institutions.map(inst => 
+      [Keyboard.button.callback(inst, `select_institution:${encodeURIComponent(inst)}`)]
+    );
+    buttons.push([Keyboard.button.callback('⏭️ Выбрать позже', 'skip_institution')]);
+    
+    await ctx.reply(
+      `👋 Привет, ${userName}!\n\n` +
+      'Я ваш помощник в учебе! Я могу помочь с:\n\n' +
+      '📅 Расписанием занятий\n' +
+      '🎉 Календарем мероприятий\n' +
+      '⏰ Уведомлениями о дедлайнах\n\n' +
+      'Для начала выберите ваше учебное заведение:',
+      {
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    );
+    return;
+  }
+  
+  // Если группа не указана, предлагаем выбрать
+  if (!dbUser.group_name) {
+    await ctx.reply(
+      `👋 Привет, ${userName}!\n\n` +
+      `Учебное заведение: ${dbUser.institution_name}\n\n` +
+      'Для начала работы укажите вашу группу:',
+      {
+        attachments: [
+          Keyboard.inlineKeyboard([
+            [Keyboard.button.callback('📋 Выбрать группу', 'select_group_start')],
+            [Keyboard.button.callback('⏭️ Выбрать позже', 'skip_group')]
+          ])
+        ]
+      }
+    );
+    return;
+  }
+  
   let message = `👋 Привет, ${userName}!\n\n`;
   message += 'Я ваш помощник в учебе! Я могу помочь с:\n\n';
   message += '📅 Расписанием занятий\n';
@@ -544,15 +616,51 @@ bot.command('start', async (ctx) => {
   
   const userName = user.name || 'Иван';
   
+  // Если учебное заведение не указано, предлагаем выбрать
+  if (!dbUser.institution_name) {
+    const institutions = getAvailableInstitutions();
+    
+    if (institutions.length === 0) {
+      await ctx.reply(
+        `👋 Привет, ${userName}!\n\n` +
+        'Я ваш помощник в учебе! К сожалению, учебные заведения не найдены.',
+        {
+          attachments: [getMainMenu()]
+        }
+      );
+      return;
+    }
+    
+    const buttons = institutions.map(inst => 
+      [Keyboard.button.callback(inst, `select_institution:${encodeURIComponent(inst)}`)]
+    );
+    buttons.push([Keyboard.button.callback('⏭️ Выбрать позже', 'skip_institution')]);
+    
+    await ctx.reply(
+      `👋 Привет, ${userName}!\n\n` +
+      'Я ваш помощник в учебе! Я могу помочь с:\n\n' +
+      '📅 Расписанием занятий\n' +
+      '🎉 Календарем мероприятий\n' +
+      '⏰ Уведомлениями о дедлайнах\n\n' +
+      'Для начала выберите ваше учебное заведение:',
+      {
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    );
+    return;
+  }
+  
   // Если группа не указана, предлагаем выбрать
   if (!dbUser.group_name) {
     await ctx.reply(
       `👋 Привет, ${userName}!\n\n` +
+      `Учебное заведение: ${dbUser.institution_name}\n\n` +
       'Для начала работы укажите вашу группу:',
       {
         attachments: [
           Keyboard.inlineKeyboard([
-            [Keyboard.button.callback('📋 Выбрать группу', 'select_group')]
+            [Keyboard.button.callback('📋 Выбрать группу', 'select_group_start')],
+            [Keyboard.button.callback('⏭️ Выбрать позже', 'skip_group')]
           ])
         ]
       }
@@ -718,6 +826,75 @@ bot.on('message_created', async (ctx) => {
     console.error('Ошибка в обработчике сообщений:', error);
     // Не отвечаем на ошибку, чтобы не мешать другим обработчикам
   }
+});
+
+// Обработчик выбора учебного заведения
+bot.action(/select_institution:(.+)/, async (ctx: Context) => {
+  if (!ctx.user) return;
+  const userId = ctx.user.user_id.toString();
+  const institutionName = decodeURIComponent(ctx.match?.[1] || '');
+  
+  if (!institutionName) {
+    return ctx.answerOnCallback({
+      notification: 'Ошибка при выборе учебного заведения'
+    });
+  }
+  
+  updateUserInstitution(userId, institutionName);
+  const user = getUser(userId);
+  
+  // После выбора учебного заведения предлагаем выбрать группу
+  await ctx.answerOnCallback({
+    message: {
+      text: `✅ Учебное заведение изменено на ${institutionName}\n\nТеперь выберите вашу группу:`,
+      attachments: [
+        Keyboard.inlineKeyboard([
+          [Keyboard.button.callback('📋 Выбрать группу', 'select_group_start')],
+          [Keyboard.button.callback('⏭️ Выбрать позже', 'skip_group')]
+        ])
+      ]
+    }
+  });
+});
+
+// Обработчик пропуска выбора учебного заведения
+bot.action('skip_institution', async (ctx: Context) => {
+  if (!ctx.user) return;
+  const userId = ctx.user.user_id.toString();
+  const user = getUser(userId);
+  const userName = (ctx.user as any).name || 'Иван';
+  
+  await ctx.answerOnCallback({
+    message: {
+      text: `👋 Привет, ${userName}!\n\n` +
+        'Я ваш помощник в учебе! Я могу помочь с:\n\n' +
+        '📅 Расписанием занятий\n' +
+        '🎉 Календарем мероприятий\n' +
+        '⏰ Уведомлениями о дедлайнах\n\n' +
+        'Вы можете выбрать учебное заведение и группу позже в настройках.',
+      attachments: [getMainMenu()]
+    }
+  });
+});
+
+// Обработчик пропуска выбора группы
+bot.action('skip_group', async (ctx: Context) => {
+  if (!ctx.user) return;
+  const userId = ctx.user.user_id.toString();
+  const user = getUser(userId);
+  const userName = (ctx.user as any).name || 'Иван';
+  
+  await ctx.answerOnCallback({
+    message: {
+      text: `👋 Привет, ${userName}!\n\n` +
+        'Я ваш помощник в учебе! Я могу помочь с:\n\n' +
+        '📅 Расписанием занятий\n' +
+        '🎉 Календарем мероприятий\n' +
+        '⏰ Уведомлениями о дедлайнах\n\n' +
+        'Вы можете выбрать группу позже в настройках.',
+      attachments: [getMainMenu()]
+    }
+  });
 });
 
 // Настройка обработчиков

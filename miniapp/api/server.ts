@@ -5,6 +5,7 @@ import {
   getUser,
   createUser,
   updateUserGroup,
+  updateUserInstitution,
   toggleNotifications,
   toggleEventsSubscription,
   getActiveDeadlines,
@@ -20,6 +21,7 @@ import {
   addFavoriteTeacher,
   removeFavoriteTeacher,
   getGroupsStructure,
+  getAvailableInstitutions,
   getAvailableSubgroups,
   getWeekNumber,
   getTeacherWeekSchedule,
@@ -240,8 +242,18 @@ app.get('/api/user', (req, res) => {
 
 app.post('/api/user/group', (req, res) => {
   try {
-    const { userId, groupName, subgroup } = req.body;
-    updateUserGroup(userId, groupName, subgroup);
+    const { userId, groupName, subgroup, institutionName } = req.body;
+    updateUserGroup(userId, groupName, subgroup, institutionName);
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/user/institution', (req, res) => {
+  try {
+    const { userId, institutionName } = req.body;
+    updateUserInstitution(userId, institutionName);
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -250,8 +262,18 @@ app.post('/api/user/group', (req, res) => {
 
 app.get('/api/groups', (req, res) => {
   try {
-    const structure = getGroupsStructure();
+    const institutionName = req.query.institution as string | undefined;
+    const structure = getGroupsStructure(institutionName);
     res.json(structure);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/institutions', (req, res) => {
+  try {
+    const institutions = getAvailableInstitutions();
+    res.json({ institutions });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
