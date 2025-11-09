@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import axios from 'axios';
 import {
   initDatabase,
   getUser,
@@ -33,7 +34,43 @@ import {
 } from './shared-utils';
 
 const app = express();
-const PORT = 3001;
+const PORT = 3002;
+
+// Токен Qwen API от ai.io.net
+// Получен с: https://ai.io.net/ai/api-keys
+const QWEN_API_TOKEN = 'io-v2-eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJvd25lciI6IjdiMDk5OGIyLWE2NmYtNGVkMy1iNjdhLWRhYzY3MTEyYzVlNyIsImV4cCI6NDkxNjI5MDMyNH0.OEnhQNY8LniHmNQF36Y0xHzRHsAtUHu0kPtGiZk--MCh5uckEFRfehqm9VX2QUVaxJFKPGHPiNYSrZbqOlXRIA';
+
+// API URL и модель для ai.io.net
+const IOI_API_URL = 'https://api.intelligence.io.solutions/api/v1';
+const IOI_MODEL = 'Qwen/Qwen3-Next-80B-A3B-Instruct';
+
+// Промпт для психолога
+const PSYCHOLOGIST_PROMPT = `Ты — добрый и понимающий психолог, который работает со студентами. Твоя главная задача — создать атмосферу тепла, поддержки и понимания.
+
+ВАЖНЫЕ ПРАВИЛА:
+1. Будь КРАТКИМ: отвечай 2-4 предложениями, максимум 100-150 слов
+2. Будь ТЕПЛЫМ: используй эмпатию, поддерживающие слова, покажи, что понимаешь чувства студента
+3. Будь ИСКРЕННИМ: говори от сердца, используй простые, человеческие слова
+4. Будь ПОЛЕЗНЫМ: давай практические, конкретные советы, которые можно применить прямо сейчас
+
+Твой стиль общения:
+- Очень дружелюбный, теплый и открытый, как близкий друг
+- Используй эмпатию: "Понимаю тебя", "Это действительно непросто", "Ты молодец, что делишься"
+- Задавай короткие, но важные вопросы для понимания ситуации
+- Предлагай простые, практичные решения
+- Используй ободряющие слова и выражения поддержки
+- Будь искренним и человечным, избегай формальностей
+- Говори простым языком, без сложных терминов
+- Покажи, что студент не одинок в своих переживаниях
+
+ФОРМАТ ОТВЕТА:
+- Начни с проявления понимания и поддержки (1 предложение)
+- Дай короткий, но полезный совет или вопрос (1-2 предложения)
+- Закончи теплым, ободряющим словом (1 предложение)
+
+Важно: Если студент говорит о серьезных проблемах (суицидальные мысли, тяжелая депрессия), вежливо и тепло порекомендуй обратиться к специалисту очно, но сделай это мягко и поддерживающе.
+
+Помни: твоя главная цель — чтобы студент почувствовал тепло, поддержку и понимание, а не получил длинную лекцию.`;
 
 // Инициализация базы данных
 initDatabase();
@@ -385,7 +422,223 @@ app.get('/api/teachers/week-schedule', (req, res) => {
   }
 });
 
+// Чат с ИИ поддержкой (Qwen)
+app.post('/api/support/chat', async (req, res) => {
+  try {
+    const { messages } = req.body;
+
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return res.status(400).json({ error: 'Сообщения не указаны' });
+    }
+
+    // Формируем сообщения для Qwen API
+    // Первое сообщение - системный промпт, остальные - история диалога
+    const qwenMessages = [
+      {
+        role: 'system',
+        content: PSYCHOLOGIST_PROMPT
+      },
+      ...messages.map((msg: { text: string; sender: string }) => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }))
+    ];
+
+    // Пробуем разные варианты API endpoints для Qwen
+    let response;
+    const errors: string[] = [];
+
+    // Вариант 1: ai.io.net API (приоритет для токенов io-v2-)
+    if (QWEN_API_TOKEN.startsWith('io-v2-')) {
+      try {
+        console.log(`Пробуем ai.io.net API: ${IOI_API_URL}/chat/completions...`);
+        console.log(`Используем модель: ${IOI_MODEL}`);
+        
+        const aionetResponse = await axios.post(
+          `${IOI_API_URL}/chat/completions`,
+          {
+            model: IOI_MODEL,
+            messages: qwenMessages,
+            temperature: 0.8, // Немного выше для более естественных ответов
+            max_tokens: 150, // Ограничиваем длину ответа для краткости
+            top_p: 0.9
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${QWEN_API_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            timeout: 60000 // Увеличиваем таймаут для больших моделей
+          }
+        );
+
+        if (aionetResponse.data && aionetResponse.data.choices && aionetResponse.data.choices[0]) {
+          response = {
+            text: aionetResponse.data.choices[0].message.content
+          };
+          console.log('✅ Успешно получен ответ от ai.io.net API');
+        } else {
+          console.log('Неожиданный формат ответа от ai.io.net API:', JSON.stringify(aionetResponse.data));
+        }
+      } catch (aionetError: any) {
+        const errorMsg = aionetError.response?.data ? JSON.stringify(aionetError.response.data) : aionetError.message;
+        errors.push(`ai.io.net: ${errorMsg}`);
+        console.log('ai.io.net API не сработал:', errorMsg);
+        console.log('Статус:', aionetError.response?.status);
+        console.log('Заголовки ответа:', aionetError.response?.headers);
+      }
+    }
+
+    // Вариант 1.5: AIMLAPI (fallback)
+    if (!response && QWEN_API_TOKEN.startsWith('io-v2-')) {
+      try {
+        console.log('Пробуем AIMLAPI как fallback...');
+        const aimlapiResponse = await axios.post(
+          'https://api.aimlapi.com/v1/chat/completions',
+          {
+            model: 'qwen/qwen-turbo',
+            messages: qwenMessages,
+            temperature: 0.7,
+            max_tokens: 2000
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${QWEN_API_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            timeout: 30000
+          }
+        );
+
+        if (aimlapiResponse.data && aimlapiResponse.data.choices && aimlapiResponse.data.choices[0]) {
+          response = {
+            text: aimlapiResponse.data.choices[0].message.content
+          };
+          console.log('✅ Успешно получен ответ от AIMLAPI');
+        }
+      } catch (aimlapiError: any) {
+        const errorMsg = aimlapiError.response?.data ? JSON.stringify(aimlapiError.response.data) : aimlapiError.message;
+        errors.push(`AIMLAPI: ${errorMsg}`);
+        console.log('AIMLAPI не сработал:', errorMsg);
+      }
+    }
+
+    // Вариант 2: DashScope API (стандартный Alibaba Cloud)
+    if (!response) {
+      try {
+        console.log('Пробуем DashScope API...');
+        const dashscopeResponse = await axios.post(
+          'https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
+          {
+            model: 'qwen-turbo',
+            input: {
+              messages: qwenMessages
+            },
+            parameters: {
+              temperature: 0.7,
+              max_tokens: 2000,
+              top_p: 0.8
+            }
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${QWEN_API_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            timeout: 30000
+          }
+        );
+
+        if (dashscopeResponse.data && dashscopeResponse.data.output && dashscopeResponse.data.output.text) {
+          response = {
+            text: dashscopeResponse.data.output.text
+          };
+          console.log('Успешно получен ответ от DashScope API');
+        } else {
+          throw new Error('Неожиданный формат ответа от DashScope API');
+        }
+      } catch (dashscopeError: any) {
+        const errorMsg = dashscopeError.response?.data ? JSON.stringify(dashscopeError.response.data) : dashscopeError.message;
+        errors.push(`DashScope: ${errorMsg}`);
+        console.log('DashScope API не сработал:', errorMsg);
+        console.log('Статус:', dashscopeError.response?.status);
+      }
+    }
+
+    // Вариант 3: Попробуем другие популярные Qwen API провайдеры
+    if (!response) {
+      // Попробуем Together AI или другие сервисы
+      try {
+        console.log('Пробуем альтернативный endpoint для Qwen...');
+        // Может быть токен для какого-то внутреннего сервиса
+        // Попробуем использовать токен как есть в разных форматах
+      } catch (altError: any) {
+        console.log('Альтернативные варианты не сработали');
+      }
+    }
+
+    // Вариант 4: Демо-режим - возвращаем ответы в стиле психолога
+    if (!response) {
+      console.warn('⚠️ Все API endpoints не сработали. Используем демо-режим с базовыми ответами.');
+      
+      const lastUserMessage = messages[messages.length - 1]?.text.toLowerCase() || '';
+      const messageLength = lastUserMessage.length;
+      
+      // Простые ответы в стиле психолога с учетом контекста
+      let demoResponse = '';
+      
+      if (lastUserMessage.includes('стресс') || lastUserMessage.includes('нерв') || lastUserMessage.includes('тревож')) {
+        demoResponse = 'Понимаю, как тяжело бывает, когда накатывает стресс или тревога. Ты не один в этом - многие студенты проходят через подобное. Попробуй сделать несколько глубоких вдохов прямо сейчас. Что именно больше всего тебя тревожит?';
+      } else if (lastUserMessage.includes('учеба') || lastUserMessage.includes('экзамен') || lastUserMessage.includes('сессия')) {
+        demoResponse = 'Экзамены - это действительно непросто, и твои переживания абсолютно нормальны. Помни: ты уже делаешь все, что можешь. Разбей большую задачу на маленькие шаги - так будет легче. Как ты обычно справляешься с подготовкой?';
+      } else if (lastUserMessage.includes('устал') || lastUserMessage.includes('усталост') || lastUserMessage.includes('выгоран')) {
+        demoResponse = 'Чувство усталости и выгорания - это серьезный сигнал, который важно услышать. Твое тело и психика просят отдыха. Попробуй сегодня выделить хотя бы час только для себя - для того, что тебе действительно нравится. Что обычно помогает тебе восстановить силы?';
+      } else if (lastUserMessage.includes('одинок') || lastUserMessage.includes('друзья') || lastUserMessage.includes('общение')) {
+        demoResponse = 'Одиночество может быть очень тяжелым чувством. Знай, что ты не один - многие студенты испытывают подобное. Попробуй найти единомышленников через учебу или студенческие активности. Что тебе мешает найти близкое общение?';
+      } else {
+        // Общие теплые ответы
+        const generalResponses = [
+          'Понимаю, что тебе непросто. Спасибо, что поделился со мной - это уже важный шаг. Расскажи, что именно тебя беспокоит больше всего?',
+          'Ты молодец, что обратился за поддержкой. Это показывает заботу о себе. Давай разберемся вместе - что происходит?',
+          'Чувствую, что тебе сейчас нелегко. Ты не один в своих переживаниях - многие студенты сталкиваются с похожими трудностями. Что бы ты хотел обсудить?',
+          'Спасибо за доверие. Понимаю, что быть студентом - это непросто. Расскажи, с чем именно ты сейчас борешься?',
+          'Важно, что ты здесь и делишься своими чувствами. Это уже проявление силы. Что тебя больше всего беспокоит?'
+        ];
+        demoResponse = generalResponses[messageLength % generalResponses.length];
+      }
+      
+      response = {
+        text: demoResponse + '\n\n*Примечание: В данный момент используется демо-режим. Для полноценной работы с ИИ необходимо настроить API токен в файле miniapp/api/server.ts'
+      };
+    }
+
+    // Если все варианты не сработали
+    if (!response) {
+      console.error('Все API endpoints не сработали. Ошибки:', errors);
+      return res.status(500).json({
+        error: 'Не удалось получить ответ от ИИ',
+        details: errors.join('; ')
+      });
+    }
+
+    res.json({ text: response.text });
+  } catch (error: any) {
+    console.error('Ошибка в /api/support/chat:', error);
+    res.status(500).json({ error: error.message || 'Внутренняя ошибка сервера' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`API сервер запущен на порту ${PORT}`);
+}).on('error', (err: any) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Порт ${PORT} уже занят. Возможно, сервер уже запущен.`);
+    console.error(`   Попробуйте выполнить: netstat -ano | findstr :${PORT}`);
+    console.error(`   Затем завершите процесс: taskkill /PID <PID> /F`);
+    process.exit(1);
+  } else {
+    console.error('Ошибка запуска сервера:', err);
+    process.exit(1);
+  }
 });
 

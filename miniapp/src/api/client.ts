@@ -261,6 +261,12 @@ export const api = {
     const response = await apiClient.get('/practice/tags', { params });
     return response.data;
   },
+
+  // Поддержка (чат с ИИ)
+  sendChatMessage: async (messages: Array<{ text: string; sender: 'user' | 'ai' }>): Promise<{ text: string }> => {
+    const response = await apiClient.post('/support/chat', { messages });
+    return response.data;
+  },
 };
 
 export default api;
