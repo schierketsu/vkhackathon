@@ -117,7 +117,54 @@ function createTeacherNameMapping(): Map<string, string> {
     return mapping;
   }
 
-  // Проходим по всем группам и создаем маппинг
+  // Вспомогательная функция для обработки расписания группы
+  const processGroupSchedule = (groupSchedule: WeekSchedule) => {
+    for (const weekType of ['odd_week', 'even_week'] as const) {
+      const week = groupSchedule[weekType];
+      for (const day of Object.values(week)) {
+        for (const lesson of day) {
+          if (lesson.teacher && lesson.teacher.trim()) {
+            const originalName = lesson.teacher.trim();
+            if (isValidTeacherName(originalName)) {
+              const normalized = normalizeTeacherName(originalName);
+              // Сохраняем маппинг: нормализованное -> оригинальное
+              // Если уже есть маппинг, берем первый найденный оригинал
+              if (!mapping.has(normalized)) {
+                mapping.set(normalized, originalName);
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+
+  // Проходим по новой структуре с учебными заведениями
+  if (timetableData.institutions) {
+    for (const institutionName in timetableData.institutions) {
+      const institution = timetableData.institutions[institutionName];
+      if (institution.faculties) {
+        for (const facultyName in institution.faculties) {
+          const faculty = institution.faculties[facultyName];
+          for (const studyFormat in faculty) {
+            const format = faculty[studyFormat];
+            for (const degree in format) {
+              const degreeCourses = format[degree];
+              for (const course in degreeCourses) {
+                const courseGroups = degreeCourses[course];
+                for (const groupName in courseGroups) {
+                  const groupSchedule = courseGroups[groupName];
+                  processGroupSchedule(groupSchedule);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Обратная совместимость со старой структурой
   if (timetableData.faculties) {
     for (const facultyName in timetableData.faculties) {
       const faculty = timetableData.faculties[facultyName];
@@ -129,25 +176,7 @@ function createTeacherNameMapping(): Map<string, string> {
             const courseGroups = degreeCourses[course];
             for (const groupName in courseGroups) {
               const groupSchedule = courseGroups[groupName];
-              
-              for (const weekType of ['odd_week', 'even_week'] as const) {
-                const week = groupSchedule[weekType];
-                for (const day of Object.values(week)) {
-                  for (const lesson of day) {
-                    if (lesson.teacher && lesson.teacher.trim()) {
-                      const originalName = lesson.teacher.trim();
-                      if (isValidTeacherName(originalName)) {
-                        const normalized = normalizeTeacherName(originalName);
-                        // Сохраняем маппинг: нормализованное -> оригинальное
-                        // Если уже есть маппинг, берем первый найденный оригинал
-                        if (!mapping.has(normalized)) {
-                          mapping.set(normalized, originalName);
-                        }
-                      }
-                    }
-                  }
-                }
-              }
+              processGroupSchedule(groupSchedule);
             }
           }
         }
@@ -183,7 +212,32 @@ export function getAllTeachers(): string[] {
 
   const teachers = new Set<string>();
 
-  // Проходим по всем группам и извлекаем преподавателей
+  // Проходим по новой структуре с учебными заведениями
+  if (timetableData.institutions) {
+    for (const institutionName in timetableData.institutions) {
+      const institution = timetableData.institutions[institutionName];
+      if (institution.faculties) {
+        for (const facultyName in institution.faculties) {
+          const faculty = institution.faculties[facultyName];
+          for (const studyFormat in faculty) {
+            const format = faculty[studyFormat];
+            for (const degree in format) {
+              const degreeCourses = format[degree];
+              for (const course in degreeCourses) {
+                const courseGroups = degreeCourses[course];
+                for (const groupName in courseGroups) {
+                  const groupSchedule = courseGroups[groupName];
+                  extractTeachersFromSchedule(groupSchedule, teachers);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Обратная совместимость со старой структурой
   if (timetableData.faculties) {
     for (const facultyName in timetableData.faculties) {
       const faculty = timetableData.faculties[facultyName];
@@ -411,7 +465,59 @@ export function getTeacherWeekScheduleFull(teacherName: string): WeekSchedule | 
     }
   };
 
-  // Проходим по всем группам и собираем занятия преподавателя
+  // Вспомогательная функция для обработки расписания группы
+  const processGroupScheduleForTeacher = (groupSchedule: WeekSchedule, groupName: string) => {
+    // Проверяем обе недели
+    for (const weekType of ['odd_week', 'even_week'] as const) {
+      const week = groupSchedule[weekType];
+      for (const dayKey in week) {
+        const day = week[dayKey as keyof typeof week];
+        for (const lesson of day) {
+          // Сравниваем как оригинальное имя, так и нормализованное
+          const lessonTeacher = lesson.teacher?.trim() || '';
+          if (lessonTeacher && (
+            lessonTeacher === teacherName.trim() || 
+            normalizeTeacherName(lessonTeacher) === normalizeTeacherName(teacherName)
+          )) {
+            // Добавляем занятие в расписание преподавателя
+            // Создаем копию урока с информацией о группе
+            const teacherLesson: Lesson = {
+              ...lesson,
+              subject: `${lesson.subject} (${groupName})`
+            };
+            teacherSchedule[weekType][dayKey as keyof typeof teacherSchedule.odd_week].push(teacherLesson);
+          }
+        }
+      }
+    }
+  };
+
+  // Проходим по новой структуре с учебными заведениями
+  if (timetableData.institutions) {
+    for (const institutionName in timetableData.institutions) {
+      const institution = timetableData.institutions[institutionName];
+      if (institution.faculties) {
+        for (const facultyName in institution.faculties) {
+          const faculty = institution.faculties[facultyName];
+          for (const studyFormat in faculty) {
+            const format = faculty[studyFormat];
+            for (const degree in format) {
+              const degreeCourses = format[degree];
+              for (const course in degreeCourses) {
+                const courseGroups = degreeCourses[course];
+                for (const groupName in courseGroups) {
+                  const groupSchedule = courseGroups[groupName];
+                  processGroupScheduleForTeacher(groupSchedule, groupName);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Обратная совместимость со старой структурой
   if (timetableData.faculties) {
     for (const facultyName in timetableData.faculties) {
       const faculty = timetableData.faculties[facultyName];
@@ -423,30 +529,7 @@ export function getTeacherWeekScheduleFull(teacherName: string): WeekSchedule | 
             const courseGroups = degreeCourses[course];
             for (const groupName in courseGroups) {
               const groupSchedule = courseGroups[groupName];
-              
-              // Проверяем обе недели
-              for (const weekType of ['odd_week', 'even_week'] as const) {
-                const week = groupSchedule[weekType];
-                for (const dayKey in week) {
-                  const day = week[dayKey as keyof typeof week];
-                  for (const lesson of day) {
-                    // Сравниваем как оригинальное имя, так и нормализованное
-                    const lessonTeacher = lesson.teacher?.trim() || '';
-                    if (lessonTeacher && (
-                      lessonTeacher === teacherName.trim() || 
-                      normalizeTeacherName(lessonTeacher) === normalizeTeacherName(teacherName)
-                    )) {
-                      // Добавляем занятие в расписание преподавателя
-                      // Создаем копию урока с информацией о группе
-                      const teacherLesson: Lesson = {
-                        ...lesson,
-                        subject: `${lesson.subject} (${groupName})`
-                      };
-                      teacherSchedule[weekType][dayKey as keyof typeof teacherSchedule.odd_week].push(teacherLesson);
-                    }
-                  }
-                }
-              }
+              processGroupScheduleForTeacher(groupSchedule, groupName);
             }
           }
         }
