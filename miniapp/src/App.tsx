@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Panel } from '@maxhub/max-ui';
 import Header from './components/Header';
@@ -31,16 +31,18 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   
   // Страницы, на которых должна отображаться нижняя навигация
-  const showBottomNav = ['/', '/services', '/profile'].includes(location.pathname);
+  const showBottomNav = useMemo(() => 
+    ['/', '/services', '/profile'].includes(location.pathname),
+    [location.pathname]
+  );
   
   // Страницы настройки (без Header и BottomNavigation)
-  const isSetupPage = location.pathname === '/setup';
+  const isSetupPage = useMemo(() => 
+    location.pathname === '/setup',
+    [location.pathname]
+  );
 
-  useEffect(() => {
-    checkSetup();
-  }, [location.pathname]);
-
-  const checkSetup = async () => {
+  const checkSetup = useCallback(async () => {
     try {
       const user = await api.getUser();
       const needs = !user.institution_name || !user.group_name;
@@ -56,7 +58,11 @@ function AppContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [location.pathname]);
+
+  useEffect(() => {
+    checkSetup();
+  }, [checkSetup]);
 
   // Показываем loading только если проверяем настройку
   if (loading && needsSetup === null) {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Typography, Input, Spinner } from '@maxhub/max-ui';
 import api from '../api/client';
 
@@ -27,7 +27,7 @@ function SupportPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSendMessage = async () => {
+  const handleSendMessage = useCallback(async () => {
     if (!inputValue.trim() || isLoading) return;
 
     const userMessage: Message = {
@@ -72,21 +72,21 @@ function SupportPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [inputValue, messages, isLoading]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
-  };
+  }, [handleSendMessage]);
 
-  const formatTime = (date: Date) => {
+  const formatTime = useCallback((date: Date) => {
     return date.toLocaleTimeString('ru-RU', {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
+  }, []);
 
   return (
     <div
@@ -213,7 +213,7 @@ function SupportPage() {
       {/* Поле ввода */}
       <div
         style={{
-          padding: '12px 16px',
+          padding: '12px 16px 12px 8px',
           backgroundColor: '#FFFFFF',
           borderTop: '1px solid #EFEFEF',
           width: '100%',

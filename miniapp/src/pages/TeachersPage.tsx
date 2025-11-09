@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, Typography, Button, SearchInput, Flex } from '@maxhub/max-ui';
 import api, { Teacher } from '../api/client';
+import { debounce } from '../utils/debounce';
 
 function TeachersPage() {
   const navigate = useNavigate();
@@ -11,40 +12,51 @@ function TeachersPage() {
   const [loading, setLoading] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
 
-  useEffect(() => {
-    loadFavorites();
-  }, []);
-
-  useEffect(() => {
-    if (searchQuery.trim()) {
-      searchTeachers();
-    } else {
-      setTeachers([]);
-    }
-  }, [searchQuery]);
-
-  const loadFavorites = async () => {
+  const loadFavorites = useCallback(async () => {
     try {
       const data = await api.getFavoriteTeachers();
       setFavorites(data);
     } catch (error) {
       console.error('Ошибка загрузки избранных:', error);
     }
-  };
+  }, []);
 
-  const searchTeachers = async () => {
+  const searchTeachers = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setTeachers([]);
+      return;
+    }
     setLoading(true);
     try {
-      const data = await api.searchTeachers(searchQuery);
+      const data = await api.searchTeachers(query);
       setTeachers(data);
     } catch (error) {
       console.error('Ошибка поиска:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const toggleFavorite = async (teacher: Teacher, isFavorite: boolean) => {
+  const debouncedSearch = useMemo(
+    () => debounce((query: string) => {
+      searchTeachers(query);
+    }, 300),
+    [searchTeachers]
+  );
+
+  useEffect(() => {
+    loadFavorites();
+  }, [loadFavorites]);
+
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      debouncedSearch(searchQuery);
+    } else {
+      setTeachers([]);
+    }
+  }, [searchQuery, debouncedSearch]);
+
+  const toggleFavorite = useCallback(async (teacher: Teacher, isFavorite: boolean) => {
     try {
       if (isFavorite) {
         await api.removeFavoriteTeacher(teacher.name);
@@ -55,13 +67,21 @@ function TeachersPage() {
     } catch (error) {
       console.error('Ошибка изменения избранного:', error);
     }
-  };
+  }, [loadFavorites]);
 
-  const isFavorite = (teacherName: string): boolean => {
-    return favorites.some((t) => t.name === teacherName);
-  };
+  const favoriteNames = useMemo(() => 
+    new Set(favorites.map(t => t.name)),
+    [favorites]
+  );
 
-  const displayTeachers = showFavorites ? favorites : teachers;
+  const isFavorite = useCallback((teacherName: string): boolean => {
+    return favoriteNames.has(teacherName);
+  }, [favoriteNames]);
+
+  const displayTeachers = useMemo(() => 
+    showFavorites ? favorites : teachers,
+    [showFavorites, favorites, teachers]
+  );
 
   return (
     <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
@@ -77,7 +97,7 @@ function TeachersPage() {
               padding: '8px 16px'
             }}
           >
-            🔍 Поиск
+Поиск
           </Button>
           <Button
             mode={showFavorites ? 'primary' : 'secondary'}
@@ -141,14 +161,6 @@ function TeachersPage() {
             <CellSimple>
               <Flex align="center" justify="center" style={{ padding: '40px 0' }}>
                 <Flex direction="column" align="center" gap={16}>
-                  <Typography.Body variant="medium" style={{ 
-                    fontSize: 48,
-                    opacity: 0.3,
-                    lineHeight: 1,
-                    margin: 0
-                  }}>
-                    👨‍🏫
-                  </Typography.Body>
                   <Typography.Body variant="small" style={{ 
                     color: 'var(--text-secondary)',
                     fontSize: 14,

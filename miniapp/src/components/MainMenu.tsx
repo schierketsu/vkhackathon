@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, Typography, Flex, Button, Spinner } from '@maxhub/max-ui';
 import api, { User, Schedule, Event } from '../api/client';
+import { getLessonTypeAndRoom, getLessonTypeColor } from '../utils/lessons';
+import { getWeekStart } from '../utils/date';
 
 function MainMenu() {
   const navigate = useNavigate();
@@ -14,17 +16,7 @@ function MainMenu() {
   const [events, setEvents] = useState<Event[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
 
-  useEffect(() => {
-    loadData();
-    loadAvailableDates();
-    loadEvents();
-  }, []);
-
-  useEffect(() => {
-    loadScheduleForDate();
-  }, [selectedDate, user]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       const userData = await api.getUser();
       setUser(userData);
@@ -33,9 +25,9 @@ function MainMenu() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const loadAvailableDates = () => {
+  const loadAvailableDates = useCallback(() => {
     const dates: Array<{ label: string; date: string; value: 'today' | 'tomorrow' | number }> = [];
     const today = new Date();
     const dayNames = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
@@ -68,9 +60,9 @@ function MainMenu() {
     }
 
     setAvailableDates(dates);
-  };
+  }, []);
 
-  const loadScheduleForDate = async () => {
+  const loadScheduleForDate = useCallback(async () => {
     if (!user?.group_name) return;
 
     setScheduleLoading(true);
@@ -87,11 +79,7 @@ function MainMenu() {
         targetDate.setHours(0, 0, 0, 0);
         
         // Вычисляем начало недели для нужной даты (понедельник)
-        const dayOfWeek = targetDate.getDay();
-        const daysUntilMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-        const weekStart = new Date(targetDate);
-        weekStart.setDate(targetDate.getDate() + daysUntilMonday);
-        weekStart.setHours(0, 0, 0, 0);
+        const weekStart = getWeekStart(targetDate);
         
         // Получаем недельное расписание для нужной недели
         const weekSchedule = await api.getWeekSchedule(weekStart);
@@ -111,9 +99,9 @@ function MainMenu() {
     } finally {
       setScheduleLoading(false);
     }
-  };
+  }, [selectedDate, user]);
 
-  const loadEvents = async () => {
+  const loadEvents = useCallback(async () => {
     setEventsLoading(true);
     try {
       const data = await api.getEvents(7);
@@ -124,9 +112,19 @@ function MainMenu() {
     } finally {
       setEventsLoading(false);
     }
-  };
+  }, []);
 
-  const handleCreateDeadline = (lesson: any, index: number) => {
+  useEffect(() => {
+    loadData();
+    loadAvailableDates();
+    loadEvents();
+  }, [loadData, loadAvailableDates, loadEvents]);
+
+  useEffect(() => {
+    loadScheduleForDate();
+  }, [loadScheduleForDate]);
+
+  const handleCreateDeadline = useCallback((lesson: any, index: number) => {
     // Получаем дату завтра
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -157,68 +155,14 @@ function MainMenu() {
         showForm: true
       }
     });
-  };
+  }, [navigate]);
 
-  const renderLesson = (lesson: any, index: number) => {
+  const renderLesson = useCallback((lesson: any, index: number) => {
     const timeParts = lesson.time.split('–');
     const startTime = timeParts[0]?.trim() || '';
     const endTime = timeParts[1]?.trim() || '';
     
-    // Извлекаем тип занятия (ЛБ, ЛК, ПР и т.д.) из данных или названия предмета или room
-    const getLessonTypeAndRoom = (room: string, subject: string, lessonTypeFromData?: string): { type: string; roomDisplay: string } => {
-      // 1. Если тип занятия есть в данных, используем его
-      if (lessonTypeFromData) {
-        return { 
-          type: lessonTypeFromData.toUpperCase(), 
-          roomDisplay: room 
-        };
-      }
-      
-      // 2. Ищем тип занятия в названии предмета в скобках (например, "Предмет (ЛБ)")
-      const subjectMatch = subject.match(/\(([ЛБКПРСлбкпрс]{2,3})\)/);
-      if (subjectMatch) {
-        return { 
-          type: subjectMatch[1].toUpperCase(), 
-          roomDisplay: room 
-        };
-      }
-      
-      // 3. Извлекаем из room, если там есть тип в начале (например, "ЛБ Б-116")
-      const roomMatch = room.match(/^([ЛБКПРСлбкпрс]{2,3})\s+(.+)$/);
-      if (roomMatch) {
-        return { 
-          type: roomMatch[1].toUpperCase(), 
-          roomDisplay: roomMatch[2] 
-        };
-      }
-      
-      // 4. Если room начинается с букв (например, "Б-116"), это не тип занятия
-      // Проверяем, не является ли это просто номером аудитории
-      const isRoomNumber = /^[А-Яа-яЁё]-\d+/.test(room);
-      if (isRoomNumber) {
-        return { type: '', roomDisplay: room };
-      }
-      
-      return { type: '', roomDisplay: room };
-    };
-    
     const { type: lessonType, roomDisplay } = getLessonTypeAndRoom(lesson.room, lesson.subject, lesson.lessonType);
-    
-    // Определяем цвет в зависимости от типа занятия
-    const getLessonTypeColor = (type: string): string => {
-      const normalizedType = type.toUpperCase();
-      switch (normalizedType) {
-        case 'ЛК':
-          return '#248A3D'; // Темно-зеленый
-        case 'ЛБ':
-          return '#0051D5'; // Темно-синий
-        case 'ПР':
-          return '#CC7700'; // Темно-оранжевый
-        default:
-          return '#0051D5'; // Темно-синий по умолчанию
-      }
-    };
-    
     const lessonTypeColor = lessonType ? getLessonTypeColor(lessonType) : '#0051D5';
     
     // Проверяем, нужно ли показывать кнопку с иконкой clock.png
@@ -267,11 +211,12 @@ function MainMenu() {
             </Typography.Body>
           )}
           <Typography.Body variant="small" style={{
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: 400,
             color: '#007AFF',
             lineHeight: 1.5,
-            fontFamily: 'system-ui, -apple-system, sans-serif'
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            textAlign: 'center'
           }}>
             МСК
           </Typography.Body>
@@ -302,11 +247,11 @@ function MainMenu() {
             {lessonType && (
               <span style={{ 
                 color: lessonTypeColor,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: 1,
-                lineHeight: 1.2
+                lineHeight: 1.4
               }}>
                 {lessonType}
               </span>
@@ -359,7 +304,7 @@ function MainMenu() {
         )}
       </div>
     );
-  };
+  }, [selectedDate, handleCreateDeadline]);
 
   if (loading) {
     return (
@@ -480,13 +425,22 @@ function MainMenu() {
                   <div>
                     <CellList mode="island" filled>
                       <CellSimple>
-                        <Flex align="center" justify="center" style={{ padding: '20px 0' }}>
+                        <Flex align="center" justify="center" gap={6} style={{ padding: '20px 0' }}>
                           <Typography.Body variant="small" style={{
                             color: 'var(--text-secondary)',
                             fontSize: 14
                           }}>
-                            Выходной день! 🥳
+                            Выходной день!
                           </Typography.Body>
+                          <img 
+                            src="/confetti.png" 
+                            alt="Confetti" 
+                            style={{
+                              width: 16,
+                              height: 16,
+                              objectFit: 'contain'
+                            }}
+                          />
                         </Flex>
                       </CellSimple>
                     </CellList>
@@ -552,7 +506,7 @@ function MainMenu() {
                   color: 'var(--text-primary)',
                   margin: 0
                 }}>
-                  Мероприятия
+                  Ближайшие мероприятия
                 </Typography.Title>
               </CellSimple>
             </div>
@@ -608,12 +562,15 @@ function MainMenu() {
                       </Typography.Body>
                       <Flex direction="column" gap={4}>
                         <Flex align="center" gap={6}>
-                          <Typography.Body variant="small" style={{
-                            color: '#666666',
-                            fontSize: 13
-                          }}>
-                            📅
-                          </Typography.Body>
+                          <img 
+                            src="/calendar.png" 
+                            alt="Calendar" 
+                            style={{
+                              width: 16,
+                              height: 16,
+                              objectFit: 'contain'
+                            }}
+                          />
                           <Typography.Body variant="small" style={{
                             color: '#666666',
                             fontSize: 13
@@ -627,12 +584,15 @@ function MainMenu() {
                         </Flex>
                         {event.location && (
                           <Flex align="center" gap={6}>
-                            <Typography.Body variant="small" style={{
-                              color: '#666666',
-                              fontSize: 13
-                            }}>
-                              📍
-                            </Typography.Body>
+                            <img 
+                              src="/placeholder2.png" 
+                              alt="Location" 
+                              style={{
+                                width: 16,
+                                height: 16,
+                                objectFit: 'contain'
+                              }}
+                            />
                             <Typography.Body variant="small" style={{
                               color: '#666666',
                               fontSize: 13

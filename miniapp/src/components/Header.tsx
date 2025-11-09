@@ -76,7 +76,7 @@ function Header() {
       }}
     >
       <img 
-        src="/back.png" 
+        src="/back.svg" 
         alt="Назад" 
         style={{
           width: 24,
@@ -109,7 +109,7 @@ function Header() {
       }}
     >
       <img 
-        src="/user.png" 
+        src="/star2.png" 
         alt="User" 
         style={{
           width: '60%',

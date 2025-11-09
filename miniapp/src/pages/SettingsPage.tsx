@@ -119,8 +119,12 @@ function SettingsPage() {
   };
 
   const handleOpenGroupSelector = () => {
-    setShowGroupSelector(true);
-    resetSelection();
+    if (showGroupSelector) {
+      setShowGroupSelector(false);
+    } else {
+      setShowGroupSelector(true);
+      resetSelection();
+    }
   };
 
   const toggleNotifications = async (enabled: boolean) => {
@@ -176,66 +180,46 @@ function SettingsPage() {
       <Grid gap={20} cols={1}>
             <CellList mode="island" header={<CellHeader>Моя группа</CellHeader>}>
               <CellSimple
-                onClick={() => setShowInstitutionSelector(true)}
+                onClick={() => setShowInstitutionSelector(!showInstitutionSelector)}
+                showChevron
                 style={{ padding: '16px' }}
               >
-                <Flex align="center" justify="space-between" style={{ width: '100%' }}>
-                  <Flex direction="column" gap={6} style={{ flex: 1 }}>
-                    <Typography.Body variant="medium" style={{ 
-                      fontWeight: 600,
-                      fontSize: 16,
-                      color: '#000000'
-                    }}>
-                      Учебное заведение
-                    </Typography.Body>
-                    <Typography.Body variant="small" style={{ 
-                      color: user.institution_name ? '#666666' : '#FF3B30',
-                      fontSize: 14
-                    }}>
-                      {user.institution_name || 'Не указано'}
-                    </Typography.Body>
-                  </Flex>
-                  <img 
-                    src="/edit.svg" 
-                    alt="Изменить"
-                    style={{
-                      width: 20,
-                      height: 20,
-                      objectFit: 'contain'
-                    }}
-                  />
+                <Flex direction="column" gap={6} style={{ flex: 1 }}>
+                  <Typography.Body variant="medium" style={{ 
+                    fontWeight: 600,
+                    fontSize: 16,
+                    color: '#000000'
+                  }}>
+                    Учебное заведение
+                  </Typography.Body>
+                  <Typography.Body variant="small" style={{ 
+                    color: user.institution_name ? '#666666' : '#FF3B30',
+                    fontSize: 14
+                  }}>
+                    {user.institution_name || 'Не указано'}
+                  </Typography.Body>
                 </Flex>
               </CellSimple>
 
               <CellSimple
                 onClick={handleOpenGroupSelector}
+                showChevron
                 style={{ padding: '16px' }}
               >
-                <Flex align="center" justify="space-between" style={{ width: '100%' }}>
-                  <Flex direction="column" gap={6} style={{ flex: 1 }}>
-                    <Typography.Body variant="medium" style={{ 
-                      fontWeight: 600,
-                      fontSize: 16,
-                      color: '#000000'
-                    }}>
-                      Группа
-                    </Typography.Body>
-                    <Typography.Body variant="small" style={{ 
-                      color: user.group_name ? '#666666' : '#FF3B30',
-                      fontSize: 14
-                    }}>
-                      {user.group_name || 'Не указана'}
-                    </Typography.Body>
-                  </Flex>
-                  <img 
-                    src="/edit.svg" 
-                    alt="Изменить"
-                    style={{
-                      width: 20,
-                      height: 20,
-                      objectFit: 'contain'
-                    }}
-                  />
+                <Flex direction="column" gap={6} style={{ flex: 1 }}>
+                  <Typography.Body variant="medium" style={{ 
+                    fontWeight: 600,
+                    fontSize: 16,
+                    color: '#000000'
+                  }}>
+                    Группа
+                  </Typography.Body>
+                  <Typography.Body variant="small" style={{ 
+                    color: user.group_name ? '#666666' : '#FF3B30',
+                    fontSize: 14
+                  }}>
+                    {user.group_name || 'Не указана'}
+                  </Typography.Body>
                 </Flex>
               </CellSimple>
 
@@ -702,7 +686,7 @@ function SettingsPage() {
               >
                 <Flex direction="column" gap={4}>
                   <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
-                    🔔 Уведомления о дедлайнах
+                    Уведомления о дедлайнах
                   </Typography.Body>
                   <Typography.Body variant="small" style={{ 
                     color: 'var(--text-secondary)',
@@ -724,7 +708,7 @@ function SettingsPage() {
               >
                 <Flex direction="column" gap={4}>
                   <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
-                    🎉 Подписка на мероприятия
+                    Подписка на мероприятия
                   </Typography.Body>
                   <Typography.Body variant="small" style={{ 
                     color: 'var(--text-secondary)',

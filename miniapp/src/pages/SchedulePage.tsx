@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, Typography, Button, Spinner, Flex } from '@maxhub/max-ui';
 import api, { Schedule } from '../api/client';
+import { getLessonTypeAndRoom, getLessonTypeColor } from '../utils/lessons';
+import { formatWeekDate, getWeekStart } from '../utils/date';
 
 function SchedulePage() {
   const navigate = useNavigate();
@@ -19,11 +21,7 @@ function SchedulePage() {
     return monday;
   });
 
-  useEffect(() => {
-    loadSchedule();
-  }, [currentWeekStart]);
-
-  const loadSchedule = async () => {
+  const loadSchedule = useCallback(async () => {
     setLoading(true);
     try {
       const data = await api.getWeekSchedule(currentWeekStart);
@@ -37,29 +35,19 @@ function SchedulePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentWeekStart, navigate]);
 
-  const navigateWeek = (direction: 'prev' | 'next') => {
-    const newWeekStart = new Date(currentWeekStart);
-    newWeekStart.setDate(currentWeekStart.getDate() + (direction === 'next' ? 7 : -7));
-    setCurrentWeekStart(newWeekStart);
-  };
+  useEffect(() => {
+    loadSchedule();
+  }, [loadSchedule]);
 
-  const formatWeekDate = (date: Date): string => {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    return `${day}.${month}`;
-  };
-
-  const getWeekStart = (date: Date): Date => {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    const result = new Date(d);
-    result.setDate(diff);
-    result.setHours(0, 0, 0, 0);
-    return result;
-  };
+  const navigateWeek = useCallback((direction: 'prev' | 'next') => {
+    setCurrentWeekStart(prev => {
+      const newWeekStart = new Date(prev);
+      newWeekStart.setDate(prev.getDate() + (direction === 'next' ? 7 : -7));
+      return newWeekStart;
+    });
+  }, []);
 
   const getWeekNumber = (date: Date): number => {
     // Начало семестра - 1 сентября
@@ -90,7 +78,7 @@ function SchedulePage() {
     return diffWeeks > 0 ? diffWeeks : 1;
   };
 
-  const getAvailableWeeks = () => {
+  const getAvailableWeeks = useCallback(() => {
     const weeks: Array<{ number: number; startDate: Date; label: string }> = [];
     
     // Начало семестра - 1 сентября
@@ -125,9 +113,11 @@ function SchedulePage() {
     }
     
     return weeks;
-  };
+  }, []);
 
-  const formatDayDate = (dateStr: string): string => {
+  const availableWeeks = useMemo(() => getAvailableWeeks(), [getAvailableWeeks]);
+
+  const formatDayDate = useCallback((dateStr: string): string => {
     // dateStr формат: "DD.MM.YYYY" или "DD.MM"
     const parts = dateStr.split('.');
     if (parts.length < 2) return dateStr;
@@ -142,55 +132,9 @@ function SchedulePage() {
     ];
 
     return `${day} ${months[month - 1]}`;
-  };
+  }, []);
 
-  const getLessonTypeAndRoom = (room: string, subject: string, lessonTypeFromData?: string): { type: string; roomDisplay: string } => {
-    if (lessonTypeFromData) {
-      return {
-        type: lessonTypeFromData.toUpperCase(),
-        roomDisplay: room
-      };
-    }
-
-    const subjectMatch = subject.match(/\(([ЛБКПРСлбкпрс]{2,3})\)/);
-    if (subjectMatch) {
-      return {
-        type: subjectMatch[1].toUpperCase(),
-        roomDisplay: room
-      };
-    }
-
-    const roomMatch = room.match(/^([ЛБКПРСлбкпрс]{2,3})\s+(.+)$/);
-    if (roomMatch) {
-      return {
-        type: roomMatch[1].toUpperCase(),
-        roomDisplay: roomMatch[2]
-      };
-    }
-
-    const isRoomNumber = /^[А-Яа-яЁё]-\d+/.test(room);
-    if (isRoomNumber) {
-      return { type: '', roomDisplay: room };
-    }
-
-    return { type: '', roomDisplay: room };
-  };
-
-  const getLessonTypeColor = (type: string): string => {
-    const normalizedType = type.toUpperCase();
-    switch (normalizedType) {
-      case 'ЛК':
-        return '#248A3D'; // Темно-зеленый
-      case 'ЛБ':
-        return '#0051D5'; // Темно-синий
-      case 'ПР':
-        return '#CC7700'; // Темно-оранжевый
-      default:
-        return '#0051D5';
-    }
-  };
-
-  const renderLesson = (lesson: any, index: number) => {
+  const renderLesson = useCallback((lesson: any, index: number) => {
     const timeParts = lesson.time.split('–');
     const startTime = timeParts[0]?.trim() || '';
     const endTime = timeParts[1]?.trim() || '';
@@ -245,11 +189,12 @@ function SchedulePage() {
             </Typography.Body>
           )}
           <Typography.Body variant="small" style={{
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: 400,
             color: '#007AFF',
             lineHeight: 1.5,
-            fontFamily: 'system-ui, -apple-system, sans-serif'
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            textAlign: 'center'
           }}>
             МСК
           </Typography.Body>
@@ -280,11 +225,11 @@ function SchedulePage() {
             {lessonType && (
               <span style={{
                 color: lessonTypeColor,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: 1,
-                lineHeight: 1.2
+                lineHeight: 1.4
               }}>
                 {lessonType}
               </span>
@@ -295,9 +240,9 @@ function SchedulePage() {
         </Flex>
       </div>
     );
-  };
+  }, []);
 
-  const renderDaySchedule = (daySchedule: Schedule) => {
+  const renderDaySchedule = useCallback((daySchedule: Schedule) => {
     const dayName = daySchedule.dayOfWeek;
     const formattedDate = formatDayDate(daySchedule.date);
     const fullDayText = `${dayName}, ${formattedDate} по МСК`;
@@ -359,9 +304,9 @@ function SchedulePage() {
         </div>
       </div>
     );
-  };
+  }, [formatDayDate, renderLesson]);
 
-  const isCurrentWeek = () => {
+  const isCurrentWeek = useMemo(() => {
     const today = new Date();
     const dayOfWeek = today.getDay();
     const daysUntilMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
@@ -370,7 +315,7 @@ function SchedulePage() {
     thisWeekMonday.setHours(0, 0, 0, 0);
 
     return currentWeekStart.getTime() === thisWeekMonday.getTime();
-  };
+  }, [currentWeekStart]);
 
   return (
     <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
@@ -385,10 +330,11 @@ function SchedulePage() {
                   fontWeight: 600,
                   color: '#000000'
                 }}>
-                  {isCurrentWeek() ? 'Текущая неделя' : 'Неделя'} с {formatWeekDate(currentWeekStart)}
+                  {isCurrentWeek ? 'Текущая неделя' : 'Неделя'} с {formatWeekDate(currentWeekStart)}
                 </Typography.Body>
                 <button
                   onClick={() => setShowWeekPicker(!showWeekPicker)}
+                  type="button"
                   style={{
                     width: 32,
                     height: 32,
@@ -421,12 +367,13 @@ function SchedulePage() {
                 fontWeight: 400,
                 color: '#999999'
               }}>
-                {isCurrentWeek() ? 'Текущая' : 'Другая неделя'}
+                {isCurrentWeek ? 'Текущая' : 'Другая неделя'}
               </Typography.Body>
             </Flex>
             <Flex gap={8}>
-              <button
-                onClick={() => navigateWeek('prev')}
+                <button
+                  onClick={() => navigateWeek('prev')}
+                  type="button"
                 style={{
                   width: 44,
                   height: 44,
@@ -454,8 +401,9 @@ function SchedulePage() {
               >
                 ←
               </button>
-              <button
-                onClick={() => navigateWeek('next')}
+                <button
+                  onClick={() => navigateWeek('next')}
+                  type="button"
                 style={{
                   width: 44,
                   height: 44,
@@ -497,7 +445,7 @@ function SchedulePage() {
               overflowY: 'auto',
               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
             }}>
-              {getAvailableWeeks().map((week, index) => {
+              {availableWeeks.map((week, index) => {
                 const isSelected = week.startDate.getTime() === currentWeekStart.getTime();
                 return (
                   <div
@@ -510,7 +458,7 @@ function SchedulePage() {
                       padding: '14px 16px',
                       cursor: 'pointer',
                       backgroundColor: isSelected ? '#F0F7FF' : 'transparent',
-                      borderBottom: index < getAvailableWeeks().length - 1 ? '1px solid #F5F5F5' : 'none',
+                      borderBottom: index < availableWeeks.length - 1 ? '1px solid #F5F5F5' : 'none',
                       transition: 'background-color 0.2s ease'
                     }}
                     onMouseEnter={(e) => {

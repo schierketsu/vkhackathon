@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, Typography, Button, Input, Switch, Flex } from '@maxhub/max-ui';
 import api, { Deadline, User } from '../api/client';
+import { parseDate, formatDate, getDaysUntil } from '../utils/date';
 
 function DeadlinesPage() {
   const navigate = useNavigate();
@@ -15,6 +16,22 @@ function DeadlinesPage() {
     dueDate: '',
     description: '',
   });
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [deadlinesData, userData] = await Promise.all([
+        api.getDeadlines(),
+        api.getUser(),
+      ]);
+      setDeadlines(deadlinesData);
+      setUser(userData);
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -33,25 +50,9 @@ function DeadlinesPage() {
       // Очищаем state после использования
       window.history.replaceState({}, document.title);
     }
-  }, [location]);
+  }, [location, loadData]);
 
-  const loadData = async () => {
-    setLoading(true);
-    try {
-      const [deadlinesData, userData] = await Promise.all([
-        api.getDeadlines(),
-        api.getUser(),
-      ]);
-      setDeadlines(deadlinesData);
-      setUser(userData);
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddDeadline = async () => {
+  const handleAddDeadline = useCallback(async () => {
     if (!newDeadline.title || !newDeadline.dueDate) {
       alert('Заполните название и дату');
       return;
@@ -82,9 +83,9 @@ function DeadlinesPage() {
       console.error('Ошибка добавления дедлайна:', error);
       alert('Ошибка добавления дедлайна');
     }
-  };
+  }, [newDeadline, loadData]);
 
-  const handleDeleteDeadline = async (id: number) => {
+  const handleDeleteDeadline = useCallback(async (id: number) => {
     if (!confirm('Удалить дедлайн?')) return;
 
     try {
@@ -94,9 +95,9 @@ function DeadlinesPage() {
       console.error('Ошибка удаления дедлайна:', error);
       alert('Ошибка удаления дедлайна');
     }
-  };
+  }, [loadData]);
 
-  const toggleNotifications = async (enabled: boolean) => {
+  const toggleNotifications = useCallback(async (enabled: boolean) => {
     try {
       await api.toggleNotifications(enabled);
       if (user) {
@@ -105,57 +106,7 @@ function DeadlinesPage() {
     } catch (error) {
       console.error('Ошибка изменения уведомлений:', error);
     }
-  };
-
-  const parseDate = (dateStr: string): Date => {
-    // Формат: DD.MM.YYYY или DD.MM.YYYY HH:MM или YYYY-MM-DD
-    if (dateStr.includes('-') && !dateStr.includes('.')) {
-      // Формат YYYY-MM-DD или YYYY-MM-DDTHH:MM
-      return new Date(dateStr);
-    }
-    
-    // Формат DD.MM.YYYY или DD.MM.YYYY HH:MM
-    const parts = dateStr.split(' ');
-    const datePart = parts[0];
-    const timePart = parts[1];
-    
-    const dateParts = datePart.split('.');
-    if (dateParts.length !== 3) {
-      return new Date(dateStr);
-    }
-    
-    const day = parseInt(dateParts[0]);
-    const month = parseInt(dateParts[1]) - 1;
-    const year = parseInt(dateParts[2]);
-    
-    if (timePart) {
-      // Есть время в формате HH:MM
-      const timeParts = timePart.split(':');
-      const hours = parseInt(timeParts[0]) || 0;
-      const minutes = parseInt(timeParts[1]) || 0;
-      return new Date(year, month, day, hours, minutes);
-    }
-    
-    return new Date(year, month, day);
-  };
-
-  const formatDate = (dateStr: string): string => {
-    const date = parseDate(dateStr);
-    return date.toLocaleDateString('ru-RU', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-  };
-
-  const getDaysUntil = (dateStr: string): number => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const deadline = parseDate(dateStr);
-    deadline.setHours(0, 0, 0, 0);
-    const diff = deadline.getTime() - today.getTime();
-    return Math.ceil(diff / (1000 * 60 * 60 * 24));
-  };
+  }, [user]);
 
   return (
     <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
@@ -183,9 +134,30 @@ function DeadlinesPage() {
                   onChange={(checked) => toggleNotifications(checked)}
                 />
               }
-              title="🔔 Уведомления о дедлайнах"
-              subtitle={user.notifications_enabled === 1 ? 'Включены' : 'Выключены'}
-            />
+            >
+              <Flex direction="column" gap={4}>
+                <Flex align="center" gap={8}>
+                  <img 
+                    src="/notification.png" 
+                    alt="Notification" 
+                    style={{
+                      width: 20,
+                      height: 20,
+                      objectFit: 'contain'
+                    }}
+                  />
+                  <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
+                    Уведомления о дедлайнах
+                  </Typography.Body>
+                </Flex>
+                <Typography.Body variant="small" style={{ 
+                  color: 'var(--text-secondary)',
+                  fontSize: 13
+                }}>
+                  {user.notifications_enabled === 1 ? 'Включены' : 'Выключены'}
+                </Typography.Body>
+              </Flex>
+            </CellSimple>
           </CellList>
         )}
 
@@ -241,14 +213,6 @@ function DeadlinesPage() {
             <CellSimple>
               <Flex align="center" justify="center" style={{ padding: '40px 0' }}>
                 <Flex direction="column" align="center" gap={16}>
-                  <Typography.Body variant="medium" style={{ 
-                    fontSize: 48,
-                    opacity: 0.3,
-                    lineHeight: 1,
-                    margin: 0
-                  }}>
-                    ⏰
-                  </Typography.Body>
                   <Typography.Body variant="small" style={{ 
                     color: 'var(--text-secondary)',
                     fontSize: 14,

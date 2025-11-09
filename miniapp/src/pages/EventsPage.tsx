@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Container, Grid, CellSimple, CellList, Typography, Switch, Flex, Spinner } from '@maxhub/max-ui';
+import { CellSimple, CellList, Typography, Switch, Flex, Spinner } from '@maxhub/max-ui';
 import api, { Event, User } from '../api/client';
 
 function EventsPage() {
@@ -51,9 +51,30 @@ function EventsPage() {
                   onChange={(checked) => toggleSubscription(checked)}
                 />
               }
-              title="🔔 Уведомления о мероприятиях"
-              subtitle={user.events_subscribed === 1 ? 'Включены' : 'Выключены'}
-            />
+            >
+              <Flex direction="column" gap={4}>
+                <Flex align="center" gap={8}>
+                  <img 
+                    src="/notification.png" 
+                    alt="Notification" 
+                    style={{
+                      width: 20,
+                      height: 20,
+                      objectFit: 'contain'
+                    }}
+                  />
+                  <Typography.Body variant="medium" style={{ fontWeight: 600 }}>
+                    Уведомления о мероприятиях
+                  </Typography.Body>
+                </Flex>
+                <Typography.Body variant="small" style={{ 
+                  color: 'var(--text-secondary)',
+                  fontSize: 13
+                }}>
+                  {user.events_subscribed === 1 ? 'Включены' : 'Выключены'}
+                </Typography.Body>
+              </Flex>
+            </CellSimple>
           </CellList>
         )}
       </div>
@@ -132,12 +153,15 @@ function EventsPage() {
                       </Typography.Body>
                       <Flex direction="column" gap={4}>
                         <Flex align="center" gap={6}>
-                          <Typography.Body variant="small" style={{
-                            color: '#666666',
-                            fontSize: 13
-                          }}>
-                            📅
-                          </Typography.Body>
+                          <img 
+                            src="/calendar.png" 
+                            alt="Calendar" 
+                            style={{
+                              width: 16,
+                              height: 16,
+                              objectFit: 'contain'
+                            }}
+                          />
                           <Typography.Body variant="small" style={{
                             color: '#666666',
                             fontSize: 13
@@ -151,12 +175,15 @@ function EventsPage() {
                         </Flex>
                         {event.location && (
                           <Flex align="center" gap={6}>
-                            <Typography.Body variant="small" style={{
-                              color: '#666666',
-                              fontSize: 13
-                            }}>
-                              📍
-                            </Typography.Body>
+                            <img 
+                              src="/placeholder2.png" 
+                              alt="Location" 
+                              style={{
+                                width: 16,
+                                height: 16,
+                                objectFit: 'contain'
+                              }}
+                            />
                             <Typography.Body variant="small" style={{
                               color: '#666666',
                               fontSize: 13
