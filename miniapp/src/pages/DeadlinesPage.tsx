@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, Typography, Button, Input, Switch, Flex } from '@maxhub/max-ui';
 import api, { Deadline, User } from '../api/client';
 
 function DeadlinesPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +18,22 @@ function DeadlinesPage() {
 
   useEffect(() => {
     loadData();
-  }, []);
+    
+    // Проверяем, есть ли предзаполненные данные из state
+    const state = location.state as { title?: string; dueDate?: string; description?: string; showForm?: boolean } | null;
+    if (state) {
+      setNewDeadline({
+        title: state.title || '',
+        dueDate: state.dueDate || '',
+        description: state.description || '',
+      });
+      if (state.showForm) {
+        setShowAddForm(true);
+      }
+      // Очищаем state после использования
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const loadData = async () => {
     setLoading(true);
@@ -42,9 +58,21 @@ function DeadlinesPage() {
     }
 
     try {
+      // Конвертируем формат из datetime-local (YYYY-MM-DDTHH:MM) в формат DD.MM.YYYY HH:MM
+      let formattedDate = newDeadline.dueDate;
+      if (newDeadline.dueDate.includes('T')) {
+        const date = new Date(newDeadline.dueDate);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
+      }
+      
       await api.addDeadline(
         newDeadline.title,
-        newDeadline.dueDate,
+        formattedDate,
         newDeadline.description || undefined
       );
       setNewDeadline({ title: '', dueDate: '', description: '' });
@@ -79,8 +107,40 @@ function DeadlinesPage() {
     }
   };
 
+  const parseDate = (dateStr: string): Date => {
+    // Формат: DD.MM.YYYY или DD.MM.YYYY HH:MM или YYYY-MM-DD
+    if (dateStr.includes('-') && !dateStr.includes('.')) {
+      // Формат YYYY-MM-DD или YYYY-MM-DDTHH:MM
+      return new Date(dateStr);
+    }
+    
+    // Формат DD.MM.YYYY или DD.MM.YYYY HH:MM
+    const parts = dateStr.split(' ');
+    const datePart = parts[0];
+    const timePart = parts[1];
+    
+    const dateParts = datePart.split('.');
+    if (dateParts.length !== 3) {
+      return new Date(dateStr);
+    }
+    
+    const day = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1;
+    const year = parseInt(dateParts[2]);
+    
+    if (timePart) {
+      // Есть время в формате HH:MM
+      const timeParts = timePart.split(':');
+      const hours = parseInt(timeParts[0]) || 0;
+      const minutes = parseInt(timeParts[1]) || 0;
+      return new Date(year, month, day, hours, minutes);
+    }
+    
+    return new Date(year, month, day);
+  };
+
   const formatDate = (dateStr: string): string => {
-    const date = new Date(dateStr);
+    const date = parseDate(dateStr);
     return date.toLocaleDateString('ru-RU', {
       day: '2-digit',
       month: '2-digit',
@@ -91,7 +151,7 @@ function DeadlinesPage() {
   const getDaysUntil = (dateStr: string): number => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const deadline = new Date(dateStr);
+    const deadline = parseDate(dateStr);
     deadline.setHours(0, 0, 0, 0);
     const diff = deadline.getTime() - today.getTime();
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
@@ -140,8 +200,8 @@ function DeadlinesPage() {
                   style={{ fontSize: 14 }}
                 />
                 <Input
-                  type="date"
-                  placeholder="Дата"
+                  type="datetime-local"
+                  placeholder="Дата и время"
                   value={newDeadline.dueDate}
                   onChange={(e) => setNewDeadline({ ...newDeadline, dueDate: e.target.value })}
                   style={{ fontSize: 14 }}

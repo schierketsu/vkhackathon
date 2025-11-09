@@ -190,6 +190,38 @@ export interface Deadline {
   created_at: string;
 }
 
+function parseDate(dateStr: string): Date {
+  // Формат: DD.MM.YYYY или DD.MM.YYYY HH:MM или YYYY-MM-DD
+  if (dateStr.includes('-') && !dateStr.includes('.')) {
+    // Формат YYYY-MM-DD или YYYY-MM-DDTHH:MM
+    return new Date(dateStr);
+  }
+  
+  // Формат DD.MM.YYYY или DD.MM.YYYY HH:MM
+  const parts = dateStr.split(' ');
+  const datePart = parts[0];
+  const timePart = parts[1];
+  
+  const dateParts = datePart.split('.');
+  if (dateParts.length !== 3) {
+    return new Date(dateStr);
+  }
+  
+  const day = parseInt(dateParts[0]);
+  const month = parseInt(dateParts[1]) - 1;
+  const year = parseInt(dateParts[2]);
+  
+  if (timePart) {
+    // Есть время в формате HH:MM
+    const timeParts = timePart.split(':');
+    const hours = parseInt(timeParts[0]) || 0;
+    const minutes = parseInt(timeParts[1]) || 0;
+    return new Date(year, month, day, hours, minutes);
+  }
+  
+  return new Date(year, month, day);
+}
+
 export function getActiveDeadlines(userId: string): Deadline[] {
   const database = getDatabase();
   if (!database) return [];
@@ -197,12 +229,36 @@ export function getActiveDeadlines(userId: string): Deadline[] {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
+  // Получаем все дедлайны пользователя
   const stmt = database.prepare(`
     SELECT * FROM deadlines 
-    WHERE user_id = ? AND date(due_date) >= date(?)
-    ORDER BY due_date ASC
+    WHERE user_id = ?
   `);
-  return stmt.all(userId, today.toISOString().split('T')[0]) as Deadline[];
+  const allDeadlines = stmt.all(userId) as Deadline[];
+  
+  // Фильтруем и сортируем в JavaScript, так как SQLite date() не умеет парсить DD.MM.YYYY HH:MM
+  const activeDeadlines = allDeadlines
+    .filter(deadline => {
+      try {
+        const dueDate = parseDate(deadline.due_date);
+        dueDate.setHours(0, 0, 0, 0);
+        return dueDate >= today;
+      } catch (error) {
+        console.error('Ошибка парсинга даты:', deadline.due_date, error);
+        return false;
+      }
+    })
+    .sort((a, b) => {
+      try {
+        const dateA = parseDate(a.due_date);
+        const dateB = parseDate(b.due_date);
+        return dateA.getTime() - dateB.getTime();
+      } catch (error) {
+        return 0;
+      }
+    });
+  
+  return activeDeadlines;
 }
 
 export function addDeadline(userId: string, title: string, dueDate: string, description?: string): Deadline {

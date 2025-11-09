@@ -126,6 +126,39 @@ function MainMenu() {
     }
   };
 
+  const handleCreateDeadline = (lesson: any, index: number) => {
+    // Получаем дату завтра
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const dateStr = `${String(tomorrow.getDate()).padStart(2, '0')}.${String(tomorrow.getMonth() + 1).padStart(2, '0')}.${tomorrow.getFullYear()}`;
+    
+    // Получаем время начала пары
+    const timeParts = lesson.time.split('–');
+    const startTime = timeParts[0]?.trim() || '';
+    const [hours, minutes] = startTime.split(':').map(Number);
+    
+    // Вычитаем 1 час
+    const deadlineDate = new Date(tomorrow);
+    deadlineDate.setHours(hours || 0, minutes || 0, 0, 0);
+    deadlineDate.setHours(deadlineDate.getHours() - 1);
+    
+    // Форматируем дату и время для дедлайна (формат YYYY-MM-DD для input type="date")
+    const deadlineDateStr = `${deadlineDate.getFullYear()}-${String(deadlineDate.getMonth() + 1).padStart(2, '0')}-${String(deadlineDate.getDate()).padStart(2, '0')}T${String(deadlineDate.getHours()).padStart(2, '0')}:${String(deadlineDate.getMinutes()).padStart(2, '0')}`;
+    
+    // Создаем описание
+    const description = `будильник ${dateStr} ${index + 1} пара`;
+    
+    // Переходим на страницу дедлайнов с предзаполненными данными
+    navigate('/deadlines', {
+      state: {
+        title: 'Не опоздывай!',
+        dueDate: deadlineDateStr,
+        description: description,
+        showForm: true
+      }
+    });
+  };
+
   const renderLesson = (lesson: any, index: number) => {
     const timeParts = lesson.time.split('–');
     const startTime = timeParts[0]?.trim() || '';
@@ -187,6 +220,9 @@ function MainMenu() {
     };
     
     const lessonTypeColor = lessonType ? getLessonTypeColor(lessonType) : '#0051D5';
+    
+    // Проверяем, нужно ли показывать кнопку с иконкой clock.png
+    const showClockButton = selectedDate === 'tomorrow' && index === 0;
     
     return (
       <div 
@@ -283,6 +319,49 @@ function MainMenu() {
             </span>
           </div>
         </Flex>
+        
+        {/* Квадратная кнопка с иконкой clock.png для первой пары на завтра */}
+        {showClockButton && (
+          <button
+            style={{
+              width: 40,
+              height: 40,
+              minWidth: 40,
+              padding: 0,
+              border: 'none',
+              borderRadius: 8,
+              backgroundColor: '#2980F2',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 4,
+              flexShrink: 0,
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCreateDeadline(lesson, index);
+            }}
+          >
+            <span style={{
+              color: '#FFFFFF',
+              fontSize: 16,
+              fontWeight: 600,
+              lineHeight: 1
+            }}>+</span>
+            <img 
+              src="/clock.png" 
+              alt="Clock" 
+              style={{
+                width: 20,
+                height: 20,
+                objectFit: 'contain',
+                filter: 'brightness(0) invert(1)'
+              }}
+            />
+          </button>
+        )}
       </div>
     );
   };
