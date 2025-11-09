@@ -344,12 +344,7 @@ function MainMenu() {
               handleCreateDeadline(lesson, index);
             }}
           >
-            <span style={{
-              color: '#FFFFFF',
-              fontSize: 16,
-              fontWeight: 600,
-              lineHeight: 1
-            }}>+</span>
+            
             <img 
               src="/clock.png" 
               alt="Clock" 
