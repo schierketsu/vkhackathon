@@ -14,6 +14,7 @@ import ServicesPage from './pages/ServicesPage';
 import ProfilePage from './pages/ProfilePage';
 import PracticePage from './pages/PracticePage';
 import SetupPage from './pages/SetupPage';
+import SupportPage from './pages/SupportPage';
 import api from './api/client';
 
 // Компонент для защищенных маршрутов (требуют настройки)
@@ -99,6 +100,7 @@ function AppContent() {
           <Route path="/services" element={<ProtectedRoute needsSetup={needsSetup || false}><ServicesPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute needsSetup={needsSetup || false}><ProfilePage /></ProtectedRoute>} />
           <Route path="/practice" element={<ProtectedRoute needsSetup={needsSetup || false}><PracticePage /></ProtectedRoute>} />
+          <Route path="/support" element={<ProtectedRoute needsSetup={needsSetup || false}><SupportPage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>

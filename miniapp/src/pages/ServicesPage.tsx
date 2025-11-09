@@ -52,6 +52,18 @@ function ServicesPage() {
       title: 'Справки',
       icon: '/справки.png',
       path: '#',
+    },
+    {
+      id: 'support',
+      title: 'Поддержка',
+      icon: '/хелп.png',
+      path: '/support',
+    },
+    {
+      id: 'volunteering',
+      title: 'Волонтерство',
+      icon: '/анималзабота.png',
+      path: '#',
     }
   ];
 

@@ -20,6 +20,7 @@ function Header() {
     '/teachers': 'Преподаватели',
     '/profile': 'Профиль',
     '/practice': 'Практика',
+    '/support': 'Поддержка',
   };
 
   /**
