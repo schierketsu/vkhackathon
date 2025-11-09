@@ -174,7 +174,7 @@ function SettingsPage() {
   return (
     <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
       <Grid gap={20} cols={1}>
-            <CellList mode="island" header={<CellHeader>Учебное заведение</CellHeader>}>
+            <CellList mode="island" header={<CellHeader>Моя группа</CellHeader>}>
               <CellSimple
                 onClick={() => setShowInstitutionSelector(true)}
                 style={{ padding: '16px' }}
@@ -206,9 +206,7 @@ function SettingsPage() {
                   />
                 </Flex>
               </CellSimple>
-            </CellList>
 
-            <CellList mode="island" header={<CellHeader>Группа и подгруппа</CellHeader>}>
               <CellSimple
                 onClick={handleOpenGroupSelector}
                 style={{ padding: '16px' }}

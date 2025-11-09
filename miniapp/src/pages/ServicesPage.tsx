@@ -42,18 +42,6 @@ function ServicesPage() {
       path: '/practice',
     },
     {
-      id: 'contacts',
-      title: 'Контакты',
-      icon: '/звонки.png',
-      path: '#',
-    },
-    {
-      id: 'certificates',
-      title: 'Справки',
-      icon: '/справки.png',
-      path: '#',
-    },
-    {
       id: 'support',
       title: 'Поддержка',
       icon: '/хелп.png',
@@ -63,6 +51,18 @@ function ServicesPage() {
       id: 'volunteering',
       title: 'Волонтерство',
       icon: '/анималзабота.png',
+      path: '#',
+    },
+    {
+      id: 'certificates',
+      title: 'Справки',
+      icon: '/справки.png',
+      path: '#',
+    },
+    {
+      id: 'contacts',
+      title: 'Контакты',
+      icon: '/звонки.png',
       path: '#',
     }
   ];

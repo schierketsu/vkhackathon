@@ -1511,7 +1511,62 @@ function getTeacherWeekScheduleFull(teacherName: string): WeekSchedule | null {
     }
   };
 
+  // Вспомогательная функция для обработки расписания группы
+  const processGroupSchedule = (groupSchedule: WeekSchedule, groupName: string) => {
+    // Проверяем обе недели
+    for (const weekType of ['odd_week', 'even_week'] as const) {
+      const week = groupSchedule[weekType];
+      for (const dayKey in week) {
+        const day = week[dayKey as keyof typeof week];
+        for (const lesson of day) {
+          // Сравниваем как оригинальное имя, так и нормализованное
+          const lessonTeacher = lesson.teacher?.trim() || '';
+          if (lessonTeacher) {
+            const normalizedLessonTeacher = normalizeTeacherName(lessonTeacher);
+            // Сравниваем нормализованные имена
+            if (normalizedLessonTeacher === normalizedSearchName || 
+                lessonTeacher === teacherName.trim()) {
+              // Добавляем занятие в расписание преподавателя
+              // Создаем копию урока с информацией о группе
+              const teacherLesson: Lesson = {
+                ...lesson,
+                subject: `${lesson.subject} (${groupName})`
+              };
+              teacherSchedule[weekType][dayKey as keyof typeof teacherSchedule.odd_week].push(teacherLesson);
+            }
+          }
+        }
+      }
+    }
+  };
+
   // Проходим по всем группам и собираем занятия преподавателя
+  // Проверяем новую структуру с учебными заведениями
+  if (timetableData.institutions) {
+    for (const institutionName in timetableData.institutions) {
+      const institution = timetableData.institutions[institutionName];
+      if (institution.faculties) {
+        for (const facultyName in institution.faculties) {
+          const faculty = institution.faculties[facultyName];
+          for (const studyFormat in faculty) {
+            const format = faculty[studyFormat];
+            for (const degree in format) {
+              const degreeCourses = format[degree];
+              for (const course in degreeCourses) {
+                const courseGroups = degreeCourses[course];
+                for (const groupName in courseGroups) {
+                  const groupSchedule = courseGroups[groupName];
+                  processGroupSchedule(groupSchedule, groupName);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Обратная совместимость со старой структурой
   if (timetableData.faculties) {
     for (const facultyName in timetableData.faculties) {
       const faculty = timetableData.faculties[facultyName];
@@ -1523,32 +1578,7 @@ function getTeacherWeekScheduleFull(teacherName: string): WeekSchedule | null {
             const courseGroups = degreeCourses[course];
             for (const groupName in courseGroups) {
               const groupSchedule = courseGroups[groupName];
-              
-              // Проверяем обе недели
-              for (const weekType of ['odd_week', 'even_week'] as const) {
-                const week = groupSchedule[weekType];
-                for (const dayKey in week) {
-                  const day = week[dayKey as keyof typeof week];
-                  for (const lesson of day) {
-                    // Сравниваем как оригинальное имя, так и нормализованное
-                    const lessonTeacher = lesson.teacher?.trim() || '';
-                    if (lessonTeacher) {
-                      const normalizedLessonTeacher = normalizeTeacherName(lessonTeacher);
-                      // Сравниваем нормализованные имена
-                      if (normalizedLessonTeacher === normalizedSearchName || 
-                          lessonTeacher === teacherName.trim()) {
-                        // Добавляем занятие в расписание преподавателя
-                        // Создаем копию урока с информацией о группе
-                        const teacherLesson: Lesson = {
-                          ...lesson,
-                          subject: `${lesson.subject} (${groupName})`
-                        };
-                        teacherSchedule[weekType][dayKey as keyof typeof teacherSchedule.odd_week].push(teacherLesson);
-                      }
-                    }
-                  }
-                }
-              }
+              processGroupSchedule(groupSchedule, groupName);
             }
           }
         }
