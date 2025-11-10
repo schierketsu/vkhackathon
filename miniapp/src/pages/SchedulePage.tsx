@@ -279,7 +279,16 @@ function SchedulePage() {
                 alignItems: 'center',
                 gap: 12
               }}>
-                <span style={{ fontSize: 24 }}>🎒</span>
+                <img 
+                  src="/backpack.png" 
+                  alt="🎒" 
+                  style={{
+                    width: 36,
+                    height: 36,
+                    objectFit: 'contain',
+                    flexShrink: 0,
+                  }}
+                />
                 <Flex direction="column" gap={4}>
                   <Typography.Body variant="medium" style={{
                     fontSize: 16,
@@ -293,7 +302,7 @@ function SchedulePage() {
                     fontWeight: 400,
                     color: '#999999'
                   }}>
-                    Занятий нет
+                    Продуктивного вам отдыха!
                   </Typography.Body>
                 </Flex>
               </div>

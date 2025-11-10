@@ -9,19 +9,61 @@ interface Message {
   timestamp: Date;
 }
 
+interface SerializedMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'ai';
+  timestamp: string;
+}
+
+const STORAGE_KEY = 'support_chat_history';
+
 function SupportPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'Привет! Я здесь, чтобы поддержать тебя. Понимаю, что учеба и жизнь студента могут быть непростыми. Расскажи, что у тебя на душе? Я слушаю.',
-      sender: 'ai',
-      timestamp: new Date()
+  // Загружаем сохраненные сообщения из localStorage при инициализации
+  const loadSavedMessages = (): Message[] => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed: SerializedMessage[] = JSON.parse(saved);
+        return parsed.map(msg => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp)
+        }));
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки истории чата:', error);
     }
-  ]);
+    // Если нет сохраненной истории, возвращаем начальное приветственное сообщение
+    return [
+      {
+        id: '1',
+        text: 'Привет! Я здесь, чтобы поддержать тебя. Понимаю, что учеба и жизнь студента могут быть непростыми. Расскажи, что у тебя на душе? Я слушаю.',
+        sender: 'ai',
+        timestamp: new Date()
+      }
+    ];
+  };
+
+  const [messages, setMessages] = useState<Message[]>(loadSavedMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Сохраняем сообщения в localStorage при каждом изменении
+  useEffect(() => {
+    try {
+      const serialized: SerializedMessage[] = messages.map(msg => ({
+        id: msg.id,
+        text: msg.text,
+        sender: msg.sender,
+        timestamp: msg.timestamp.toISOString()
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
+    } catch (error) {
+      console.error('Ошибка сохранения истории чата:', error);
+    }
+  }, [messages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

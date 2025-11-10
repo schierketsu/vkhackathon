@@ -247,6 +247,8 @@ export const api = {
     description?: string;
     location?: string;
     tags: string[];
+    avatar?: string;
+    rating?: number;
   }>> => {
     const response = await apiClient.get('/practice/companies', {
       params: { institution, faculty },
@@ -260,6 +262,107 @@ export const api = {
     if (faculty) params.faculty = faculty;
     const response = await apiClient.get('/practice/tags', { params });
     return response.data;
+  },
+
+  getPracticeCompany: async (companyId: string, institution: string, faculty: string): Promise<{
+    id: string;
+    name: string;
+    description?: string;
+    location?: string;
+    tags: string[];
+    avatar?: string;
+    rating?: number;
+  }> => {
+    const response = await apiClient.get(`/practice/companies/${companyId}`, {
+      params: { institution, faculty },
+    });
+    return response.data;
+  },
+
+  // Заявки на практику
+  getPracticeApplications: async (): Promise<Array<{
+    id: number;
+    user_id: string;
+    company_id: string;
+    company_name: string;
+    status: 'pending' | 'accepted' | 'rejected';
+    created_at: string;
+  }>> => {
+    const response = await apiClient.get('/practice/applications', {
+      params: { userId: getUserId() },
+    });
+    return response.data;
+  },
+
+  createPracticeApplication: async (companyId: string, companyName: string): Promise<{
+    id: number;
+    user_id: string;
+    company_id: string;
+    company_name: string;
+    status: 'pending' | 'accepted' | 'rejected';
+    created_at: string;
+  }> => {
+    const response = await apiClient.post('/practice/applications', {
+      userId: getUserId(),
+      companyId,
+      companyName,
+    });
+    return response.data;
+  },
+
+  deletePracticeApplication: async (applicationId: number): Promise<void> => {
+    await apiClient.delete(`/practice/applications/${applicationId}`, {
+      params: { userId: getUserId() },
+    });
+  },
+
+  // Отзывы о компаниях
+  getCompanyReviews: async (companyId: string): Promise<Array<{
+    id: number;
+    user_id: string;
+    company_id: string;
+    rating: number;
+    comment?: string;
+    created_at: string;
+  }>> => {
+    const response = await apiClient.get(`/practice/companies/${companyId}/reviews`);
+    return response.data;
+  },
+
+  createCompanyReview: async (companyId: string, rating: number, comment?: string): Promise<{
+    id: number;
+    user_id: string;
+    company_id: string;
+    rating: number;
+    comment?: string;
+    created_at: string;
+  }> => {
+    const response = await apiClient.post(`/practice/companies/${companyId}/reviews`, {
+      userId: getUserId(),
+      rating,
+      comment,
+    });
+    return response.data;
+  },
+
+  getUserCompanyReview: async (companyId: string): Promise<{
+    id: number;
+    user_id: string;
+    company_id: string;
+    rating: number;
+    comment?: string;
+    created_at: string;
+  } | null> => {
+    const response = await apiClient.get(`/practice/companies/${companyId}/reviews/my`, {
+      params: { userId: getUserId() },
+    });
+    return response.data;
+  },
+
+  deleteCompanyReview: async (companyId: string, reviewId: number): Promise<void> => {
+    await apiClient.delete(`/practice/companies/${companyId}/reviews/${reviewId}`, {
+      params: { userId: getUserId() },
+    });
   },
 
   // Поддержка (чат с ИИ)

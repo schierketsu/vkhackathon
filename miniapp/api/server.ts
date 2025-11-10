@@ -31,6 +31,17 @@ import {
   getPracticeCompanies,
   getAllPracticeTags,
   getPracticeTagsForFaculty,
+  createPracticeApplication,
+  getUserPracticeApplications,
+  hasUserAppliedToCompany,
+  deletePracticeApplication,
+  PracticeApplication,
+  createCompanyReview,
+  getCompanyReviews,
+  getUserCompanyReview,
+  getCompanyRating,
+  deleteCompanyReview,
+  CompanyReview,
 } from './shared-utils';
 
 const app = express();
@@ -341,10 +352,31 @@ app.get('/api/practice/companies', (req, res) => {
 
     const companies = getPracticeCompanies(institutionName, facultyName);
     console.log('[API] Найдено компаний:', companies.length);
-    res.json(companies);
+    
+    // Добавляем рейтинг для каждой компании на основе отзывов
+    const companiesWithRatings = companies.map(company => {
+      try {
+        const rating = getCompanyRating(company.id);
+        return {
+          ...company,
+          rating
+        };
+      } catch (ratingError: any) {
+        console.error(`[API] Ошибка получения рейтинга для компании ${company.id}:`, ratingError);
+        // Если ошибка при получении рейтинга, возвращаем компанию с рейтингом 0
+        return {
+          ...company,
+          rating: 0
+        };
+      }
+    });
+    
+    console.log('[API] Компании с рейтингами подготовлены:', companiesWithRatings.length);
+    res.json(companiesWithRatings);
   } catch (error: any) {
     console.error('[API] Ошибка получения компаний:', error);
-    res.status(500).json({ error: error.message });
+    console.error('[API] Стек ошибки:', error.stack);
+    res.status(500).json({ error: error.message || 'Внутренняя ошибка сервера' });
   }
 });
 
@@ -369,6 +401,153 @@ app.get('/api/practice/tags', (req, res) => {
     res.json({ tags });
   } catch (error: any) {
     console.error('[API] Ошибка получения тегов:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Заявки на практику
+app.get('/api/practice/applications', (req, res) => {
+  try {
+    const userId = req.query.userId as string;
+    if (!userId) {
+      return res.status(400).json({ error: 'Не указан userId' });
+    }
+    const applications = getUserPracticeApplications(userId);
+    res.json(applications);
+  } catch (error: any) {
+    console.error('[API] Ошибка получения заявок:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/practice/applications', (req, res) => {
+  try {
+    const { userId, companyId, companyName } = req.body;
+    if (!userId || !companyId || !companyName) {
+      return res.status(400).json({ error: 'Не указаны обязательные поля' });
+    }
+    
+    // Проверяем, не подана ли уже заявка
+    if (hasUserAppliedToCompany(userId, companyId)) {
+      return res.status(400).json({ error: 'Заявка на эту компанию уже подана' });
+    }
+    
+    const application = createPracticeApplication(userId, companyId, companyName);
+    res.json(application);
+  } catch (error: any) {
+    console.error('[API] Ошибка создания заявки:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/practice/applications/:id', (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.query.userId as string;
+    if (!userId) {
+      return res.status(400).json({ error: 'Не указан userId' });
+    }
+    const success = deletePracticeApplication(userId, parseInt(id));
+    if (!success) {
+      return res.status(404).json({ error: 'Заявка не найдена' });
+    }
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[API] Ошибка удаления заявки:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/practice/companies/:id', (req, res) => {
+  try {
+    const companyId = req.params.id;
+    const institutionName = req.query.institution as string;
+    const facultyName = req.query.faculty as string;
+    
+    if (!institutionName || !facultyName) {
+      return res.status(400).json({ error: 'Не указано учебное заведение или факультет' });
+    }
+    
+    const companies = getPracticeCompanies(institutionName, facultyName);
+    const company = companies.find(c => c.id === companyId);
+    
+    if (!company) {
+      return res.status(404).json({ error: 'Компания не найдена' });
+    }
+    
+    // Добавляем рейтинг на основе отзывов
+    const rating = getCompanyRating(companyId);
+    const companyWithRating = { ...company, rating };
+    
+    res.json(companyWithRating);
+  } catch (error: any) {
+    console.error('[API] Ошибка получения компании:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Отзывы о компаниях
+app.get('/api/practice/companies/:id/reviews', (req, res) => {
+  try {
+    const companyId = req.params.id;
+    const reviews = getCompanyReviews(companyId);
+    res.json(reviews);
+  } catch (error: any) {
+    console.error('[API] Ошибка получения отзывов:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/practice/companies/:id/reviews', (req, res) => {
+  try {
+    const companyId = req.params.id;
+    const { userId, rating, comment } = req.body;
+    
+    if (!userId || !rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ error: 'Не указаны обязательные поля или неверный рейтинг (1-5)' });
+    }
+    
+    const review = createCompanyReview(userId, companyId, rating, comment);
+    res.json(review);
+  } catch (error: any) {
+    console.error('[API] Ошибка создания отзыва:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/practice/companies/:id/reviews/my', (req, res) => {
+  try {
+    const companyId = req.params.id;
+    const userId = req.query.userId as string;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'Не указан userId' });
+    }
+    
+    const review = getUserCompanyReview(userId, companyId);
+    res.json(review || null);
+  } catch (error: any) {
+    console.error('[API] Ошибка получения отзыва пользователя:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.delete('/api/practice/companies/:id/reviews/:reviewId', (req, res) => {
+  try {
+    const { reviewId } = req.params;
+    const userId = req.query.userId as string;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'Не указан userId' });
+    }
+    
+    const success = deleteCompanyReview(userId, parseInt(reviewId));
+    if (!success) {
+      return res.status(404).json({ error: 'Отзыв не найден' });
+    }
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[API] Ошибка удаления отзыва:', error);
     res.status(500).json({ error: error.message });
   }
 });

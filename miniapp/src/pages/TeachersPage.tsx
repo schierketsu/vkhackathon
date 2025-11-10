@@ -99,17 +99,48 @@ function TeachersPage() {
           >
 Поиск
           </Button>
-          <Button
-            mode={showFavorites ? 'primary' : 'secondary'}
+          <div
             onClick={() => setShowFavorites(true)}
-            size="s"
-            style={{ 
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              backgroundColor: showFavorites ? '#2980F2' : '#F5F5F5',
+              color: showFavorites ? '#FFFFFF' : '#000000',
               fontWeight: showFavorites ? 600 : 500,
-              padding: '8px 16px'
+              fontSize: '14px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              cursor: 'pointer',
+              border: 'none',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={(e) => {
+              if (!showFavorites) {
+                e.currentTarget.style.backgroundColor = '#E8E8E8';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!showFavorites) {
+                e.currentTarget.style.backgroundColor = '#F5F5F5';
+              }
             }}
           >
-            ⭐ Избранные {favorites.length > 0 && `(${favorites.length})`}
-          </Button>
+            <img 
+              src="/стар.png" 
+              alt="⭐" 
+              style={{
+                width: 16,
+                height: 16,
+                objectFit: 'contain',
+                display: 'block',
+                flexShrink: 0,
+                margin: 0,
+                padding: 0,
+              }}
+            />
+            Избранные {favorites.length > 0 && `(${favorites.length})`}
+          </div>
           </Flex>
         </div>
 
@@ -136,14 +167,16 @@ function TeachersPage() {
             <CellSimple>
               <Flex align="center" justify="center" style={{ padding: '40px 0' }}>
                 <Flex direction="column" align="center" gap={16}>
-                  <Typography.Body variant="medium" style={{ 
-                    fontSize: 48,
-                    opacity: 0.3,
-                    lineHeight: 1,
-                    margin: 0
-                  }}>
-                    ⭐
-                  </Typography.Body>
+                  <img 
+                    src="/стар.png" 
+                    alt="⭐" 
+                    style={{
+                      width: 48,
+                      height: 48,
+                      objectFit: 'contain',
+                      opacity: 0.3,
+                    }}
+                  />
                   <Typography.Body variant="small" style={{ 
                     color: 'var(--text-secondary)',
                     fontSize: 14,
@@ -206,13 +239,24 @@ function TeachersPage() {
                       mode="tertiary"
                       size="s"
                       style={{ 
-                        fontSize: 20,
                         minWidth: 36,
                         height: 36,
-                        padding: 0
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                       }}
                     >
-                      {fav ? '⭐' : '☆'}
+                      <img 
+                        src="/стар.png" 
+                        alt={fav ? "⭐" : "☆"} 
+                        style={{
+                          width: 20,
+                          height: 20,
+                          objectFit: 'contain',
+                          opacity: fav ? 1 : 0.3,
+                        }}
+                      />
                     </Button>
                   }
                   title={teacher.name}

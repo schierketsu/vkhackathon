@@ -273,25 +273,26 @@ function SettingsPage() {
                   </CellSimple>
                 ))}
                 <Flex gap={8} style={{ padding: '16px' }}>
-                  <div
+                  <Button
+                    mode="secondary"
                     onClick={() => setShowInstitutionSelector(false)}
-                    style={{ 
+                    style={{
                       flex: 1,
-                      padding: '12px 16px',
-                      textAlign: 'center',
-                      cursor: 'pointer',
-                      borderRadius: 8,
-                      backgroundColor: '#F5F5F5'
+                      fontSize: 14,
+                      padding: '10px 20px',
+                      backgroundColor: '#FF3B30',
+                      color: '#FFFFFF',
+                      borderColor: '#FF3B30',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#FF2D20';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = '#FF3B30';
                     }}
                   >
-                    <Typography.Body variant="medium" style={{ 
-                      color: '#FF3B30',
-                      fontWeight: 500,
-                      fontSize: 16
-                    }}>
-                      Отмена
-                    </Typography.Body>
-                  </div>
+                    Отмена
+                  </Button>
                 </Flex>
               </CellList>
             )}
@@ -334,25 +335,26 @@ function SettingsPage() {
                       ));
                     })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => setShowGroupSelector(false)}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#FF3B30',
+                          color: '#FFFFFF',
+                          borderColor: '#FF3B30',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF2D20';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF3B30';
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#FF3B30',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Отмена
-                        </Typography.Body>
-                      </div>
+                        Отмена
+                      </Button>
                     </Flex>
                   </>
                 )}
@@ -406,25 +408,26 @@ function SettingsPage() {
                           Назад
                         </Typography.Body>
                       </div>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => setShowGroupSelector(false)}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#FF3B30',
+                          color: '#FFFFFF',
+                          borderColor: '#FF3B30',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF2D20';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF3B30';
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#FF3B30',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Отмена
-                        </Typography.Body>
-                      </div>
+                        Отмена
+                      </Button>
                     </Flex>
                   </>
                 )}
@@ -484,25 +487,26 @@ function SettingsPage() {
                           Назад
                         </Typography.Body>
                       </div>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => setShowGroupSelector(false)}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#FF3B30',
+                          color: '#FFFFFF',
+                          borderColor: '#FF3B30',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF2D20';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF3B30';
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#FF3B30',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Отмена
-                        </Typography.Body>
-                      </div>
+                        Отмена
+                      </Button>
                     </Flex>
                   </>
                 )}
@@ -558,25 +562,26 @@ function SettingsPage() {
                           Назад
                         </Typography.Body>
                       </div>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => setShowGroupSelector(false)}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#FF3B30',
+                          color: '#FFFFFF',
+                          borderColor: '#FF3B30',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF2D20';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF3B30';
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#FF3B30',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Отмена
-                        </Typography.Body>
-                      </div>
+                        Отмена
+                      </Button>
                     </Flex>
                   </>
                 )}
@@ -649,25 +654,26 @@ function SettingsPage() {
                           Назад
                         </Typography.Body>
                       </div>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => setShowGroupSelector(false)}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#FF3B30',
+                          color: '#FFFFFF',
+                          borderColor: '#FF3B30',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF2D20';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FF3B30';
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#FF3B30',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Отмена
-                        </Typography.Body>
-                      </div>
+                        Отмена
+                      </Button>
                     </Flex>
                   </>
                 )}

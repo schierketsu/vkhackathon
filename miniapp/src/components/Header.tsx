@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Flex, Typography } from '@maxhub/max-ui';
+import { Flex, Typography, Button } from '@maxhub/max-ui';
 
 /**
  * Единый компонент Header для всех страниц приложения
@@ -20,6 +20,7 @@ function Header() {
     '/teachers': 'Преподаватели',
     '/profile': 'Профиль',
     '/practice': 'Практика',
+    '/practice/applications': 'Мои заявки',
     '/support': 'Поддержка',
   };
 
@@ -37,6 +38,11 @@ function Header() {
       return 'Преподаватели';
     }
     
+    // Проверяем путь к компании
+    if (location.pathname.startsWith('/practice/companies/')) {
+      return 'Компания';
+    }
+    
     // По умолчанию
     return 'Главная';
   };
@@ -51,42 +57,105 @@ function Header() {
   /**
    * Рендерит кнопку "Назад"
    */
-  const renderBackButton = () => (
-    <div
-      onClick={() => navigate(-1)}
-      style={{
-        width: 40,
-        height: 40,
-        minWidth: 40,
-        maxWidth: 40,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-        cursor: 'pointer',
-        borderRadius: '50%',
-        transition: 'background-color 0.2s',
-        boxSizing: 'border-box'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = 'transparent';
-      }}
-    >
-      <img 
-        src="/back.svg" 
-        alt="Назад" 
+  const renderBackButton = () => {
+    const handleBack = () => {
+      // Если мы на странице практики, всегда идем на страницу сервисов
+      if (location.pathname === '/practice') {
+        navigate('/services');
+      }
+      // Если мы на странице заявок и есть сохраненное состояние фильтров, передаем его
+      else if (location.pathname === '/practice/applications') {
+        const practiceState = location.state as {
+          selectedInstitution?: string | null;
+          selectedFaculty?: string | null;
+          selectedTags?: string[];
+          filterStep?: string;
+          searchQuery?: string;
+        } | null;
+        
+        if (practiceState) {
+          navigate('/practice', { state: practiceState });
+        } else {
+          navigate('/practice');
+        }
+      }
+      // Если мы на странице компании, возвращаемся на страницу практики с сохраненными фильтрами
+      else if (location.pathname.startsWith('/practice/companies/')) {
+        // Пытаемся получить состояние из location.state
+        const practiceState = location.state as {
+          selectedInstitution?: string | null;
+          selectedFaculty?: string | null;
+          selectedTags?: string[];
+          filterStep?: string;
+          searchQuery?: string;
+        } | null;
+        
+        // Если состояние не передано, пытаемся восстановить из sessionStorage
+        if (practiceState) {
+          navigate('/practice', { state: practiceState });
+        } else {
+          // Восстанавливаем состояние из sessionStorage
+          const savedInstitution = sessionStorage.getItem('practice_selectedInstitution');
+          const savedFaculty = sessionStorage.getItem('practice_selectedFaculty');
+          const savedTags = sessionStorage.getItem('practice_selectedTags');
+          const savedFilterStep = sessionStorage.getItem('practice_filterStep');
+          const savedSearchQuery = sessionStorage.getItem('practice_searchQuery');
+          
+          if (savedInstitution || savedFaculty || savedFilterStep) {
+            const restoredState = {
+              selectedInstitution: savedInstitution || null,
+              selectedFaculty: savedFaculty || null,
+              selectedTags: savedTags ? JSON.parse(savedTags) : [],
+              filterStep: savedFilterStep || 'companies',
+              searchQuery: savedSearchQuery || '',
+            };
+            navigate('/practice', { state: restoredState });
+          } else {
+            navigate('/practice');
+          }
+        }
+      } else {
+        navigate(-1);
+      }
+    };
+
+    return (
+      <div
+        onClick={handleBack}
         style={{
-          width: 24,
-          height: 24,
-          objectFit: 'contain',
-          display: 'block'
+          width: 40,
+          height: 40,
+          minWidth: 40,
+          maxWidth: 40,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          cursor: 'pointer',
+          borderRadius: '50%',
+          transition: 'background-color 0.2s',
+          boxSizing: 'border-box'
         }}
-      />
-    </div>
-  );
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
+      >
+        <img 
+          src="/back.svg" 
+          alt="Назад" 
+          style={{
+            width: 24,
+            height: 24,
+            objectFit: 'contain',
+            display: 'block'
+          }}
+        />
+      </div>
+    );
+  };
 
   /**
    * Рендерит аватарку пользователя
@@ -120,6 +189,8 @@ function Header() {
       />
     </div>
   );
+
+  const isPracticePage = location.pathname === '/practice';
 
   return (
     <Flex
@@ -155,9 +226,36 @@ function Header() {
         </Typography.Title>
       </Flex>
       
-      {/* Аватарка справа (только на главной странице) */}
-      {!showBackButton && renderAvatar()}
-      {showBackButton && <div style={{ width: 40, flexShrink: 0 }} />}
+      {/* Кнопка "Мои заявки" на странице Практика или аватарка на главной */}
+      {isPracticePage ? (
+        <Button
+          mode="primary"
+          onClick={() => {
+            // Сохраняем состояние фильтров в sessionStorage для восстановления при возврате
+            const practiceState = {
+              selectedInstitution: sessionStorage.getItem('practice_selectedInstitution'),
+              selectedFaculty: sessionStorage.getItem('practice_selectedFaculty'),
+              selectedTags: sessionStorage.getItem('practice_selectedTags') ? JSON.parse(sessionStorage.getItem('practice_selectedTags')!) : [],
+              filterStep: sessionStorage.getItem('practice_filterStep') || 'companies',
+              searchQuery: sessionStorage.getItem('practice_searchQuery') || '',
+            };
+            navigate('/practice/applications', { state: practiceState });
+          }}
+          style={{
+            fontSize: 14,
+            padding: '8px 16px',
+            height: 36,
+            backgroundColor: '#2980F2',
+            color: '#FFFFFF',
+          }}
+        >
+          Мои заявки
+        </Button>
+      ) : !showBackButton ? (
+        renderAvatar()
+      ) : (
+        <div style={{ width: 40, flexShrink: 0 }} />
+      )}
     </Flex>
   );
 }

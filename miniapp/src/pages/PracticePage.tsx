@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, CellHeader, Typography, Button, SearchInput, Flex, Spinner } from '@maxhub/max-ui';
 import api from '../api/client';
 import { formatFacultyName } from '../utils/formatters';
@@ -10,6 +10,8 @@ interface PracticeCompany {
   description?: string;
   location?: string;
   tags: string[];
+  avatar?: string;
+  rating?: number;
 }
 
 interface PracticeInstitutionsStructure {
@@ -25,24 +27,122 @@ type FilterStep = 'institution' | 'faculty' | 'interests' | 'companies';
 
 function PracticePage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [loadingTags, setLoadingTags] = useState(false);
   const [institutionsStructure, setInstitutionsStructure] = useState<PracticeInstitutionsStructure | null>(null);
-  const [filterStep, setFilterStep] = useState<FilterStep>('institution');
+  
+  // Получаем состояние фильтров из location.state или sessionStorage, или инициализируем значениями по умолчанию
+  const savedState = location.state as {
+    selectedInstitution?: string | null;
+    selectedFaculty?: string | null;
+    selectedTags?: string[];
+    filterStep?: FilterStep;
+    searchQuery?: string;
+  } | null;
+
+  // Если нет состояния в location.state, пытаемся восстановить из sessionStorage
+  const getInitialState = () => {
+    if (savedState) {
+      return savedState;
+    }
+    // Fallback на sessionStorage
+    const savedInstitution = sessionStorage.getItem('practice_selectedInstitution');
+    const savedFaculty = sessionStorage.getItem('practice_selectedFaculty');
+    const savedTags = sessionStorage.getItem('practice_selectedTags');
+    const savedFilterStep = sessionStorage.getItem('practice_filterStep');
+    const savedSearchQuery = sessionStorage.getItem('practice_searchQuery');
+    
+    if (savedInstitution || savedFaculty || savedFilterStep) {
+      return {
+        selectedInstitution: savedInstitution || null,
+        selectedFaculty: savedFaculty || null,
+        selectedTags: savedTags ? JSON.parse(savedTags) : [],
+        filterStep: (savedFilterStep as FilterStep) || 'institution',
+        searchQuery: savedSearchQuery || '',
+      };
+    }
+    return null;
+  };
+
+  const initialState = getInitialState();
+
+  const [filterStep, setFilterStep] = useState<FilterStep>(initialState?.filterStep || 'institution');
   
   // Фильтры
-  const [selectedInstitution, setSelectedInstitution] = useState<string | null>(null);
-  const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedInstitution, setSelectedInstitution] = useState<string | null>(initialState?.selectedInstitution || null);
+  const [selectedFaculty, setSelectedFaculty] = useState<string | null>(initialState?.selectedFaculty || null);
+  const [selectedTags, setSelectedTags] = useState<string[]>(initialState?.selectedTags || []);
+  const [searchQuery, setSearchQuery] = useState(initialState?.searchQuery || '');
   
   // Данные
   const [companies, setCompanies] = useState<PracticeCompany[]>([]);
   const [filteredCompanies, setFilteredCompanies] = useState<PracticeCompany[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
 
+  // Сохраняем состояние фильтров в sessionStorage при изменении
+  useEffect(() => {
+    sessionStorage.setItem('practice_selectedInstitution', selectedInstitution || '');
+    sessionStorage.setItem('practice_selectedFaculty', selectedFaculty || '');
+    sessionStorage.setItem('practice_selectedTags', JSON.stringify(selectedTags));
+    sessionStorage.setItem('practice_filterStep', filterStep);
+    sessionStorage.setItem('practice_searchQuery', searchQuery);
+  }, [selectedInstitution, selectedFaculty, selectedTags, filterStep, searchQuery]);
+
   useEffect(() => {
     loadData();
+  }, []);
+
+  // Обновляем состояние фильтров при изменении location.state (например, при возврате со страницы компании)
+  useEffect(() => {
+    if (savedState) {
+      // Обновляем состояние фильтров из location.state
+      if (savedState.selectedInstitution !== undefined) {
+        setSelectedInstitution(savedState.selectedInstitution);
+      }
+      if (savedState.selectedFaculty !== undefined) {
+        setSelectedFaculty(savedState.selectedFaculty);
+      }
+      if (savedState.selectedTags !== undefined) {
+        setSelectedTags(savedState.selectedTags);
+      }
+      if (savedState.filterStep !== undefined) {
+        setFilterStep(savedState.filterStep);
+      }
+      if (savedState.searchQuery !== undefined) {
+        setSearchQuery(savedState.searchQuery);
+      }
+    }
+  }, [location.state]);
+
+  // Восстанавливаем состояние при возврате со страницы заявок или компании
+  useEffect(() => {
+    if (initialState) {
+      // Если есть сохраненное состояние, восстанавливаем его
+      if (initialState.selectedInstitution && initialState.selectedFaculty) {
+        // Если были выбраны institution и faculty, загружаем компании и теги
+        if (initialState.filterStep === 'companies') {
+          // Загружаем компании асинхронно
+          const loadCompaniesAsync = async () => {
+            if (!initialState.selectedInstitution || !initialState.selectedFaculty) return;
+            setLoading(true);
+            try {
+              const companiesData = await api.getPracticeCompanies(initialState.selectedInstitution, initialState.selectedFaculty);
+              setCompanies(companiesData);
+              setFilteredCompanies(companiesData);
+            } catch (error) {
+              console.error('Ошибка загрузки компаний:', error);
+            } finally {
+              setLoading(false);
+            }
+          };
+          loadCompaniesAsync();
+        } else if (initialState.filterStep === 'interests') {
+          loadTagsForFaculty();
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -361,25 +461,26 @@ function PracticePage() {
                 </Flex>
               </CellSimple>
               <Flex gap={8} style={{ padding: '16px' }}>
-                <div
+                <Button
+                  mode="secondary"
                   onClick={resetFilters}
                   style={{
                     flex: 1,
-                    padding: '12px 16px',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    borderRadius: 8,
-                    backgroundColor: '#F5F5F5'
+                    fontSize: 14,
+                    padding: '10px 20px',
+                    backgroundColor: '#FF3B30',
+                    color: '#FFFFFF',
+                    borderColor: '#FF3B30',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FF2D20';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FF3B30';
                   }}
                 >
-                  <Typography.Body variant="medium" style={{
-                    color: '#FF3B30',
-                    fontWeight: 500,
-                    fontSize: 16
-                  }}>
-                    Сбросить фильтры
-                  </Typography.Body>
-                </div>
+                  Сбросить фильтры
+                </Button>
               </Flex>
             </CellList>
 
@@ -400,40 +501,109 @@ function PracticePage() {
                   <CellSimple
                     key={company.id}
                     onClick={() => {
-                      // TODO: Переход на страницу компании или открытие модального окна
-                      console.log('Selected company:', company);
+                      // Передаем все состояние фильтров при переходе на страницу компании
+                      const practiceState = {
+                        institution: selectedInstitution,
+                        faculty: selectedFaculty,
+                        selectedInstitution: selectedInstitution,
+                        selectedFaculty: selectedFaculty,
+                        selectedTags: selectedTags,
+                        filterStep: filterStep,
+                        searchQuery: searchQuery,
+                      };
+                      navigate(`/practice/companies/${company.id}`, {
+                        state: practiceState,
+                      });
                     }}
                     style={{ padding: '16px', cursor: 'pointer' }}
                   >
-                    <Flex direction="column" gap={8}>
-                      <Typography.Body variant="medium" style={{
-                        fontWeight: 600,
-                        fontSize: 16,
-                        color: '#000000'
-                      }}>
-                        {company.name}
-                      </Typography.Body>
-                      {company.description && (
-                        <Typography.Body variant="small" style={{
-                          fontSize: 14,
-                          color: '#666666',
-                          lineHeight: 1.4
+                    <Flex gap={12} align="flex-start" justify="space-between">
+                      <Flex direction="column" gap={8} style={{ flex: 1 }}>
+                        <Typography.Body variant="medium" style={{
+                          fontWeight: 600,
+                          fontSize: 16,
+                          color: '#000000'
                         }}>
-                          {company.description}
+                          {company.name}
                         </Typography.Body>
-                      )}
-                      <Flex gap={8} wrap="wrap" style={{ marginTop: 4 }}>
-                        {company.tags && company.tags.map((tag, tagIdx) => (
-                          <Typography.Body key={tagIdx} variant="small" style={{
-                            fontSize: 12,
-                            color: '#2980F2',
-                            backgroundColor: '#E8F4FD',
-                            padding: '4px 8px',
-                            borderRadius: 4
+                        {company.description && (
+                          <Typography.Body variant="small" style={{
+                            fontSize: 14,
+                            color: '#666666',
+                            lineHeight: 1.4
                           }}>
-                            {tag}
+                            {company.description}
                           </Typography.Body>
-                        ))}
+                        )}
+                        <Flex gap={8} wrap="wrap" style={{ marginTop: 4 }}>
+                          {company.tags && company.tags.map((tag, tagIdx) => (
+                            <Typography.Body key={tagIdx} variant="small" style={{
+                              fontSize: 12,
+                              color: '#2980F2',
+                              backgroundColor: '#E8F4FD',
+                              padding: '4px 8px',
+                              borderRadius: 4
+                            }}>
+                              {tag}
+                            </Typography.Body>
+                          ))}
+                        </Flex>
+                      </Flex>
+                      
+                      {/* Аватарка компании справа */}
+                      <Flex direction="column" gap={8} align="center" style={{ flexShrink: 0 }}>
+                        <div style={{
+                          width: 56,
+                          height: 56,
+                          minWidth: 56,
+                          minHeight: 56,
+                          borderRadius: 8,
+                          backgroundColor: '#2980F2',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                        }}>
+                          {company.avatar ? (
+                            <img
+                              src={company.avatar}
+                              alt={company.name}
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                              }}
+                            />
+                          ) : (
+                            <Typography.Body variant="medium" style={{
+                              fontSize: 24,
+                              color: '#FFFFFF',
+                              fontWeight: 700,
+                              margin: 0,
+                            }}>
+                              {company.name.charAt(0).toUpperCase()}
+                            </Typography.Body>
+                          )}
+                        </div>
+                        {/* Оценка под аватаркой */}
+                        <Flex gap={4} align="center">
+                          <img 
+                            src="/стар.png" 
+                            alt="⭐" 
+                            style={{
+                              width: 16,
+                              height: 16,
+                              objectFit: 'contain',
+                            }}
+                          />
+                          <Typography.Body variant="small" style={{
+                            fontSize: 13,
+                            color: '#000000',
+                            fontWeight: 500,
+                          }}>
+                            {(company.rating ?? 0).toFixed(2)}
+                          </Typography.Body>
+                        </Flex>
                       </Flex>
                     </Flex>
                   </CellSimple>

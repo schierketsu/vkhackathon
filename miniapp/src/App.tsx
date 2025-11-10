@@ -13,6 +13,8 @@ import SettingsPage from './pages/SettingsPage';
 import ServicesPage from './pages/ServicesPage';
 import ProfilePage from './pages/ProfilePage';
 import PracticePage from './pages/PracticePage';
+import PracticeApplicationsPage from './pages/PracticeApplicationsPage';
+import CompanyDetailPage from './pages/CompanyDetailPage';
 import SetupPage from './pages/SetupPage';
 import SupportPage from './pages/SupportPage';
 import api from './api/client';
@@ -106,6 +108,8 @@ function AppContent() {
           <Route path="/services" element={<ProtectedRoute needsSetup={needsSetup || false}><ServicesPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute needsSetup={needsSetup || false}><ProfilePage /></ProtectedRoute>} />
           <Route path="/practice" element={<ProtectedRoute needsSetup={needsSetup || false}><PracticePage /></ProtectedRoute>} />
+          <Route path="/practice/applications" element={<ProtectedRoute needsSetup={needsSetup || false}><PracticeApplicationsPage /></ProtectedRoute>} />
+          <Route path="/practice/companies/:companyId" element={<ProtectedRoute needsSetup={needsSetup || false}><CompanyDetailPage /></ProtectedRoute>} />
           <Route path="/support" element={<ProtectedRoute needsSetup={needsSetup || false}><SupportPage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

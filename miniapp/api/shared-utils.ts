@@ -58,10 +58,11 @@ export function initDatabase() {
   if (!fs.existsSync(dbPath)) {
     // Создаем базу данных если её нет
     db = new Database(dbPath);
-    createTables();
   } else {
     db = new Database(dbPath);
   }
+  // Всегда создаем таблицы (CREATE TABLE IF NOT EXISTS безопасно)
+  createTables();
 }
 
 function createTables() {
@@ -112,11 +113,40 @@ function createTables() {
       FOREIGN KEY (user_id) REFERENCES users(user_id)
     )
   `);
+
+  // Таблица заявок на практику
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS practice_applications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT NOT NULL,
+      company_id TEXT NOT NULL,
+      company_name TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(user_id)
+    )
+  `);
+
+  // Таблица отзывов о компаниях
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS company_reviews (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT NOT NULL,
+      company_id TEXT NOT NULL,
+      rating INTEGER NOT NULL CHECK(rating >= 1 AND rating <= 5),
+      comment TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(user_id)
+    )
+  `);
 }
 
 export function getDatabase() {
   if (!db) {
     initDatabase();
+  }
+  if (!db) {
+    throw new Error('База данных не инициализирована');
   }
   return db;
 }
@@ -1687,5 +1717,139 @@ export function getTeacherWeekSchedule(teacherName: string, startDate: Date): Da
   }
 
   return weekSchedule;
+}
+
+// Заявки на практику
+export interface PracticeApplication {
+  id: number;
+  user_id: string;
+  company_id: string;
+  company_name: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  created_at: string;
+}
+
+export function createPracticeApplication(userId: string, companyId: string, companyName: string): PracticeApplication {
+  const database = getDatabase();
+  if (!database) throw new Error('База данных не инициализирована');
+  
+  const stmt = database.prepare(`
+    INSERT INTO practice_applications (user_id, company_id, company_name, status)
+    VALUES (?, ?, ?, 'pending')
+  `);
+  const result = stmt.run(userId, companyId, companyName);
+  
+  return getPracticeApplication(result.lastInsertRowid as number)!;
+}
+
+export function getPracticeApplication(id: number): PracticeApplication | null {
+  const database = getDatabase();
+  if (!database) return null;
+  const stmt = database.prepare('SELECT * FROM practice_applications WHERE id = ?');
+  return (stmt.get(id) as PracticeApplication) || null;
+}
+
+export function getUserPracticeApplications(userId: string): PracticeApplication[] {
+  const database = getDatabase();
+  if (!database) return [];
+  const stmt = database.prepare('SELECT * FROM practice_applications WHERE user_id = ? ORDER BY created_at DESC');
+  return (stmt.all(userId) as PracticeApplication[]) || [];
+}
+
+export function hasUserAppliedToCompany(userId: string, companyId: string): boolean {
+  const database = getDatabase();
+  if (!database) return false;
+  const stmt = database.prepare('SELECT COUNT(*) as count FROM practice_applications WHERE user_id = ? AND company_id = ?');
+  const result = stmt.get(userId, companyId) as { count: number };
+  return result.count > 0;
+}
+
+export function deletePracticeApplication(userId: string, applicationId: number): boolean {
+  const database = getDatabase();
+  if (!database) return false;
+  const stmt = database.prepare('DELETE FROM practice_applications WHERE id = ? AND user_id = ?');
+  const result = stmt.run(applicationId, userId);
+  return result.changes > 0;
+}
+
+// Отзывы о компаниях
+export interface CompanyReview {
+  id: number;
+  user_id: string;
+  company_id: string;
+  rating: number;
+  comment?: string;
+  created_at: string;
+}
+
+export function createCompanyReview(userId: string, companyId: string, rating: number, comment?: string): CompanyReview {
+  const database = getDatabase();
+  if (!database) throw new Error('База данных не инициализирована');
+  
+  // Проверяем, не оставлял ли пользователь уже отзыв на эту компанию
+  const existingReview = getUserCompanyReview(userId, companyId);
+  if (existingReview) {
+    // Обновляем существующий отзыв
+    const stmt = database.prepare(`
+      UPDATE company_reviews 
+      SET rating = ?, comment = ?
+      WHERE id = ?
+    `);
+    stmt.run(rating, comment || null, existingReview.id);
+    return getCompanyReview(existingReview.id)!;
+  }
+  
+  // Создаем новый отзыв
+  const stmt = database.prepare(`
+    INSERT INTO company_reviews (user_id, company_id, rating, comment)
+    VALUES (?, ?, ?, ?)
+  `);
+  const result = stmt.run(userId, companyId, rating, comment || null);
+  
+  return getCompanyReview(result.lastInsertRowid as number)!;
+}
+
+export function getCompanyReview(id: number): CompanyReview | null {
+  const database = getDatabase();
+  if (!database) return null;
+  const stmt = database.prepare('SELECT * FROM company_reviews WHERE id = ?');
+  return (stmt.get(id) as CompanyReview) || null;
+}
+
+export function getCompanyReviews(companyId: string): CompanyReview[] {
+  const database = getDatabase();
+  if (!database) return [];
+  const stmt = database.prepare('SELECT * FROM company_reviews WHERE company_id = ? ORDER BY created_at DESC');
+  return (stmt.all(companyId) as CompanyReview[]) || [];
+}
+
+export function getUserCompanyReview(userId: string, companyId: string): CompanyReview | null {
+  const database = getDatabase();
+  if (!database) return null;
+  const stmt = database.prepare('SELECT * FROM company_reviews WHERE user_id = ? AND company_id = ?');
+  return (stmt.get(userId, companyId) as CompanyReview) || null;
+}
+
+export function getCompanyRating(companyId: string): number {
+  try {
+    const database = getDatabase();
+    const stmt = database.prepare('SELECT AVG(rating) as avg_rating FROM company_reviews WHERE company_id = ?');
+    const result = stmt.get(companyId) as { avg_rating: number | null } | undefined;
+    if (!result || result.avg_rating === null) {
+      return 0;
+    }
+    return Math.round(result.avg_rating * 100) / 100; // Округляем до 2 знаков после запятой
+  } catch (error) {
+    console.error('Ошибка получения рейтинга компании:', error);
+    return 0;
+  }
+}
+
+export function deleteCompanyReview(userId: string, reviewId: number): boolean {
+  const database = getDatabase();
+  if (!database) return false;
+  const stmt = database.prepare('DELETE FROM company_reviews WHERE id = ? AND user_id = ?');
+  const result = stmt.run(reviewId, userId);
+  return result.changes > 0;
 }
 
