@@ -243,7 +243,10 @@ function SettingsPage() {
                           style={{ 
                             fontWeight: user.subgroup === sub ? 600 : 500,
                             padding: '10px 16px',
-                            minWidth: 100
+                            minWidth: 100,
+                            ...(user.subgroup !== sub && {
+                              backgroundColor: '#F1F2F4'
+                            })
                           }}
                         >
                           {sub === null ? 'Общая' : `Подгруппа ${sub}`}
@@ -389,25 +392,20 @@ function SettingsPage() {
                       ));
                     })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => setSelectionStep('faculty')}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#F1F2F4',
+                          color: '#2980F2',
+                          borderColor: '#F1F2F4',
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#2980F2',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Назад
-                        </Typography.Body>
-                      </div>
+                        Назад
+                      </Button>
                       <Button
                         mode="secondary"
                         onClick={() => setShowGroupSelector(false)}
@@ -468,25 +466,20 @@ function SettingsPage() {
                       ));
                     })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => setSelectionStep('format')}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#F1F2F4',
+                          color: '#2980F2',
+                          borderColor: '#F1F2F4',
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#2980F2',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Назад
-                        </Typography.Body>
-                      </div>
+                        Назад
+                      </Button>
                       <Button
                         mode="secondary"
                         onClick={() => setShowGroupSelector(false)}
@@ -543,25 +536,20 @@ function SettingsPage() {
                       ));
                     })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => setSelectionStep('degree')}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#F1F2F4',
+                          color: '#2980F2',
+                          borderColor: '#F1F2F4',
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#2980F2',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Назад
-                        </Typography.Body>
-                      </div>
+                        Назад
+                      </Button>
                       <Button
                         mode="secondary"
                         onClick={() => setShowGroupSelector(false)}
@@ -620,7 +608,8 @@ function SettingsPage() {
                       ));
                     })()}
                     <Flex gap={8} style={{ padding: '16px' }}>
-                      <div
+                      <Button
+                        mode="secondary"
                         onClick={() => {
                           // Поддерживаем как новую структуру с institutions, так и старую с faculties
                           const faculties = groupsStructure.institutions 
@@ -637,23 +626,17 @@ function SettingsPage() {
                             setSelectionStep('degree');
                           }
                         }}
-                        style={{ 
+                        style={{
                           flex: 1,
-                          padding: '12px 16px',
-                          textAlign: 'center',
-                          cursor: 'pointer',
-                          borderRadius: 8,
-                          backgroundColor: '#F5F5F5'
+                          fontSize: 14,
+                          padding: '10px 20px',
+                          backgroundColor: '#F1F2F4',
+                          color: '#2980F2',
+                          borderColor: '#F1F2F4',
                         }}
                       >
-                        <Typography.Body variant="medium" style={{ 
-                          color: '#2980F2',
-                          fontWeight: 500,
-                          fontSize: 16
-                        }}>
-                          Назад
-                        </Typography.Body>
-                      </div>
+                        Назад
+                      </Button>
                       <Button
                         mode="secondary"
                         onClick={() => setShowGroupSelector(false)}

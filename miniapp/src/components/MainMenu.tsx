@@ -165,6 +165,10 @@ function MainMenu() {
     const { type: lessonType, roomDisplay } = getLessonTypeAndRoom(lesson.room, lesson.subject, lesson.lessonType);
     const lessonTypeColor = lessonType ? getLessonTypeColor(lessonType) : '#0051D5';
     
+    const subgroupText = lesson.subgroup !== null && lesson.subgroup !== undefined 
+      ? `${lesson.subgroup} подгруппа`
+      : 'Общая пара';
+    
     // Проверяем, нужно ли показывать кнопку с иконкой clock.png
     const showClockButton = selectedDate === 'tomorrow' && index === 0;
     
@@ -173,7 +177,7 @@ function MainMenu() {
         key={index} 
         style={{
           marginBottom: 12,
-          backgroundColor: '#EFEFEF',
+          backgroundColor: '#F1F2F4',
           borderRadius: 10,
           padding: '12px 16px',
           display: 'flex',
@@ -188,35 +192,38 @@ function MainMenu() {
           borderRight: '1px solid #DDDDDD',
           display: 'flex',
           flexDirection: 'column',
-          gap: 4
+          gap: 0
         }}>
           <Typography.Body variant="small" style={{
             fontSize: 14,
-            fontWeight: 400,
-            color: '#333333',
-            lineHeight: 1.5,
-            fontFamily: 'system-ui, -apple-system, sans-serif'
+            fontWeight: 600,
+            color: '#999999',
+            lineHeight: 1.2,
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            marginBottom: 2
           }}>
             {startTime}
           </Typography.Body>
           {endTime && (
             <Typography.Body variant="small" style={{
               fontSize: 14,
-              fontWeight: 400,
-              color: '#333333',
-              lineHeight: 1.5,
-              fontFamily: 'system-ui, -apple-system, sans-serif'
+              fontWeight: 600,
+              color: '#999999',
+              lineHeight: 1.2,
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              marginBottom: 2
             }}>
               {endTime}
             </Typography.Body>
           )}
           <Typography.Body variant="small" style={{
-            fontSize: 12,
+            fontSize: 10,
             fontWeight: 400,
             color: '#007AFF',
-            lineHeight: 1.5,
+            lineHeight: 1.2,
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            textAlign: 'center'
+            textAlign: 'center',
+            marginTop: 2
           }}>
             МСК
           </Typography.Body>
@@ -256,12 +263,8 @@ function MainMenu() {
                 {lessonType}
               </span>
             )}
-            <span>{roomDisplay}</span>
-            <span style={{ color: '#999999' }}>
-              {lesson.subgroup !== null && lesson.subgroup !== undefined 
-                ? `${lesson.subgroup} подгруппа`
-                : 'Общая пара'}
-            </span>
+            <span style={{ color: '#999999', fontWeight: 600 }}>{roomDisplay}</span>
+            <span style={{ color: '#999999', fontWeight: 600 }}>{subgroupText}</span>
           </div>
         </Flex>
         
@@ -523,7 +526,7 @@ function MainMenu() {
                     key={index}
                     style={{
                       marginBottom: index < Math.min(events.length, 3) - 1 ? 12 : 0,
-                      backgroundColor: '#EFEFEF',
+                      backgroundColor: '#F1F2F4',
                       borderRadius: 10,
                       padding: '12px 16px',
                       display: 'flex',

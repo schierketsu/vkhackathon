@@ -30,12 +30,6 @@ function ServicesPage() {
       path: '/deadlines',
     },
     {
-      id: 'library',
-      title: 'Библиотека',
-      icon: '/библиотека.png',
-      path: '#',
-    },
-    {
       id: 'practice',
       title: 'Практика',
       icon: '/практика.png',
@@ -46,6 +40,12 @@ function ServicesPage() {
       title: 'Поддержка',
       icon: '/хелп.png',
       path: '/support',
+    },
+    {
+      id: 'library',
+      title: 'Библиотека',
+      icon: '/библиотека.png',
+      path: '#',
     },
     {
       id: 'volunteering',
@@ -90,7 +90,7 @@ function ServicesPage() {
               key={service.id}
               onClick={() => service.path !== '#' && navigate(service.path)}
               style={{
-                backgroundColor: '#EFEFEF',
+                backgroundColor: '#F1F2F4',
                 borderRadius: 16,
                 padding: '16px',
                 minHeight: 120,

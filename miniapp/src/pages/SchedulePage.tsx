@@ -151,7 +151,7 @@ function SchedulePage() {
         key={index}
         style={{
           marginBottom: 12,
-          backgroundColor: '#EFEFEF',
+          backgroundColor: '#F1F2F4',
           borderRadius: 10,
           padding: '12px 16px',
           display: 'flex',
@@ -166,35 +166,38 @@ function SchedulePage() {
           borderRight: '1px solid #DDDDDD',
           display: 'flex',
           flexDirection: 'column',
-          gap: 4
+          gap: 0
         }}>
           <Typography.Body variant="small" style={{
             fontSize: 14,
-            fontWeight: 400,
-            color: '#333333',
-            lineHeight: 1.5,
-            fontFamily: 'system-ui, -apple-system, sans-serif'
+            fontWeight: 600,
+            color: '#999999',
+            lineHeight: 1.2,
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            marginBottom: 2
           }}>
             {startTime}
           </Typography.Body>
           {endTime && (
             <Typography.Body variant="small" style={{
               fontSize: 14,
-              fontWeight: 400,
-              color: '#333333',
-              lineHeight: 1.5,
-              fontFamily: 'system-ui, -apple-system, sans-serif'
+              fontWeight: 600,
+              color: '#999999',
+              lineHeight: 1.2,
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              marginBottom: 2
             }}>
               {endTime}
             </Typography.Body>
           )}
           <Typography.Body variant="small" style={{
-            fontSize: 12,
+            fontSize: 10,
             fontWeight: 400,
             color: '#007AFF',
-            lineHeight: 1.5,
+            lineHeight: 1.2,
             fontFamily: 'system-ui, -apple-system, sans-serif',
-            textAlign: 'center'
+            textAlign: 'center',
+            marginTop: 2
           }}>
             МСК
           </Typography.Body>
@@ -234,8 +237,8 @@ function SchedulePage() {
                 {lessonType}
               </span>
             )}
-            <span>{roomDisplay}</span>
-            <span style={{ color: '#999999' }}>{subgroupText}</span>
+            <span style={{ color: '#999999', fontWeight: 600 }}>{roomDisplay}</span>
+            <span style={{ color: '#999999', fontWeight: 600 }}>{subgroupText}</span>
           </div>
         </Flex>
       </div>
@@ -245,7 +248,6 @@ function SchedulePage() {
   const renderDaySchedule = useCallback((daySchedule: Schedule) => {
     const dayName = daySchedule.dayOfWeek;
     const formattedDate = formatDayDate(daySchedule.date);
-    const fullDayText = `${dayName}, ${formattedDate} по МСК`;
 
     return (
       <div key={daySchedule.date} style={{ marginBottom: 20 }}>
@@ -263,16 +265,28 @@ function SchedulePage() {
             fontWeight: 700,
             color: '#000000',
             marginBottom: 0,
-            marginTop: 0
+            marginTop: 0,
+            display: 'flex',
+            alignItems: 'baseline',
+            gap: 8,
+            flexWrap: 'wrap'
           }}>
-            {fullDayText}
+            <span>{dayName}, {formattedDate}</span>
+            <span style={{
+              fontSize: 14,
+              fontWeight: 400,
+              color: '#999999',
+              fontFamily: 'system-ui, -apple-system, sans-serif'
+            }}>
+              по МСК
+            </span>
           </Typography.Title>
 
           {/* Карточки занятий */}
           <div style={{ marginTop: 20 }}>
             {daySchedule.lessons.length === 0 ? (
               <div style={{
-                backgroundColor: '#EFEFEF',
+                backgroundColor: '#F1F2F4',
                 borderRadius: 10,
                 padding: '20px 16px',
                 display: 'flex',

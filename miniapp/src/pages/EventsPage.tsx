@@ -114,7 +114,7 @@ function EventsPage() {
                     key={index}
                     style={{
                       marginBottom: index < events.length - 1 ? 12 : 0,
-                      backgroundColor: '#EFEFEF',
+                      backgroundColor: '#F1F2F4',
                       borderRadius: 10,
                       padding: '12px 16px',
                       display: 'flex',
