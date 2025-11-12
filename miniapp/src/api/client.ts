@@ -9,9 +9,19 @@ const apiClient = axios.create({
   },
 });
 
-// Получаем userId из localStorage или используем тестовый
 function getUserId(): string {
-  // В реальном приложении это должно приходить через MAX Bridge
+  try {
+    if (window.maxBridge && window.maxBridge.getUserId) {
+      const userId = window.maxBridge.getUserId();
+      if (userId) {
+        localStorage.setItem('userId', userId);
+        return userId;
+      }
+    }
+  } catch (e) {
+    console.warn('MAX Bridge не доступен:', e);
+  }
+  
   return localStorage.getItem('userId') || 'test_user_1';
 }
 

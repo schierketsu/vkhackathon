@@ -27,7 +27,16 @@ export default defineConfig({
     },
   },
   build: {
-    sourcemap: true,
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          maxui: ['@maxhub/max-ui'],
+        },
+      },
+    },
   },
 });
 

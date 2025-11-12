@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, Typography, Flex, Button, Spinner } from '@maxhub/max-ui';
 import api, { User, Schedule, Event } from '../api/client';
 import { getLessonTypeAndRoom, getLessonTypeColor } from '../utils/lessons';
-import { getWeekStart } from '../utils/date';
+import { getWeekStart, formatDate } from '../utils/date';
 
 function MainMenu() {
   const navigate = useNavigate();
@@ -578,11 +578,7 @@ function MainMenu() {
                             color: '#666666',
                             fontSize: 13
                           }}>
-                            {new Date(event.date).toLocaleDateString('ru-RU', {
-                              day: '2-digit',
-                              month: '2-digit',
-                              year: 'numeric'
-                            })}
+                            {formatDate(event.date)}
                           </Typography.Body>
                         </Flex>
                         {event.location && (

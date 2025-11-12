@@ -7,7 +7,6 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "api": "tsx api/server.ts",
     "clean": "rimraf node_modules/.vite dist"
   },
   "dependencies": {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { CellSimple, CellList, Typography, Switch, Flex, Spinner } from '@maxhub/max-ui';
 import api, { Event, User } from '../api/client';
+import { formatDate } from '../utils/date';
 
 function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -166,11 +167,7 @@ function EventsPage() {
                             color: '#666666',
                             fontSize: 13
                           }}>
-                            {new Date(event.date).toLocaleDateString('ru-RU', {
-                              day: '2-digit',
-                              month: '2-digit',
-                              year: 'numeric'
-                            })}
+                            {formatDate(event.date)}
                           </Typography.Body>
                         </Flex>
                         {event.location && (
