@@ -15,7 +15,15 @@ export function getMainMenu(): InlineKeyboard {
       Keyboard.button.callback('⏰ Дедлайны', 'menu:deadlines')
     ],
     [
-      Keyboard.button.callback('📱 В приложение', 'menu:open_app')
+      Keyboard.button.callback('💼 Практика', 'menu:practice'),
+      Keyboard.button.callback('💬 Поддержка', 'menu:support')
+    ],
+    [
+      Keyboard.button.link('🌐 Открыть сайт', 'https://maxhackathon.ru/')
+    ],
+    [
+      Keyboard.button.callback('👤 Профиль', 'menu:profile'),
+      Keyboard.button.callback('🛠️ Сервисы', 'menu:services')
     ],
     [
       Keyboard.button.callback('❔', 'menu:help'),

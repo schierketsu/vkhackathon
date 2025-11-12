@@ -79,7 +79,38 @@ export function initDatabase() {
     )
   `);
 
+  // Таблица заявок на практику
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS practice_applications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT NOT NULL,
+      company_id TEXT NOT NULL,
+      company_name TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(user_id)
+    )
+  `);
+
+  // Таблица отзывов о компаниях
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS company_reviews (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT NOT NULL,
+      company_id TEXT NOT NULL,
+      rating INTEGER NOT NULL,
+      comment TEXT,
+      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, company_id),
+      FOREIGN KEY (user_id) REFERENCES users(user_id)
+    )
+  `);
+
   console.log('✅ База данных инициализирована');
+}
+
+export function getDatabase(): Database.Database | null {
+  return db;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
