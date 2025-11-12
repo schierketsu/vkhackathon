@@ -1,0 +1,70 @@
+# Настройки для Apache на reg.ru
+# Путь: /www/maxhackathon.ru/
+
+# Включение mod_rewrite
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Перенаправление всех запросов к API на Node.js сервер
+    # Проверка, что mod_proxy включен
+    RewriteCond %{REQUEST_URI} ^/api/
+    RewriteRule ^api/(.*)$ http://localhost:3002/api/$1 [P,L]
+    
+    # Альтернативный вариант без mod_proxy (если прокси не работает)
+    # Раскомментируйте следующую строку и закомментируйте предыдущую, если прокси не работает:
+    # RewriteRule ^api/(.*)$ http://localhost:3002/api/$1 [L]
+    
+    # Для всех остальных запросов - отдавать index.html (SPA routing)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.html [L]
+</IfModule>
+
+# Настройки кэширования
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Кэширование статических ресурсов
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    
+    # Не кэшировать HTML
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Сжатие файлов
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Безопасность
+<IfModule mod_headers.c>
+    # Защита от XSS
+    Header set X-XSS-Protection "1; mode=block"
+    # Защита от clickjacking
+    Header set X-Frame-Options "SAMEORIGIN"
+    # Защита от MIME-sniffing
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# Настройки для статических файлов
+<IfModule mod_mime.c>
+    AddType application/javascript js
+    AddType text/css css
+    AddType image/svg+xml svg
+</IfModule>
+
+# Запрет доступа к скрытым файлам
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+

@@ -1163,7 +1163,7 @@ function getTeacherWeekScheduleFull(teacherName: string): WeekSchedule | null {
       for (const dayKey in week) {
         const day = week[dayKey as keyof typeof week];
         for (const lesson of day) {
-          const lessonTeacher = lesson.teacher?.trim() || '';
+          const lessonTeacher = (lesson.teacher && lesson.teacher.trim) ? lesson.teacher.trim() : '';
           if (lessonTeacher) {
             const normalizedLessonTeacher = normalizeTeacherName(lessonTeacher);
             if (normalizedLessonTeacher === normalizedSearchName || 

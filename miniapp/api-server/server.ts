@@ -638,7 +638,7 @@ app.post('/api/support/chat', async (req, res) => {
           };
         }
       } catch (aionetError: any) {
-        const errorMsg = aionetError.response?.data ? JSON.stringify(aionetError.response.data) : aionetError.message;
+        const errorMsg = (aionetError.response && aionetError.response.data) ? JSON.stringify(aionetError.response.data) : aionetError.message;
         errors.push(`ai.io.net: ${errorMsg}`);
       }
     }
@@ -668,7 +668,7 @@ app.post('/api/support/chat', async (req, res) => {
           };
         }
       } catch (aimlapiError: any) {
-        const errorMsg = aimlapiError.response?.data ? JSON.stringify(aimlapiError.response.data) : aimlapiError.message;
+        const errorMsg = (aimlapiError.response && aimlapiError.response.data) ? JSON.stringify(aimlapiError.response.data) : aimlapiError.message;
         errors.push(`AIMLAPI: ${errorMsg}`);
       }
     }
@@ -705,13 +705,14 @@ app.post('/api/support/chat', async (req, res) => {
           throw new Error('Неожиданный формат ответа от DashScope API');
         }
       } catch (dashscopeError: any) {
-        const errorMsg = dashscopeError.response?.data ? JSON.stringify(dashscopeError.response.data) : dashscopeError.message;
+        const errorMsg = (dashscopeError.response && dashscopeError.response.data) ? JSON.stringify(dashscopeError.response.data) : dashscopeError.message;
         errors.push(`DashScope: ${errorMsg}`);
       }
     }
 
     if (!response) {
-      const lastUserMessage = messages[messages.length - 1]?.text.toLowerCase() || '';
+      const lastMessage = messages[messages.length - 1];
+      const lastUserMessage = (lastMessage && lastMessage.text) ? lastMessage.text.toLowerCase() : '';
       const messageLength = lastUserMessage.length;
       let fallbackResponse = '';
       
