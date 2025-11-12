@@ -68,13 +68,12 @@ function ServicesPage() {
   ];
 
   return (
-    <div style={{ flex: 1, paddingTop: 16, paddingBottom: 20, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ flex: 1, paddingTop: 8, paddingBottom: 20, paddingLeft: 'var(--spacing-size-xl, 16px)', paddingRight: 'var(--spacing-size-xl, 16px)', display: 'flex', flexDirection: 'column' }}>
       {/* Белый контейнер с сервисами */}
       <div style={{
         backgroundColor: '#FFFFFF',
         borderRadius: 20,
         padding: '18px',
-        marginTop: 8,
         width: '100%',
         boxSizing: 'border-box',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'

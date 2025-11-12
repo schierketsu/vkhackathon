@@ -19,11 +19,11 @@ export function getMainMenu(): InlineKeyboard {
       Keyboard.button.callback('💬 Поддержка', 'menu:support')
     ],
     [
-      Keyboard.button.link('🌐 Открыть сайт', 'https://maxhackathon.ru/')
+      Keyboard.button.callback('👤 Профиль', 'menu:profile'),
+      Keyboard.button.callback('📋 Сервисы', 'menu:services')
     ],
     [
-      Keyboard.button.callback('👤 Профиль', 'menu:profile'),
-      Keyboard.button.callback('🛠️ Сервисы', 'menu:services')
+      Keyboard.button.link('📱 Открыть мини-приложение', 'https://maxhackathon.ru/')
     ],
     [
       Keyboard.button.callback('❔', 'menu:help'),

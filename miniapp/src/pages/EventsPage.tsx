@@ -40,7 +40,7 @@ function EventsPage() {
   };
 
   return (
-    <div style={{ flex: 1, paddingTop: 16, paddingBottom: 20, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ flex: 1, paddingTop: 8, paddingBottom: 20, display: 'flex', flexDirection: 'column' }}>
       <div style={{ paddingLeft: 'var(--spacing-size-xl, 16px)', paddingRight: 'var(--spacing-size-xl, 16px)', marginBottom: 20 }}>
         {/* Переключатель уведомлений */}
         {user && (

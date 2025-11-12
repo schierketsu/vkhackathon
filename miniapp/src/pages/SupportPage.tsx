@@ -136,9 +136,8 @@ function SupportPage() {
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
-        overflow: 'hidden',
-        minHeight: 0
+        minHeight: 0,
+        width: '100%'
       }}
     >
       {/* Область сообщений */}
@@ -148,6 +147,7 @@ function SupportPage() {
           overflowY: 'auto',
           overflowX: 'hidden',
           padding: '16px',
+          paddingTop: '8px',
           paddingBottom: '8px',
           display: 'flex',
           flexDirection: 'column',

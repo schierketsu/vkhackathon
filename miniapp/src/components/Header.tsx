@@ -196,8 +196,10 @@ function Header() {
     <Flex
       align="center"
       justify="space-between"
+      data-header
       style={{
         padding: '12px var(--spacing-size-xl, 16px)',
+        paddingTop: `max(12px, calc(12px + env(safe-area-inset-top, 0px)))`,
         background: '#F5F5F5',
         borderBottom: 'none',
         position: 'fixed',
@@ -205,9 +207,18 @@ function Header() {
         left: 0,
         right: 0,
         width: '100%',
-        zIndex: 100,
+        maxWidth: '100%',
+        zIndex: 1000,
         minHeight: 56,
-      }}
+        height: 'auto',
+        boxSizing: 'border-box',
+        WebkitTransform: 'translateZ(0)',
+        transform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        willChange: 'transform',
+        margin: 0,
+      } as React.CSSProperties}
     >
       <Flex align="center" gap={12} style={{ flex: 1, alignItems: 'center' }}>
         {/* Кнопка назад (если не главная страница) */}

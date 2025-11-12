@@ -149,7 +149,7 @@ function SettingsPage() {
 
   if (loading) {
     return (
-      <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20 }}>
+      <Container style={{ flex: 1, paddingTop: 8, paddingBottom: 20 }}>
         <Flex direction="column" align="center" justify="center" style={{ minHeight: '50vh' }}>
           <Typography.Body style={{ color: 'var(--text-secondary)' }}>
             Загрузка...
@@ -161,7 +161,7 @@ function SettingsPage() {
 
   if (!user) {
     return (
-      <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
+      <Container style={{ flex: 1, paddingTop: 8, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
         <CellList mode="island">
           <CellSimple>
             <Typography.Body variant="small" style={{ color: 'var(--text-secondary)' }}>

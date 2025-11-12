@@ -200,7 +200,7 @@ function CompanyDetailPage() {
 
   if (loading) {
     return (
-      <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20 }}>
+      <Container style={{ flex: 1, paddingTop: 8, paddingBottom: 20 }}>
         <Flex direction="column" align="center" justify="center" style={{ minHeight: '50vh' }}>
           <Spinner size={32} />
           <Typography.Body style={{ color: 'var(--text-secondary)', marginTop: 16 }}>
@@ -213,7 +213,7 @@ function CompanyDetailPage() {
 
   if (!loading && !company) {
     return (
-      <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20 }}>
+      <Container style={{ flex: 1, paddingTop: 8, paddingBottom: 20 }}>
         <CellList mode="island">
           <CellSimple style={{ padding: '32px 16px', textAlign: 'center' }}>
             <Typography.Body variant="medium" style={{
@@ -246,7 +246,7 @@ function CompanyDetailPage() {
   }
 
   return (
-    <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
+    <Container style={{ flex: 1, paddingTop: 8, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
       <Grid gap={16} cols={1}>
         {/* Основная информация о компании */}
         <CellList mode="island">

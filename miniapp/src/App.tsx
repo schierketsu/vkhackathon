@@ -94,9 +94,26 @@ function AppContent() {
   }
 
   return (
-    <Panel mode="secondary" style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden', position: 'relative', backgroundColor: '#F5F5F5', paddingBottom: showBottomNav ? '80px' : '0', gap: 0, margin: 0 }}>
+    <Panel mode="secondary" style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', backgroundColor: '#F5F5F5', margin: 0, padding: 0 }}>
       <Header />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', margin: 0, padding: 0, paddingTop: '56px' }}>
+      <div style={{ 
+        flex: 1, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        margin: 0, 
+        padding: 0, 
+        paddingTop: 'var(--header-height-mobile, calc(56px + env(safe-area-inset-top, 0px)))',
+        paddingBottom: showBottomNav ? 'var(--bottom-nav-height-mobile, calc(90px + env(safe-area-inset-bottom, 0px)))' : '0',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        WebkitOverflowScrolling: 'touch',
+        position: 'relative',
+        minHeight: 0,
+        width: '100%',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        zIndex: 0
+      }}>
         <Routes>
           <Route path="/" element={<ProtectedRoute needsSetup={needsSetup || false}><MainMenu /></ProtectedRoute>} />
           <Route path="/schedule" element={<ProtectedRoute needsSetup={needsSetup || false}><SchedulePage /></ProtectedRoute>} />

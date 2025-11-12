@@ -260,7 +260,7 @@ function PracticePage() {
 
   if (loading) {
     return (
-      <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20 }}>
+      <Container style={{ flex: 1, paddingTop: 8, paddingBottom: 20 }}>
         <Flex direction="column" align="center" justify="center" style={{ minHeight: '50vh' }}>
           <Typography.Body style={{ color: 'var(--text-secondary)' }}>
             Загрузка...
@@ -271,7 +271,7 @@ function PracticePage() {
   }
 
   return (
-    <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
+    <Container style={{ flex: 1, paddingTop: 8, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
       <Grid gap={20} cols={1}>
 
         {/* Фильтр 1: Учебное заведение */}

@@ -320,7 +320,7 @@ function MainMenu() {
   }
 
   return (
-        <Container style={{ flex: 1, paddingTop: 16, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
+        <Container style={{ flex: 1, paddingTop: 8, paddingBottom: 20, paddingLeft: 0, paddingRight: 0 }}>
           <Grid gap={24} cols={1}>
             {/* Заглушки новостей */}
             <div style={{ paddingLeft: 'var(--spacing-size-xl, 16px)', paddingRight: 'var(--spacing-size-xl, 16px)' }}>

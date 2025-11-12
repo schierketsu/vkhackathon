@@ -44,6 +44,10 @@ body {
 :root {
   --accent-primary: var(--color-primary, #3C35F2);
   --accent-primary-hover: var(--color-accent, #2980F2);
+  --header-height: 56px;
+  --header-height-mobile: calc(56px + env(safe-area-inset-top, 0px));
+  --bottom-nav-height: 90px;
+  --bottom-nav-height-mobile: calc(90px + env(safe-area-inset-bottom, 0px));
 }
 
 /* Стили для использования кастомных цветов */
