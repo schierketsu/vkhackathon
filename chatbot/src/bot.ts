@@ -7,6 +7,10 @@ import { setupEventsHandlers } from './handlers/events';
 import { setupDeadlinesHandlers } from './handlers/deadlines';
 import { setupMenuHandlers } from './handlers/menu';
 import { setupTeachersHandlers } from './handlers/teachers';
+import { setupPracticeHandlers } from './handlers/practice';
+import { setupSupportHandlers } from './handlers/support';
+import { setupProfileHandlers } from './handlers/profile';
+import { setupServicesHandlers } from './handlers/services';
 import { searchTeachers, getTeacherScheduleForDate, formatTeacherSchedule, isFavoriteTeacher, getAllTeachers, getTeacherWeekSchedule, getFavoriteTeachers, addFavoriteTeacher, removeFavoriteTeacher } from './utils/teachers';
 import { getTeacherSearchMenu, getTeachersMenu, getTeacherScheduleMenu, getMainMenu } from './utils/menu';
 import { startScheduler, setBotApi } from './utils/scheduler';
@@ -239,19 +243,33 @@ bot.command('help', async (ctx: Context) => {
   });
 });
 
-bot.on('message_created', async (ctx: Context) => {
+bot.on('message_created', async (ctx: Context, next: () => Promise<void>) => {
   try {
-    if (!ctx.user) return;
-    
-    const msg = ctx.message as any;
+    if (!ctx.user || !ctx.message) {
+      return next();
+    }
     
     // Обработка поиска преподавателя
-    const messageText = msg?.body?.text || '';
-    if (!messageText) return;
+    // Получаем текст сообщения правильно для MAX API
+    const messageText = ctx.message.body.text;
+    if (!messageText) {
+      return next();
+    }
+    
+    // Пропускаем команды - они обрабатываются через bot.command()
+    if (messageText.startsWith('/')) {
+      return next();
+    }
     
     // Проверяем, начинается ли сообщение с /поиск
+    // Но команды уже обрабатываются через bot.command, так что это не нужно
+    // Оставляем только для обратной совместимости
     const isSearchCommand = messageText.startsWith('/поиск ');
-    if (!isSearchCommand) return;
+    if (!isSearchCommand) {
+      // Если это не команда поиска, передаем управление другим обработчикам
+      // (например, обработчику поддержки)
+      return next();
+    }
     
     console.log('🔍 Команда поиска преподавателя обнаружена');
     console.log('📝 Текст сообщения:', messageText);
@@ -332,7 +350,8 @@ bot.on('message_created', async (ctx: Context) => {
     });
   } catch (error) {
     console.error('Ошибка в обработчике сообщений:', error);
-    // Не отвечаем на ошибку, чтобы не мешать другим обработчикам
+    // В случае ошибки передаем управление дальше
+    return next();
   }
 });
 
@@ -406,11 +425,17 @@ bot.action('skip_group', async (ctx: Context) => {
 });
 
 // Настройка обработчиков
+// ВАЖНО: setupSupportHandlers должен быть вызван ПЕРЕД setupTeachersHandlers,
+// чтобы обработчик поддержки регистрировался раньше и имел приоритет
 setupScheduleHandlers(bot);
 setupEventsHandlers(bot);
 setupDeadlinesHandlers(bot);
 setupMenuHandlers(bot);
+setupSupportHandlers(bot); // Перемещено выше для приоритета
 setupTeachersHandlers(bot);
+setupPracticeHandlers(bot);
+setupProfileHandlers(bot);
+setupServicesHandlers(bot);
 
 bot.catch((error: any, ctx?: Context) => {
   console.error('Ошибка в боте:', error);
