@@ -2,9 +2,9 @@ import { Context, Keyboard } from '@maxhub/max-bot-api';
 import { getMainMenu } from '../utils/menu';
 
 export function setupServicesHandlers(bot: any) {
-  // Меню услуг
+  // Меню сервисов
   bot.action('menu:services', async (ctx: Context) => {
-    const text = `🛠️ Услуги\n\nДоступные сервисы:\n\n` +
+    const text = `🛠️ Сервисы\n\nДоступные сервисы:\n\n` +
       `📅 Расписание - просмотр расписания занятий\n` +
       `🎉 Мероприятия - календарь событий\n` +
       `👨‍🏫 Преподаватели - поиск и расписание преподавателей\n` +
