@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, Typography, Flex, Button, Spinner } from '@maxhub/max-ui';
 import api, { User, Schedule, Event } from '../api/client';

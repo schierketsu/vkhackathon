@@ -47,7 +47,7 @@ function SupportPage() {
   const [messages, setMessages] = useState<Message[]>(loadSavedMessages);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Сохраняем сообщения в localStorage при каждом изменении

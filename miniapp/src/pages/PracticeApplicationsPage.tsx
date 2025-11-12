@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, CellHeader, Typography, Button, Flex, Spinner } from '@maxhub/max-ui';
 import api from '../api/client';
 
@@ -13,7 +12,6 @@ interface PracticeApplication {
 }
 
 function PracticeApplicationsPage() {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState<PracticeApplication[]>([]);
 

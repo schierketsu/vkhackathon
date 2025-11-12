@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Grid, CellSimple, CellList, Typography, Button, Spinner, Flex } from '@maxhub/max-ui';
+import { Container, Grid, CellSimple, CellList, Typography, Spinner, Flex } from '@maxhub/max-ui';
 import api, { Schedule } from '../api/client';
 import { getLessonTypeAndRoom, getLessonTypeColor } from '../utils/lessons';
-import { formatWeekDate, getWeekStart } from '../utils/date';
+import { formatWeekDate } from '../utils/date';
 
 function SchedulePage() {
   const navigate = useNavigate();
@@ -48,35 +48,6 @@ function SchedulePage() {
       return newWeekStart;
     });
   }, []);
-
-  const getWeekNumber = (date: Date): number => {
-    // Начало семестра - 1 сентября
-    const semesterStart = new Date(new Date().getFullYear(), 8, 1); // 8 = сентябрь (0-indexed)
-    semesterStart.setHours(0, 0, 0, 0);
-    
-    const dateWeekStart = getWeekStart(date);
-    dateWeekStart.setHours(0, 0, 0, 0);
-    
-    const semesterDayOfWeek = semesterStart.getDay();
-    let firstWeekMonday: Date;
-    
-    if (semesterDayOfWeek === 1) {
-      firstWeekMonday = new Date(semesterStart);
-    } else if (semesterDayOfWeek === 0) {
-      firstWeekMonday = new Date(semesterStart);
-      firstWeekMonday.setDate(semesterStart.getDate() + 1);
-    } else {
-      const daysUntilMonday = 8 - semesterDayOfWeek;
-      firstWeekMonday = new Date(semesterStart);
-      firstWeekMonday.setDate(semesterStart.getDate() + daysUntilMonday);
-    }
-    firstWeekMonday.setHours(0, 0, 0, 0);
-    
-    const diffMs = dateWeekStart.getTime() - firstWeekMonday.getTime();
-    const diffWeeks = Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)) + 1;
-    
-    return diffWeeks > 0 ? diffWeeks : 1;
-  };
 
   const getAvailableWeeks = useCallback(() => {
     const weeks: Array<{ number: number; startDate: Date; label: string }> = [];
@@ -124,7 +95,8 @@ function SchedulePage() {
 
     const day = parseInt(parts[0]);
     const month = parseInt(parts[1]);
-    const year = parts[2] ? parseInt(parts[2]) : new Date().getFullYear();
+    // year не используется, но нужен для парсинга
+    parts[2] ? parseInt(parts[2]) : new Date().getFullYear();
 
     const months = [
       'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',

@@ -18,6 +18,7 @@ import {
   getCurrentWeekSchedule,
   getAllTeachers,
   searchTeachers,
+  PracticeCompany,
   getFavoriteTeachers,
   addFavoriteTeacher,
   removeFavoriteTeacher,
@@ -366,7 +367,7 @@ app.get('/api/practice/companies', (req, res) => {
 
     const companies = getPracticeCompanies(institutionName, facultyName);
     
-    const companiesWithRatings = companies.map(company => {
+    const companiesWithRatings = companies.map((company: PracticeCompany) => {
       try {
         const rating = getCompanyRating(company.id);
         return {
@@ -465,7 +466,7 @@ app.get('/api/practice/companies/:id', (req, res) => {
     }
     
     const companies = getPracticeCompanies(institutionName, facultyName);
-    const company = companies.find(c => c.id === companyId);
+    const company = companies.find((c: PracticeCompany) => c.id === companyId);
     
     if (!company) {
       return res.status(404).json({ error: 'Компания не найдена' });

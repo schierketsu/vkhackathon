@@ -49,7 +49,7 @@ function EventsPage() {
               after={
                 <Switch
                   checked={user.events_subscribed === 1}
-                  onChange={(checked) => toggleSubscription(checked)}
+                  onChange={(e) => toggleSubscription(e.target.checked)}
                 />
               }
             >

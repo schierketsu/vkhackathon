@@ -91,7 +91,6 @@ function TeachersPage() {
           <Button
             mode={!showFavorites ? 'primary' : 'secondary'}
             onClick={() => setShowFavorites(false)}
-            size="s"
             style={{ 
               fontWeight: !showFavorites ? 600 : 500,
               padding: '8px 16px'
@@ -237,7 +236,6 @@ function TeachersPage() {
                         toggleFavorite(teacher, fav);
                       }}
                       mode="tertiary"
-                      size="s"
                       style={{ 
                         minWidth: 36,
                         height: 36,

@@ -22,29 +22,51 @@ import { formatFacultyName } from '../utils/formatters';
 export function setupMenuHandlers(bot: any) {
   // Главное меню
   bot.action('menu:main', async (ctx: Context) => {
-    const message = `🏠 Главное меню\n\nВыберите действие:`;
-    await ctx.answerOnCallback({
-      message: {
-        text: message,
-        attachments: [getMainMenu()]
+    try {
+      const message = `🏠 Главное меню\n\nВыберите действие:`;
+      await ctx.answerOnCallback({
+        message: {
+          text: message,
+          attachments: [getMainMenu()]
+        }
+      });
+    } catch (error) {
+      console.error('Ошибка в menu:main:', error);
+      try {
+        await ctx.answerOnCallback({
+          notification: 'Произошла ошибка. Попробуйте позже.'
+        });
+      } catch (e) {
+        console.error('Не удалось отправить уведомление об ошибке:', e);
       }
-    });
+    }
   });
 
   // Открыть приложение
   bot.action('menu:open_app', async (ctx: Context) => {
-    const appUrl = 'http://localhost:3000/';
-    const message = `📱 Мини-приложение\n\n` +
-      `🔗 Ссылка для открытия:\n` +
-      `${appUrl}\n\n` +
-      `💡 Скопируйте ссылку выше и откройте в браузере.\n\n` +
-      `⚠️ Убедитесь, что мини-приложение запущено:\n` +
-      `cd miniapp\n` +
-      `npm run dev`;
-    
-    await ctx.reply(message, {
-      attachments: [getMainMenu()]
-    });
+    try {
+      const appUrl = 'http://localhost:3000/';
+      const message = `📱 Мини-приложение\n\n` +
+        `🔗 Ссылка для открытия:\n` +
+        `${appUrl}\n\n` +
+        `💡 Скопируйте ссылку выше и откройте в браузере.\n\n` +
+        `⚠️ Убедитесь, что мини-приложение запущено:\n` +
+        `cd miniapp\n` +
+        `npm run dev`;
+      
+      await ctx.reply(message, {
+        attachments: [getMainMenu()]
+      });
+    } catch (error) {
+      console.error('Ошибка в menu:open_app:', error);
+      try {
+        await ctx.answerOnCallback({
+          notification: 'Произошла ошибка. Попробуйте позже.'
+        });
+      } catch (e) {
+        console.error('Не удалось отправить уведомление об ошибке:', e);
+      }
+    }
   });
 
   // Меню расписания (главное)

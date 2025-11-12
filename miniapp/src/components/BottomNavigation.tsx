@@ -1,6 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Flex, Button } from '@maxhub/max-ui';
-import { Typography } from '@maxhub/max-ui';
+import { Flex } from '@maxhub/max-ui';
 
 function BottomNavigation() {
   const navigate = useNavigate();
@@ -52,10 +51,10 @@ function BottomNavigation() {
     >
       <Flex
         align="center"
-        justify="space-around"
         style={{
           width: '100%',
-          height: '100%'
+          height: '100%',
+          justifyContent: 'space-around'
         }}
       >
         {navItems.map((item) => (

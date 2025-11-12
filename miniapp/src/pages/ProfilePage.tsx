@@ -1,4 +1,4 @@
-import { Container, Grid, Typography, Flex } from '@maxhub/max-ui';
+import { Container, Grid, Typography } from '@maxhub/max-ui';
 
 function ProfilePage() {
   return (

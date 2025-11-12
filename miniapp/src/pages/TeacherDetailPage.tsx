@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, CellHeader, Typography, Button, Flex, Spinner } from '@maxhub/max-ui';
 import api, { Schedule } from '../api/client';
 
 function TeacherDetailPage() {
   const { teacherName } = useParams<{ teacherName: string }>();
-  const navigate = useNavigate();
   const [currentWeekSchedule, setCurrentWeekSchedule] = useState<Schedule[]>([]);
   const [nextWeekSchedule, setNextWeekSchedule] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -178,7 +177,6 @@ function TeacherDetailPage() {
           <Button
             mode={activeWeek === 'current' ? 'primary' : 'secondary'}
             onClick={() => setActiveWeek('current')}
-            size="s"
             style={{ 
               fontWeight: activeWeek === 'current' ? 600 : 500,
               padding: '8px 16px'
@@ -189,7 +187,6 @@ function TeacherDetailPage() {
           <Button
             mode={activeWeek === 'next' ? 'primary' : 'secondary'}
             onClick={() => setActiveWeek('next')}
-            size="s"
             style={{ 
               fontWeight: activeWeek === 'next' ? 600 : 500,
               padding: '8px 16px'

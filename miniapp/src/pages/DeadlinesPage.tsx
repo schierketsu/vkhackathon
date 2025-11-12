@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, Typography, Button, Input, Switch, Flex } from '@maxhub/max-ui';
 import api, { Deadline, User } from '../api/client';
-import { parseDate, formatDate, getDaysUntil } from '../utils/date';
+import { formatDate, getDaysUntil } from '../utils/date';
 
 function DeadlinesPage() {
-  const navigate = useNavigate();
   const location = useLocation();
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [user, setUser] = useState<User | null>(null);
@@ -131,7 +130,7 @@ function DeadlinesPage() {
               after={
                 <Switch
                   checked={user.notifications_enabled === 1}
-                  onChange={(checked) => toggleNotifications(checked)}
+                  onChange={(e) => toggleNotifications(e.target.checked)}
                 />
               }
             >
@@ -247,7 +246,6 @@ function DeadlinesPage() {
                     <Button
                       onClick={() => handleDeleteDeadline(deadline.id)}
                       mode="tertiary"
-                      size="s"
                       style={{ fontSize: 12, padding: '6px 12px' }}
                     >
                       Удалить

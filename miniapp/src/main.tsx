@@ -8,12 +8,11 @@ import './styles/colors.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <MaxUI 
-      colorScheme="light"
-      style={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}
-    >
-      <App />
-    </MaxUI>
+    <div style={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+      <MaxUI colorScheme="light">
+        <App />
+      </MaxUI>
+    </div>
   </StrictMode>
 );
 

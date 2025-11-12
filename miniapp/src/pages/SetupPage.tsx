@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Container, Grid, CellSimple, CellList, CellHeader, Typography, Flex, Button } from '@maxhub/max-ui';
-import api, { User } from '../api/client';
+import { Grid, CellSimple, CellList, CellHeader, Typography, Flex } from '@maxhub/max-ui';
+import api from '../api/client';
 import { formatFacultyName } from '../utils/formatters';
 
 interface GroupsStructure {
@@ -38,7 +38,7 @@ interface GroupsStructure {
 }
 
 function SetupPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [_user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [groupsStructure, setGroupsStructure] = useState<GroupsStructure | null>(null);
   const [institutions, setInstitutions] = useState<string[]>([]);
@@ -619,7 +619,7 @@ function SetupPage() {
                 )}
               </Flex>
             </CellSimple>
-            {availableSubgroups.map((sub, idx) => (
+            {availableSubgroups.map((sub) => (
               <CellSimple
                 key={sub}
                 onClick={() => handleSubgroupSelect(sub)}

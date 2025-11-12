@@ -414,8 +414,21 @@ setupTeachersHandlers(bot);
 
 bot.catch((error: any, ctx?: Context) => {
   console.error('Ошибка в боте:', error);
+  if (error.response) {
+    console.error('Ответ API:', error.response);
+  }
   if (ctx) {
-    ctx.reply('Произошла ошибка. Попробуйте позже.').catch(console.error);
+    try {
+      if (ctx.callback) {
+        ctx.answerOnCallback({
+          notification: 'Произошла ошибка. Попробуйте позже.'
+        }).catch(console.error);
+      } else {
+        ctx.reply('Произошла ошибка. Попробуйте позже.').catch(console.error);
+      }
+    } catch (e) {
+      console.error('Не удалось отправить сообщение об ошибке:', e);
+    }
   }
 });
 

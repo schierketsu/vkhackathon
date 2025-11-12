@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Typography, Flex } from '@maxhub/max-ui';
+import { Typography } from '@maxhub/max-ui';
 
 function ServicesPage() {
   const navigate = useNavigate();

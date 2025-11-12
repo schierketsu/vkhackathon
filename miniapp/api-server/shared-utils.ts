@@ -330,6 +330,14 @@ export interface Event {
   link?: string;
 }
 
+export interface PracticeCompany {
+  id: string;
+  name: string;
+  description: string;
+  location: string;
+  tags: string[];
+}
+
 export function getUpcomingEvents(days: number = 7): Event[] {
   const possiblePaths = [
     path.join(__dirname, '../../data/events.json'),
@@ -1314,7 +1322,7 @@ export function getPracticeInstitutionsStructure() {
   return structure;
 }
 
-export function getPracticeCompanies(institutionName: string, facultyName: string) {
+export function getPracticeCompanies(institutionName: string, facultyName: string): PracticeCompany[] {
   const practiceCompaniesData = loadPracticeCompaniesData();
   if (!practiceCompaniesData) {
     return [];
@@ -1324,7 +1332,7 @@ export function getPracticeCompanies(institutionName: string, facultyName: strin
     practiceCompaniesData[institutionName] &&
     practiceCompaniesData[institutionName][facultyName]
   ) {
-    return practiceCompaniesData[institutionName][facultyName];
+    return practiceCompaniesData[institutionName][facultyName] as PracticeCompany[];
   }
 
   return [];

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Container, Grid, CellSimple, CellList, CellHeader, Typography, Button, Switch, Flex } from '@maxhub/max-ui';
 import api, { User } from '../api/client';
 import { formatFacultyName } from '../utils/formatters';
@@ -42,7 +41,6 @@ interface GroupsStructure {
 type SelectionStep = 'institution' | 'faculty' | 'format' | 'degree' | 'course' | 'group';
 
 function SettingsPage() {
-  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [groupsStructure, setGroupsStructure] = useState<GroupsStructure | null>(null);
@@ -50,7 +48,7 @@ function SettingsPage() {
   const [showGroupSelector, setShowGroupSelector] = useState(false);
   const [showInstitutionSelector, setShowInstitutionSelector] = useState(false);
   const [selectionStep, setSelectionStep] = useState<SelectionStep>('faculty');
-  const [selectedInstitution, setSelectedInstitution] = useState<string | null>(null);
+  const [_selectedInstitution, setSelectedInstitution] = useState<string | null>(null);
   const [selectedFaculty, setSelectedFaculty] = useState<string | null>(null);
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null);
   const [selectedDegree, setSelectedDegree] = useState<string | null>(null);
@@ -72,7 +70,7 @@ function SettingsPage() {
       
       // Если у пользователя есть учебное заведение, загружаем структуру групп для него
       // Иначе загружаем все группы
-      const groupsData = await api.getAvailableGroups(userData?.institution_name);
+      const groupsData = await api.getAvailableGroups(userData?.institution_name || undefined);
       setGroupsStructure(groupsData);
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
@@ -239,7 +237,6 @@ function SettingsPage() {
                           key={sub ?? 'null'}
                           mode={user.subgroup === sub ? 'primary' : 'secondary'}
                           onClick={() => handleGroupSelect(user.group_name!, sub)}
-                          size="s"
                           style={{ 
                             fontWeight: user.subgroup === sub ? 600 : 500,
                             padding: '10px 16px',
@@ -668,7 +665,7 @@ function SettingsPage() {
                 after={
                   <Switch
                     checked={user.notifications_enabled === 1}
-                    onChange={(checked) => toggleNotifications(checked)}
+                    onChange={(e) => toggleNotifications(e.target.checked)}
                   />
                 }
                 style={{ padding: '14px 16px' }}
@@ -690,7 +687,7 @@ function SettingsPage() {
                 after={
                   <Switch
                     checked={user.events_subscribed === 1}
-                    onChange={(checked) => toggleEventsSubscription(checked)}
+                    onChange={(e) => toggleEventsSubscription(e.target.checked)}
                   />
                 }
                 style={{ padding: '14px 16px' }}
