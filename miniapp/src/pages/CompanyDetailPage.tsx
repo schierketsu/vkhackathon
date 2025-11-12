@@ -310,7 +310,7 @@ function CompanyDetailPage() {
                         {/* Рейтинг */}
                         <Flex gap={6} align="center">
                           <img 
-                            src="/стар.png" 
+                            src="/star.png" 
                             alt="⭐" 
                             style={{
                               width: 16,
@@ -458,7 +458,7 @@ function CompanyDetailPage() {
                       {[1, 2, 3, 4, 5].map((star) => (
                         <img
                           key={star}
-                          src="/стар.png"
+                          src="/star.png"
                           alt="⭐"
                           style={{
                             width: 20,
@@ -596,7 +596,7 @@ function CompanyDetailPage() {
                         }}
                       >
                         <img
-                          src="/стар.png"
+                          src="/star.png"
                           alt="⭐"
                           style={{
                             width: 40,

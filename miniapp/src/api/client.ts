@@ -22,7 +22,17 @@ function getUserId(): string {
     console.warn('MAX Bridge не доступен:', e);
   }
   
-  return localStorage.getItem('userId') || 'test_user_1';
+  // Проверяем, есть ли сохраненный userId
+  let userId = localStorage.getItem('userId');
+  
+  // Если нет сохраненного userId, генерируем уникальный
+  if (!userId) {
+    // Генерируем уникальный ID на основе timestamp и случайного числа
+    userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
+    localStorage.setItem('userId', userId);
+  }
+  
+  return userId;
 }
 
 export interface Schedule {

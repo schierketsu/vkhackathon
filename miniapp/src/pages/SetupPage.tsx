@@ -309,7 +309,7 @@ function SetupPage() {
         }}>
           <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'center' }}>
             <img 
-              src="/рукопажатие1.png" 
+              src="/handshake1.png" 
               alt="Приветствие"
               style={{
                 width: 120,

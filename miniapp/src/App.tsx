@@ -96,7 +96,7 @@ function AppContent() {
   return (
     <Panel mode="secondary" style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', overflowY: 'auto', overflowX: 'hidden', position: 'relative', backgroundColor: '#F5F5F5', paddingBottom: showBottomNav ? '80px' : '0', gap: 0, margin: 0 }}>
       <Header />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', margin: 0, padding: 0 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', margin: 0, padding: 0, paddingTop: '56px' }}>
         <Routes>
           <Route path="/" element={<ProtectedRoute needsSetup={needsSetup || false}><MainMenu /></ProtectedRoute>} />
           <Route path="/schedule" element={<ProtectedRoute needsSetup={needsSetup || false}><SchedulePage /></ProtectedRoute>} />

@@ -126,7 +126,7 @@ function TeachersPage() {
             }}
           >
             <img 
-              src="/стар.png" 
+              src="/star.png" 
               alt="⭐" 
               style={{
                 width: 16,
@@ -167,7 +167,7 @@ function TeachersPage() {
               <Flex align="center" justify="center" style={{ padding: '40px 0' }}>
                 <Flex direction="column" align="center" gap={16}>
                   <img 
-                    src="/стар.png" 
+                    src="/star.png" 
                     alt="⭐" 
                     style={{
                       width: 48,
@@ -246,7 +246,7 @@ function TeachersPage() {
                       }}
                     >
                       <img 
-                        src="/стар.png" 
+                        src="/star.png" 
                         alt={fav ? "⭐" : "☆"} 
                         style={{
                           width: 20,

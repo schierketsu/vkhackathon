@@ -588,7 +588,7 @@ function PracticePage() {
                         {/* Оценка под аватаркой */}
                         <Flex gap={4} align="center">
                           <img 
-                            src="/стар.png" 
+                            src="/star.png" 
                             alt="⭐" 
                             style={{
                               width: 16,

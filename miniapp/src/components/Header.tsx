@@ -200,8 +200,11 @@ function Header() {
         padding: '12px var(--spacing-size-xl, 16px)',
         background: '#F5F5F5',
         borderBottom: 'none',
-        position: 'sticky',
+        position: 'fixed',
         top: 0,
+        left: 0,
+        right: 0,
+        width: '100%',
         zIndex: 100,
         minHeight: 56,
       }}
