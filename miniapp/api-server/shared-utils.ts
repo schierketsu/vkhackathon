@@ -339,21 +339,32 @@ export interface PracticeCompany {
 }
 
 export function getUpcomingEvents(days: number = 7): Event[] {
+  // Определяем базовый путь к данным
+  const baseDataPath = process.env.DATA_PATH || 
+    (fs.existsSync('/app/data') ? '/app/data' : 
+     (__dirname.includes('dist') ? path.join(__dirname, '../../../data') : 
+      path.join(__dirname, '../../data')));
+  
   const possiblePaths = [
+    path.join(baseDataPath, 'events.json'),
     path.join(__dirname, '../../data/events.json'),
+    path.join(__dirname, '../../../data/events.json'),
     path.join(process.cwd(), 'data/events.json'),
     path.join(process.cwd(), 'miniapp/api-server/../../data/events.json'),
+    '/app/data/events.json', // Docker путь
   ];
   
   let eventsPath: string | null = null;
   for (const possiblePath of possiblePaths) {
     if (fs.existsSync(possiblePath)) {
       eventsPath = possiblePath;
+      console.log(`✅ Загружены события из: ${eventsPath}`);
       break;
     }
   }
   
   if (!eventsPath) {
+    console.warn('Файл events.json не найден');
     return [];
   }
   
@@ -406,16 +417,27 @@ const dayNames: { [key: string]: string } = {
 };
 
 function loadTimetableDataFromFile(): TimetableData | null {
+  // Определяем базовый путь к данным
+  // В Docker: /app/data, в локальной разработке: ../../data или ./data
+  const baseDataPath = process.env.DATA_PATH || 
+    (fs.existsSync('/app/data') ? '/app/data' : 
+     (__dirname.includes('dist') ? path.join(__dirname, '../../../data') : 
+      path.join(__dirname, '../../data')));
+  
   const possiblePaths = [
+    path.join(baseDataPath, 'timetable.json'),
     path.join(__dirname, '../../data/timetable.json'),
+    path.join(__dirname, '../../../data/timetable.json'),
     path.join(process.cwd(), 'data/timetable.json'),
     path.join(process.cwd(), 'miniapp/api-server/../../data/timetable.json'),
+    '/app/data/timetable.json', // Docker путь
   ];
   
   for (const timetablePath of possiblePaths) {
     if (fs.existsSync(timetablePath)) {
       try {
         const data = fs.readFileSync(timetablePath, 'utf-8');
+        console.log(`✅ Загружено расписание из: ${timetablePath}`);
         return JSON.parse(data) as TimetableData;
       } catch (error) {
         console.error('Ошибка загрузки расписания:', error);
@@ -423,21 +445,32 @@ function loadTimetableDataFromFile(): TimetableData | null {
     }
   }
   
-  console.error('Файл расписания не найден');
+  console.error('Файл расписания не найден. Проверенные пути:');
+  possiblePaths.forEach(p => console.error(`  - ${p} (exists: ${fs.existsSync(p)})`));
   return null;
 }
 
 function getConfigFromFile() {
+  // Определяем базовый путь к конфигурации
+  const baseConfigPath = process.env.CONFIG_PATH || 
+    (fs.existsSync('/app/config.json') ? '/app' : 
+     (__dirname.includes('dist') ? path.join(__dirname, '../../../') : 
+      path.join(__dirname, '../../')));
+  
   const possiblePaths = [
+    path.join(baseConfigPath, 'config.json'),
     path.join(__dirname, '../../config.json'),
+    path.join(__dirname, '../../../config.json'),
     path.join(process.cwd(), 'config.json'),
     path.join(process.cwd(), 'miniapp/api-server/../../config.json'),
+    '/app/config.json', // Docker путь
   ];
   
   for (const configPath of possiblePaths) {
     if (fs.existsSync(configPath)) {
       try {
         const data = fs.readFileSync(configPath, 'utf-8');
+        console.log(`✅ Загружена конфигурация из: ${configPath}`);
         return JSON.parse(data);
       } catch (error) {
         console.error('Ошибка загрузки конфига:', error);
@@ -445,6 +478,7 @@ function getConfigFromFile() {
     }
   }
   
+  console.warn('Конфигурация не найдена, используются значения по умолчанию');
   return { semester_start: '2025-09-01' };
 }
 
@@ -1270,16 +1304,26 @@ export function getTeacherWeekSchedule(teacherName: string, startDate: Date): Da
 
 // Практика
 function loadPracticeCompaniesData() {
+  // Определяем базовый путь к данным (используем ту же логику, что и для timetable)
+  const baseDataPath = process.env.DATA_PATH || 
+    (fs.existsSync('/app/data') ? '/app/data' : 
+     (__dirname.includes('dist') ? path.join(__dirname, '../../../data') : 
+      path.join(__dirname, '../../data')));
+  
   const possiblePaths = [
+    path.join(baseDataPath, 'practice-companies.json'),
     path.join(__dirname, '../../data/practice-companies.json'),
+    path.join(__dirname, '../../../data/practice-companies.json'),
     path.join(process.cwd(), 'data/practice-companies.json'),
     path.join(process.cwd(), 'miniapp/api-server/../../data/practice-companies.json'),
+    '/app/data/practice-companies.json', // Docker путь
   ];
 
   for (const practiceCompaniesPath of possiblePaths) {
     if (fs.existsSync(practiceCompaniesPath)) {
       try {
         const content = fs.readFileSync(practiceCompaniesPath, 'utf-8');
+        console.log(`✅ Загружены данные практики из: ${practiceCompaniesPath}`);
         return JSON.parse(content);
       } catch (error) {
         console.error('Ошибка загрузки practice-companies.json из', practiceCompaniesPath, ':', error);
@@ -1287,6 +1331,7 @@ function loadPracticeCompaniesData() {
     }
   }
 
+  console.warn('Файл practice-companies.json не найден');
   return null;
 }
 

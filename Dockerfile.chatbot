@@ -1,0 +1,34 @@
+# Dockerfile для чат-бота (отдельный сервис)
+FROM node:20-alpine
+
+WORKDIR /app/chatbot
+
+# Установка системных зависимостей для сборки нативных модулей (better-sqlite3)
+RUN apk add --no-cache python3 make g++
+
+# Копирование package.json чат-бота
+COPY chatbot/package*.json ./
+
+# Установка зависимостей
+RUN npm install
+
+# Копирование исходного кода чат-бота напрямую в /app/chatbot/
+COPY chatbot/src ./src
+COPY chatbot/tsconfig.json ./
+
+# Копирование конфигурации из корня проекта в /app/
+# Чат-бот ищет config.json на 3 уровня выше от dist/bot.js:
+# dist/bot.js -> dist -> /app/chatbot -> /app -> /app/config.json
+COPY config.json /app/config.json
+
+# Создание директории для данных
+RUN mkdir -p /app/data
+
+# Сборка TypeScript (в текущей директории /app/chatbot)
+RUN npm run build
+
+# Переменные окружения
+ENV NODE_ENV=production
+
+# Запуск чат-бота из директории /app/chatbot
+CMD ["node", "dist/bot.js"]

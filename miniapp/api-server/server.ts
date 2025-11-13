@@ -93,6 +93,7 @@ if (dbPath) {
 
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:80',
   'https://maxhackathon.ru',
   'http://maxhackathon.ru',
   'https://www.maxhackathon.ru',
@@ -101,14 +102,28 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Разрешаем запросы без origin (например, из мобильных приложений или прокси)
+    if (!origin) {
+      return callback(null, true);
     }
+    
+    // Разрешаем запросы из разрешенных источников
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      return callback(null, true);
+    }
+    
+    // В режиме разработки разрешаем все запросы
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // Для production разрешаем только из разрешенных источников
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
 }));
 
 app.use(express.json());

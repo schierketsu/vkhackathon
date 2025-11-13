@@ -1,0 +1,55 @@
+services:
+  api-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: campus-api-server
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./data:/app/data
+      - ./config.json:/app/config.json
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - DB_PATH=/app/data/campus.db
+      - QWEN_API_TOKEN=${QWEN_API_TOKEN:-}
+    restart: unless-stopped
+    networks:
+      - campus-network
+
+  chatbot:
+    build:
+      context: .
+      dockerfile: Dockerfile.chatbot
+    container_name: campus-chatbot
+    volumes:
+      - ./data:/app/data
+      - ./config.json:/app/config.json
+    environment:
+      - NODE_ENV=production
+      - BOT_TOKEN=${BOT_TOKEN:-}
+      - API_URL=http://api-server:3002/api
+    depends_on:
+      - api-server
+    restart: unless-stopped
+    networks:
+      - campus-network
+
+  miniapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.miniapp
+    container_name: campus-miniapp
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-server
+    restart: unless-stopped
+    networks:
+      - campus-network
+
+networks:
+  campus-network:
+    driver: bridge
+
