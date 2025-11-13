@@ -44,6 +44,7 @@ function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [groupsStructure, setGroupsStructure] = useState<GroupsStructure | null>(null);
+  const [loadingGroups, setLoadingGroups] = useState(false);
   const [institutions, setInstitutions] = useState<string[]>([]);
   const [showGroupSelector, setShowGroupSelector] = useState(false);
   const [showInstitutionSelector, setShowInstitutionSelector] = useState(false);
@@ -61,17 +62,14 @@ function SettingsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
+      // Загружаем только необходимые данные для отображения страницы
+      // Структура групп будет загружена только когда пользователь откроет селектор
       const [userData, institutionsData] = await Promise.all([
         api.getUser(),
         api.getAvailableInstitutions(),
       ]);
       setUser(userData);
       setInstitutions(institutionsData.institutions || []);
-      
-      // Если у пользователя есть учебное заведение, загружаем структуру групп для него
-      // Иначе загружаем все группы
-      const groupsData = await api.getAvailableGroups(userData?.institution_name || undefined);
-      setGroupsStructure(groupsData);
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
     } finally {
@@ -96,11 +94,8 @@ function SettingsPage() {
       await api.updateUserInstitution(institutionName);
       loadData();
       setShowInstitutionSelector(false);
-      // Если выбрано учебное заведение, обновляем структуру групп
-      if (institutionName) {
-        const groupsData = await api.getAvailableGroups(institutionName);
-        setGroupsStructure(groupsData);
-      }
+      // Очищаем структуру групп, чтобы она загрузилась заново при следующем открытии селектора
+      setGroupsStructure(null);
     } catch (error) {
       console.error('Ошибка обновления учебного заведения:', error);
       alert('Ошибка обновления учебного заведения');
@@ -116,12 +111,28 @@ function SettingsPage() {
     setSelectedCourse(null);
   };
 
-  const handleOpenGroupSelector = () => {
+  const handleOpenGroupSelector = async () => {
     if (showGroupSelector) {
       setShowGroupSelector(false);
     } else {
-      setShowGroupSelector(true);
-      resetSelection();
+      // Загружаем структуру групп только когда пользователь открывает селектор
+      if (!groupsStructure) {
+        setLoadingGroups(true);
+        try {
+          const groupsData = await api.getAvailableGroups(user?.institution_name || undefined);
+          setGroupsStructure(groupsData);
+          setShowGroupSelector(true);
+          resetSelection();
+        } catch (error) {
+          console.error('Ошибка загрузки структуры групп:', error);
+          alert('Ошибка загрузки структуры групп');
+        } finally {
+          setLoadingGroups(false);
+        }
+      } else {
+        setShowGroupSelector(true);
+        resetSelection();
+      }
     }
   };
 
@@ -297,16 +308,28 @@ function SettingsPage() {
               </CellList>
             )}
 
-            {showGroupSelector && groupsStructure && (
+            {showGroupSelector && (
               <CellList mode="island" header={
                 <CellHeader>
-                  {selectionStep === 'faculty' && 'Выберите факультет'}
-                  {selectionStep === 'format' && 'Выберите форму обучения'}
-                  {selectionStep === 'degree' && 'Выберите степень'}
-                  {selectionStep === 'course' && 'Выберите курс'}
-                  {selectionStep === 'group' && 'Выберите группу'}
+                  {loadingGroups ? 'Загрузка...' : (
+                    <>
+                      {selectionStep === 'faculty' && 'Выберите факультет'}
+                      {selectionStep === 'format' && 'Выберите форму обучения'}
+                      {selectionStep === 'degree' && 'Выберите степень'}
+                      {selectionStep === 'course' && 'Выберите курс'}
+                      {selectionStep === 'group' && 'Выберите группу'}
+                    </>
+                  )}
                 </CellHeader>
               }>
+                {loadingGroups ? (
+                  <CellSimple style={{ padding: '16px' }}>
+                    <Typography.Body variant="small" style={{ color: 'var(--text-secondary)' }}>
+                      Загрузка структуры групп...
+                    </Typography.Body>
+                  </CellSimple>
+                ) : groupsStructure ? (
+                  <>
                 {selectionStep === 'faculty' && (
                   <>
                     {(() => {
@@ -657,6 +680,8 @@ function SettingsPage() {
                     </Flex>
                   </>
                 )}
+                  </>
+                ) : null}
               </CellList>
             )}
 

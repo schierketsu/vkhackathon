@@ -293,115 +293,118 @@ function CompanyDetailPage() {
 
                 {/* Информация о компании */}
                 {company && (
-                  <>
-                    <Flex direction="column" gap={8} style={{ flex: 1, minWidth: 0 }}>
-                      <Typography.Title style={{
-                        fontSize: 22,
-                        fontWeight: 700,
-                        color: '#000000',
-                        margin: 0,
-                        lineHeight: 1.2,
-                      }}>
-                        {company.name}
-                      </Typography.Title>
-                      
-                      {/* Рейтинг и локация */}
-                      <Flex direction="column" gap={6}>
-                        {/* Рейтинг */}
+                  <Flex direction="column" gap={8} style={{ flex: 1, minWidth: 0 }}>
+                    <Typography.Title style={{
+                      fontSize: 22,
+                      fontWeight: 700,
+                      color: '#000000',
+                      margin: 0,
+                      lineHeight: 1.2,
+                    }}>
+                      {company.name}
+                    </Typography.Title>
+                    
+                    {/* Рейтинг и локация */}
+                    <Flex direction="column" gap={6}>
+                      {/* Рейтинг */}
+                      <Flex gap={6} align="center">
+                        <img 
+                          src="/star.png" 
+                          alt="⭐" 
+                          style={{
+                            width: 16,
+                            height: 16,
+                            objectFit: 'contain',
+                          }}
+                        />
+                        <Typography.Body variant="medium" style={{
+                          fontSize: 15,
+                          color: '#000000',
+                          fontWeight: 600,
+                        }}>
+                          {(company.rating ?? 0).toFixed(2)}
+                        </Typography.Body>
+                      </Flex>
+
+                      {/* Локация */}
+                      {company.location && (
                         <Flex gap={6} align="center">
                           <img 
-                            src="/star.png" 
-                            alt="⭐" 
+                            src="/placeholder2.png" 
+                            alt="📍" 
                             style={{
-                              width: 16,
-                              height: 16,
+                              width: 14,
+                              height: 14,
                               objectFit: 'contain',
                             }}
                           />
-                          <Typography.Body variant="medium" style={{
-                            fontSize: 15,
-                            color: '#000000',
-                            fontWeight: 600,
+                          <Typography.Body variant="small" style={{
+                            fontSize: 14,
+                            color: '#666666',
                           }}>
-                            {(company.rating ?? 0).toFixed(2)}
+                            {company.location}
                           </Typography.Body>
                         </Flex>
-
-                        {/* Локация */}
-                        {company.location && (
-                          <Flex gap={6} align="center">
-                            <img 
-                              src="/placeholder2.png" 
-                              alt="📍" 
-                              style={{
-                                width: 14,
-                                height: 14,
-                                objectFit: 'contain',
-                              }}
-                            />
-                            <Typography.Body variant="small" style={{
-                              fontSize: 14,
-                              color: '#666666',
-                            }}>
-                              {company.location}
-                            </Typography.Body>
-                          </Flex>
-                        )}
-                      </Flex>
+                      )}
                     </Flex>
+                  </Flex>
+                )}
+              </Flex>
 
-                    {/* Разделитель */}
-                    <div style={{
-                      height: 1,
-                      backgroundColor: '#E5E5E5',
-                      width: '100%',
-                    }} />
+              {/* Разделитель */}
+              {company && (
+                <div style={{
+                  height: 1,
+                  backgroundColor: '#E5E5E5',
+                  width: '100%',
+                }} />
+              )}
 
-                    {/* Описание */}
-                    {company.description && (
-                      <div>
-                        <Typography.Body variant="medium" style={{
-                          fontSize: 15,
-                          color: '#000000',
-                          fontWeight: 600,
-                          marginBottom: 10,
-                          display: 'block',
-                        }}>
-                          О нас:
-                        </Typography.Body>
-                        <Typography.Body variant="small" style={{
-                          fontSize: 14,
-                          color: '#666666',
-                          lineHeight: 1.6,
-                          display: 'block',
-                          marginTop: 4,
-                        }}>
-                          {company.description}
-                        </Typography.Body>
-                      </div>
-                    )}
+              {/* Описание */}
+              {company && company.description && (
+                <div>
+                  <Typography.Body variant="medium" style={{
+                    fontSize: 15,
+                    color: '#000000',
+                    fontWeight: 600,
+                    marginBottom: 10,
+                    display: 'block',
+                  }}>
+                    О нас:
+                  </Typography.Body>
+                  <Typography.Body variant="small" style={{
+                    fontSize: 14,
+                    color: '#666666',
+                    lineHeight: 1.6,
+                    display: 'block',
+                    marginTop: 4,
+                  }}>
+                    {company.description}
+                  </Typography.Body>
+                </div>
+              )}
 
-                    {/* Теги */}
-                    {company.tags && company.tags.length > 0 && (
-                      <div>
-                        <Typography.Body variant="medium" style={{
-                          fontSize: 15,
-                          color: '#000000',
-                          fontWeight: 600,
-                          marginBottom: 10,
-                        }}>
-                          Направления
-                        </Typography.Body>
-                        <Flex gap={6} wrap="wrap" style={{ marginTop: 12 }}>
-                          {company.tags.map((tag, idx) => (
-                            <div
-                              key={idx}
-                              style={{
-                                padding: '6px 12px',
-                                borderRadius: 6,
-                                backgroundColor: '#E8F4FD',
-                              }}
-                            >
+              {/* Теги */}
+              {company && company.tags && company.tags.length > 0 && (
+                <div>
+                  <Typography.Body variant="medium" style={{
+                    fontSize: 15,
+                    color: '#000000',
+                    fontWeight: 600,
+                    marginBottom: 10,
+                  }}>
+                    Направления
+                  </Typography.Body>
+                  <Flex gap={6} wrap="wrap" style={{ marginTop: 12 }}>
+                    {company.tags.map((tag, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: '6px 12px',
+                          borderRadius: 6,
+                          backgroundColor: '#E8F4FD',
+                        }}
+                      >
                         <Typography.Body variant="small" style={{
                           fontSize: 13,
                           color: '#2980F2',
@@ -409,14 +412,11 @@ function CompanyDetailPage() {
                         }}>
                           {tag}
                         </Typography.Body>
-                            </div>
-                          ))}
-                        </Flex>
                       </div>
-                    )}
-                  </>
-                )}
-              </Flex>
+                    ))}
+                  </Flex>
+                </div>
+              )}
 
               {/* Кнопка подачи заявки */}
               <Button

@@ -95,7 +95,7 @@ npm run dev
 
 **В третьем терминале:**
 ```bash
-cd miniapp
+cd
 npm run dev
 ```
 
