@@ -15,6 +15,7 @@ html {
 
 body {
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height для мобильных браузеров */
   width: 100vw;
   margin: 0;
   padding: 0;
@@ -29,6 +30,7 @@ body {
 
 #root {
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height для мобильных браузеров */
   width: 100vw;
   display: flex;
   flex-direction: column;
@@ -76,6 +78,16 @@ button,
 [role="button"],
 [class*="Button"] {
   border-radius: 12px !important;
+}
+
+/* Fallback для 100dvh для старых браузеров */
+@supports not (height: 100dvh) {
+  body {
+    height: 100vh;
+  }
+  #root {
+    height: 100vh;
+  }
 }
 
 /* Скрытие scrollbar для горизонтальной прокрутки дат */

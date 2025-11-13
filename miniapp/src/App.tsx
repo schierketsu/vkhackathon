@@ -94,15 +94,13 @@ function AppContent() {
   }
 
   return (
-    <Panel mode="secondary" style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', backgroundColor: '#F5F5F5', margin: 0, padding: 0 }}>
-      <Header />
+    <Panel mode="secondary" style={{ height: '100dvh', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', backgroundColor: '#F5F5F5', margin: 0, padding: 0 }}>
       <div style={{ 
         flex: 1, 
         display: 'flex', 
         flexDirection: 'column', 
         margin: 0, 
         padding: 0, 
-        paddingTop: 'var(--header-height-mobile, calc(56px + env(safe-area-inset-top, 0px)))',
         paddingBottom: showBottomNav ? 'var(--bottom-nav-height-mobile, calc(90px + env(safe-area-inset-bottom, 0px)))' : '0',
         overflowY: 'auto',
         overflowX: 'hidden',
@@ -114,6 +112,7 @@ function AppContent() {
         boxSizing: 'border-box',
         zIndex: 0
       }}>
+        <Header />
         <Routes>
           <Route path="/" element={<ProtectedRoute needsSetup={needsSetup || false}><MainMenu /></ProtectedRoute>} />
           <Route path="/schedule" element={<ProtectedRoute needsSetup={needsSetup || false}><SchedulePage /></ProtectedRoute>} />
