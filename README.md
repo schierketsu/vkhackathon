@@ -57,3 +57,81 @@ docker-compose down
 **Доступ:**
 - API сервер: `http://localhost:3002/api`
 - Мини-приложение: `http://localhost:3000`
+
+## Описание Docker-образов
+
+Проект использует Docker для контейнеризации и состоит из трех основных сервисов, которые можно запустить как отдельно, так и вместе через `docker-compose`.
+
+### Структура Docker-образов
+
+#### 1. **API Server** (`Dockerfile`)
+- **Базовый образ:** `node:20-alpine`
+- **Архитектура:** Многоэтапная сборка (builder + production)
+- **Назначение:** Backend API сервер для мини-приложения
+- **Порт:** 3002
+- **Особенности:**
+  - Собирает TypeScript код для API сервера, чат-бота и мини-приложения
+  - Использует только production зависимости в финальном образе
+  - Требует системные зависимости (python3, make, g++) для сборки `better-sqlite3`
+  - Монтирует `data/` и `config.json` как volumes
+- **Переменные окружения:**
+  - `NODE_ENV=production`
+  - `PORT=3002`
+  - `DB_PATH=/app/data/campus.db`
+  - `QWEN_API_TOKEN` (опционально)
+
+#### 2. **Chatbot** (`Dockerfile.chatbot`)
+- **Базовый образ:** `node:20-alpine`
+- **Назначение:** Чат-бот для VK MAX
+- **Особенности:**
+  - Отдельный сервис, работающий независимо от API
+  - Компилирует TypeScript код чат-бота
+  - Ищет `config.json` на 3 уровня выше от `dist/bot.js`
+  - Монтирует `data/` и `config.json` как volumes
+- **Переменные окружения:**
+  - `NODE_ENV=production`
+  - `BOT_TOKEN` (токен VK бота)
+  - `API_URL=http://api-server:3002/api` (URL для обращения к API серверу)
+
+#### 3. **Miniapp** (`Dockerfile.miniapp`)
+- **Базовый образ:** `node:20-alpine` (builder) + `nginx:alpine` (production)
+- **Архитектура:** Многоэтапная сборка
+- **Назначение:** Frontend мини-приложение
+- **Порт:** 80 (внутри контейнера), маппится на 3000 хоста
+- **Особенности:**
+  - Собирает React/Vite приложение на этапе builder
+  - Использует nginx для раздачи статических файлов
+  - Использует кастомную конфигурацию nginx из `nginx.conf`
+  - Не требует volumes, так как все файлы копируются в образ
+
+### Docker Compose
+
+`docker-compose.yml` оркестрирует все три сервиса:
+
+- **api-server** — основной API сервер
+- **chatbot** — чат-бот (зависит от api-server)
+- **miniapp** — фронтенд приложение (зависит от api-server)
+
+Все сервисы работают в одной сети `campus-network` и могут общаться друг с другом по именам сервисов.
+
+### Переменные окружения
+
+Перед запуском через Docker Compose убедитесь, что установлены следующие переменные окружения (можно через `.env` файл или экспорт):
+
+- `BOT_TOKEN` — токен VK бота
+- `QWEN_API_TOKEN` — токен для Qwen API (опционально)
+
+### Сборка отдельных образов
+
+Если нужно собрать образы отдельно:
+
+```bash
+# API Server
+docker build -f Dockerfile -t campus-api-server .
+
+# Chatbot
+docker build -f Dockerfile.chatbot -t campus-chatbot .
+
+# Miniapp
+docker build -f Dockerfile.miniapp -t campus-miniapp .
+```
