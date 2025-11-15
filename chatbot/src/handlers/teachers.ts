@@ -12,12 +12,212 @@ import {
 } from '../utils/teachers';
 import { getTeachersMenu, getTeacherScheduleMenu, getTeacherSearchMenu } from '../utils/menu';
 import { getMainMenu } from '../utils/menu';
+import { setUserState, getUser } from '../utils/users';
 
 export function setupTeachersHandlers(bot: any) {
+  // Команда поиска преподавателя - обрабатывается напрямую в message_created
+  // (аналогично модулю поддержки)
+  bot.on('message_created', async (ctx: Context, next: () => Promise<void>) => {
+    try {
+      if (!ctx.user || !ctx.message) {
+        return next();
+      }
+
+      const userId = ctx.user.user_id.toString();
+      const user = getUser(userId);
+      const messageText = ctx.message.body.text;
+
+      // Пропускаем, если нет текста или это не команда /поиск
+      if (!messageText || !messageText.startsWith('/поиск')) {
+        return next();
+      }
+
+      console.log('🔍 [Teachers] Команда /поиск обнаружена в message_created');
+      console.log('📝 [Teachers] Полный текст:', messageText);
+
+      // Извлекаем запрос из команды
+      const query = messageText.replace(/^\/поиск\s*/, '').trim();
+
+      console.log('🔎 [Teachers] Извлеченный запрос:', query);
+
+      // Если параметры не указаны, переводим в интерактивный режим
+      if (!query) {
+        setUserState(userId, 'waiting_teacher_search');
+        await ctx.reply(
+          '🔍 Поиск преподавателя\n\nВведите имя или фамилию преподавателя для поиска.\n\nПримеры:\n• Иванов\n• Ржавин\n• Петрова',
+          {
+            attachments: [Keyboard.inlineKeyboard([
+              [Keyboard.button.callback('❌ Отмена', 'menu:teachers')]
+            ])]
+          }
+        );
+        return; // Не вызываем next(), чтобы команда не обрабатывалась дальше
+      }
+
+      // Если параметры указаны, выполняем поиск сразу
+      const allTeachers = getAllTeachers();
+      console.log('📊 [Teachers] Всего преподавателей в базе:', allTeachers.length);
+
+      const results = searchTeachers(query);
+      console.log('✅ [Teachers] Найдено преподавателей:', results.length);
+
+      if (results.length === 0) {
+        await ctx.reply(
+          `❌ Преподаватели по запросу "${query}" не найдены.\n\n` +
+          `Попробуйте ввести фамилию преподавателя, например:\n` +
+          `• Иванов\n` +
+          `• Андреева`,
+          { attachments: [getTeacherSearchMenu()] }
+        );
+        return; // Не вызываем next()
+      }
+
+      // Если найден один преподаватель, показываем его расписание
+      if (results.length === 1) {
+        const teacherName = results[0];
+        const today = new Date();
+        const schedule = getTeacherScheduleForDate(teacherName, today);
+        const text = formatTeacherSchedule(schedule);
+        const favorite = isFavoriteTeacher(userId, teacherName);
+
+        await ctx.reply(`👨‍🏫 ${teacherName}\n\n${text}`, {
+          attachments: [getTeacherScheduleMenu(teacherName, favorite)]
+        });
+        return; // Не вызываем next()
+      }
+
+      // Если найдено несколько, показываем список
+      let replyText = `🔍 Найдено преподавателей: ${results.length}\n\n`;
+      const buttons: any[][] = [];
+
+      const displayResults = results.slice(0, 20);
+      for (let i = 0; i < displayResults.length; i += 2) {
+        const row = displayResults.slice(i, i + 2).map(teacher =>
+          Keyboard.button.callback(teacher, `teacher:${encodeURIComponent(teacher)}`)
+        );
+        buttons.push(row);
+      }
+
+      if (results.length > 20) {
+        replyText += `Показано первых 20 результатов. Уточните запрос.\n\n`;
+      }
+
+      buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:teachers')]);
+
+      await ctx.reply(replyText, {
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      });
+      return; // Не вызываем next()
+    } catch (error) {
+      console.error('[Teachers] Ошибка в обработчике поиска:', error);
+      // В случае ошибки передаем управление дальше
+      return next();
+    }
+  });
+
+  // Обработка интерактивного поиска (когда user_state === 'waiting_teacher_search')
+  bot.on('message_created', async (ctx: Context, next: () => Promise<void>) => {
+    try {
+      if (!ctx.user || !ctx.message) {
+        return next();
+      }
+
+      const userId = ctx.user.user_id.toString();
+      const user = getUser(userId);
+      const messageText = ctx.message.body.text;
+
+      // Пропускаем команды
+      if (!messageText || messageText.startsWith('/')) {
+        return next();
+      }
+
+      // Проверяем состояние ожидания поиска преподавателя
+      if (!user || user.user_state !== 'waiting_teacher_search') {
+        return next();
+      }
+
+      console.log('🔍 [Teachers] Интерактивный поиск для пользователя:', userId);
+      console.log('📝 [Teachers] Запрос:', messageText);
+
+      const query = messageText.trim();
+
+      if (!query) {
+        await ctx.reply(
+          '❌ Пустой запрос. Введите имя или фамилию преподавателя для поиска.\n\n' +
+          'Примеры:\n• Иванов\n• Ржавин\n• Петрова',
+          {
+            attachments: [Keyboard.inlineKeyboard([
+              [Keyboard.button.callback('❌ Отмена', 'menu:teachers')]
+            ])]
+          }
+        );
+        return;
+      }
+
+      const allTeachers = getAllTeachers();
+      const results = searchTeachers(query);
+
+      setUserState(userId, null);
+
+      if (results.length === 0) {
+        await ctx.reply(
+          `❌ Преподаватели по запросу "${query}" не найдены.\n\n` +
+          `Попробуйте ввести фамилию преподавателя, например:\n` +
+          `• Иванов\n` +
+          `• Андреева`,
+          { attachments: [getTeacherSearchMenu()] }
+        );
+        return;
+      }
+
+      // Если найден один преподаватель, показываем его расписание
+      if (results.length === 1) {
+        const teacherName = results[0];
+        const today = new Date();
+        const schedule = getTeacherScheduleForDate(teacherName, today);
+        const text = formatTeacherSchedule(schedule);
+        const favorite = isFavoriteTeacher(userId, teacherName);
+
+        await ctx.reply(`👨‍🏫 ${teacherName}\n\n${text}`, {
+          attachments: [getTeacherScheduleMenu(teacherName, favorite)]
+        });
+        return;
+      }
+
+      // Если найдено несколько, показываем список
+      let replyText = `🔍 Найдено преподавателей: ${results.length}\n\n`;
+      const buttons: any[][] = [];
+
+      const displayResults = results.slice(0, 20);
+      for (let i = 0; i < displayResults.length; i += 2) {
+        const row = displayResults.slice(i, i + 2).map(teacher =>
+          Keyboard.button.callback(teacher, `teacher:${encodeURIComponent(teacher)}`)
+        );
+        buttons.push(row);
+      }
+
+      if (results.length > 20) {
+        replyText += `Показано первых 20 результатов. Уточните запрос.\n\n`;
+      }
+
+      buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:teachers')]);
+
+      await ctx.reply(replyText, {
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      });
+      return;
+    } catch (error) {
+      console.error('[Teachers] Ошибка в обработчике интерактивного поиска:', error);
+      return next();
+    }
+  });
   // Главное меню преподавателей
   bot.action('menu:teachers', async (ctx: Context) => {
     if (!ctx.user) return;
     const userId = ctx.user.user_id.toString();
+    
+    // Сбрасываем состояние при открытии меню
+    setUserState(userId, null);
     
     const favorites = getFavoriteTeachers(userId);
     const allTeachers = getAllTeachers();
@@ -39,10 +239,18 @@ export function setupTeachersHandlers(bot: any) {
 
   // Поиск преподавателей
   bot.action('menu:teachers_search', async (ctx: Context) => {
+    if (!ctx.user) return;
+    const userId = ctx.user.user_id.toString();
+    
+    // Устанавливаем состояние ожидания ввода имени преподавателя
+    setUserState(userId, 'waiting_teacher_search');
+    
     await ctx.answerOnCallback({
       message: {
-        text: '🔍 Поиск преподавателя\n\nВведите имя преподавателя для поиска:\n\nИспользуйте команду:\n/поиск <имя>\n\nПример:\n/поиск Иванов',
-        attachments: [getTeacherSearchMenu()]
+        text: '🔍 Поиск преподавателя\n\nВведите имя или фамилию преподавателя для поиска.\n\nПримеры:\n• Иванов\n• Ржавин\n• Петрова',
+        attachments: [Keyboard.inlineKeyboard([
+          [Keyboard.button.callback('❌ Отмена', 'menu:teachers')]
+        ])]
       }
     });
   });

@@ -46,6 +46,7 @@ export function setupProfileHandlers(bot: any) {
     text += `\n⚙️ Настройки:\n`;
     text += `🔔 Уведомления: ${user.notifications_enabled ? '✅ Включены' : '❌ Выключены'}\n`;
     text += `📢 Подписка на мероприятия: ${user.events_subscribed ? '✅ Включена' : '❌ Выключена'}\n`;
+    text += `⏰ Будильник к первой паре: ${user.morning_alarm_enabled !== 0 ? '✅ Включен' : '❌ Выключен'}\n`;
 
     await ctx.answerOnCallback({
       message: {
@@ -57,5 +58,7 @@ export function setupProfileHandlers(bot: any) {
       }
     });
   });
+  
+  // Обработчик "Будильник к первой паре" перенесен в handlers/menu.ts
 }
 

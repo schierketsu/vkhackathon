@@ -14,7 +14,7 @@ import {
 } from '../utils/timetable';
 import { getUpcomingEvents, formatEvents } from '../utils/events';
 import { getActiveDeadlines, formatDeadlines } from '../utils/deadlines';
-import { getUser, toggleNotifications, toggleEventsSubscription, updateUserGroup, updateUserSubgroup, updateUserInstitution } from '../utils/users';
+import { getUser, toggleNotifications, toggleEventsSubscription, updateUserGroup, updateUserSubgroup, updateUserInstitution, setUserState, toggleMorningAlarm } from '../utils/users';
 import { getConfig } from '../utils/config';
 import { getMainMenu, getSettingsMenu, getScheduleMenu, getScheduleMainMenu, getDeadlinesMenu, getEventsMenu } from '../utils/menu';
 import { formatFacultyName } from '../utils/formatters';
@@ -269,6 +269,9 @@ export function setupMenuHandlers(bot: any) {
       return;
     }
     
+    // Сбрасываем состояние при открытии меню
+    setUserState(userId, null);
+    
     const deadlines = getActiveDeadlines(userId);
     const text = formatDeadlines(deadlines);
     
@@ -512,6 +515,33 @@ export function setupMenuHandlers(bot: any) {
     });
   });
 
+  // Будильник к первой паре
+  bot.action('menu:toggle_morning_alarm', async (ctx: Context) => {
+    if (!ctx.user) return;
+    const userId = ctx.user.user_id.toString();
+    const user = getUser(userId);
+    
+    if (!user) {
+      await ctx.answerOnCallback({
+        message: {
+          text: '❌ Ошибка получения данных пользователя.',
+          attachments: [getSettingsMenu()]
+        }
+      });
+      return;
+    }
+    
+    const currentState = user.morning_alarm_enabled !== 0;
+    toggleMorningAlarm(userId, !currentState);
+    
+    await ctx.answerOnCallback({
+      message: {
+        text: `⏰ Будильник к первой паре ${!currentState ? '✅ включен' : '❌ выключен'}.\n\nВы будете получать уведомления за 15 и 5 минут до первой пары.`,
+        attachments: [getSettingsMenu()]
+      }
+    });
+  });
+
   // Подписка на события
   bot.action('menu:events_subscribe', async (ctx: Context) => {
     if (!ctx.user) return;
@@ -577,41 +607,36 @@ export function setupMenuHandlers(bot: any) {
     });
   });
 
-  // Добавить дедлайн
-  bot.action('menu:add_deadline', async (ctx: Context) => {
-    await ctx.answerOnCallback({
-      message: {
-        text: '➕ Добавление дедлайна\n\nИспользуйте команду:\n/новыйдедлайн <название> <дата>\n\nПример:\n/новыйдедлайн РГР по ТРПО 20.11.2024',
-        attachments: [getDeadlinesMenu()]
-      }
-    });
-  });
+  // Обработчик "Добавить дедлайн" перенесен в handlers/deadlines.ts
 
   // Помощь
   bot.action('menu:help', async (ctx: Context) => {
-    const helpText = `📚 Доступные команды:\n\n` +
-      `📅 Расписание:\n` +
-      `  /сегодня — пары на сегодня\n` +
-      `  /завтра — пары на завтра\n` +
-      `  /неделя — расписание недели\n` +
-      `  /группа — выбрать группу\n` +
-      `  /подгруппа — выбрать подгруппу\n\n` +
-      `👨‍🏫 Преподаватели:\n` +
-      `  /поиск <имя> — поиск преподавателя\n\n` +
-      `🎉 Мероприятия:\n` +
-      `  /мероприятия — ближайшие мероприятия\n` +
-      `  /подписка — подписка на уведомления\n\n` +
-      `⏰ Дедлайны:\n` +
-      `  /дедлайны — список активных дедлайнов\n` +
-      `  /новыйдедлайн <название> <дата> — добавить дедлайн\n` +
-      `  /уведомления — настройки уведомлений\n\n` +
-      `Пример добавления дедлайна:\n` +
-      `  /новыйдедлайн РГР по ТРПО 20.11.2024\n\n` +
-      `💡 Совет: Используйте кнопки меню для быстрого доступа!`;
+    const helpText = `📚 **Справка по командам**\n\n` +
+      `━━━━━━━━━━━━━━━━━━\n\n` +
+      `📅 **Расписание:**\n` +
+      `  \`/сегодня\` — пары на сегодня\n` +
+      `  \`/завтра\` — пары на завтра\n` +
+      `  \`/неделя\` — расписание недели\n` +
+      `  \`/группа\` — выбрать группу\n` +
+      `  \`/подгруппа\` — выбрать подгруппу\n\n` +
+      `👨‍🏫 **Преподаватели:**\n` +
+      `  \`/поиск <имя>\` — поиск преподавателя\n\n` +
+      `🎉 **Мероприятия:**\n` +
+      `  \`/мероприятия\` — ближайшие мероприятия\n` +
+      `  \`/подписка\` — подписка на уведомления\n\n` +
+      `⏰ **Дедлайны:**\n` +
+      `  \`/дедлайны\` — список активных дедлайнов\n` +
+      `  \`/новыйдедлайн <название> <дата>\` — добавить дедлайн\n` +
+      `  \`/уведомления\` — настройки уведомлений\n\n` +
+      `━━━━━━━━━━━━━━━━━━\n\n` +
+      `💡 *Пример:*\n` +
+      `\`/новыйдедлайн РГР по ТРПО 20.11.2024\`\n\n` +
+      `💡 *Совет:* Используй кнопки меню для быстрого доступа!`;
     
     await ctx.answerOnCallback({
       message: {
         text: helpText,
+        format: 'markdown',
         attachments: [getMainMenu()]
       }
     });

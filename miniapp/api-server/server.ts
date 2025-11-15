@@ -768,9 +768,46 @@ app.post('/api/support/chat', async (req, res) => {
   }
 });
 
+// Max Bridge: эндпоинты для получения данных от бота
+app.post('/api/bridge/deadlines', (req, res) => {
+  try {
+    const { userId, deadlines } = req.body;
+    
+    if (!userId || !Array.isArray(deadlines)) {
+      return res.status(400).json({ error: 'Неверный формат данных' });
+    }
+    
+    // Здесь можно обновить дедлайны в базе данных мини-приложения
+    // или просто залогировать синхронизацию
+    console.log(`🌉 Max Bridge: Синхронизация дедлайнов для пользователя ${userId}, получено ${deadlines.length} дедлайнов`);
+    
+    res.json({ success: true, synced: deadlines.length });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/bridge/user-settings', (req, res) => {
+  try {
+    const { userId, settings } = req.body;
+    
+    if (!userId || !settings) {
+      return res.status(400).json({ error: 'Неверный формат данных' });
+    }
+    
+    // Здесь можно обновить настройки пользователя в базе данных мини-приложения
+    console.log(`🌉 Max Bridge: Синхронизация настроек для пользователя ${userId}`);
+    
+    res.json({ success: true });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🌐 API сервер запущен на порту ${PORT}`);
   console.log(`📡 API доступен по адресу: http://localhost:${PORT}/api`);
+  console.log(`🌉 Max Bridge эндпоинты готовы к работе`);
   if (dbPath) {
     console.log(`🗄️ База данных: ${dbPath}`);
   }

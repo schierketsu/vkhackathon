@@ -40,6 +40,20 @@ export function initDatabase() {
     // Колонка уже существует, игнорируем
   }
 
+  // Добавляем поле user_state для отслеживания состояний пользователя
+  try {
+    db.exec('ALTER TABLE users ADD COLUMN user_state TEXT');
+  } catch (e) {
+    // Колонка уже существует, игнорируем
+  }
+
+  // Добавляем поле morning_alarm_enabled для будильника к первой паре
+  try {
+    db.exec('ALTER TABLE users ADD COLUMN morning_alarm_enabled INTEGER DEFAULT 1');
+  } catch (e) {
+    // Колонка уже существует, игнорируем
+  }
+
   // Таблица дедлайнов
   db.exec(`
     CREATE TABLE IF NOT EXISTS deadlines (

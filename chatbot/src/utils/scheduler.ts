@@ -1,6 +1,6 @@
 import * as cron from 'node-cron';
 import { getConfig } from './config';
-import { getUser } from './users';
+import { getUser, toggleMorningAlarm } from './users';
 import { getTodaySchedule, getTomorrowSchedule, formatSchedule } from './timetable';
 import { getUpcomingEvents, formatEvents } from './events';
 import { getUpcomingDeadlines, markDeadlineNotified, formatDeadlines, getUserDeadlines } from './deadlines';
@@ -43,6 +43,11 @@ export function startScheduler() {
   cron.schedule('0 */6 * * *', async () => {
     console.log('⏰ Проверка дедлайнов...');
     await checkDeadlines();
+  });
+  
+  // Проверка будильников к первой паре каждые 5 минут
+  cron.schedule('*/5 * * * *', async () => {
+    await checkMorningAlarms();
   });
   
   console.log('✅ Планировщик уведомлений запущен');
@@ -190,5 +195,115 @@ function parseDate(dateStr: string): Date {
   const month = parseInt(parts[1]) - 1;
   const year = parseInt(parts[2]);
   return new Date(year, month, day);
+}
+
+// Получить время начала первой пары из расписания
+function getFirstLessonTime(schedule: any): Date | null {
+  if (!schedule || !schedule.lessons || schedule.lessons.length === 0) {
+    return null;
+  }
+  
+  // Сортируем пары по времени начала
+  const sortedLessons = [...schedule.lessons].sort((a, b) => {
+    const timeA = a.time.split(/[–-]/)[0].trim();
+    const timeB = b.time.split(/[–-]/)[0].trim();
+    return timeA.localeCompare(timeB);
+  });
+  
+  const firstLesson = sortedLessons[0];
+  if (!firstLesson || !firstLesson.time) {
+    return null;
+  }
+  
+  // Извлекаем время начала (формат "08:00–09:35" или "08:00-09:35")
+  const timeMatch = firstLesson.time.match(/^(\d{1,2}):(\d{2})/);
+  if (!timeMatch) {
+    return null;
+  }
+  
+  const hours = parseInt(timeMatch[1]);
+  const minutes = parseInt(timeMatch[2]);
+  
+  // Создаем дату на сегодня с временем начала первой пары
+  const today = new Date();
+  today.setHours(hours, minutes, 0, 0);
+  
+  return today;
+}
+
+// Проверка и отправка будильников к первой паре
+async function checkMorningAlarms() {
+  if (!botApi) return;
+  
+  // Получаем пользователей с включенным будильником к первой паре
+  const stmt = database.prepare('SELECT * FROM users WHERE morning_alarm_enabled = 1 AND notifications_enabled = 1 AND group_name IS NOT NULL');
+  const users = stmt.all() as any[];
+  
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  
+  // Проверяем только в рабочее время (5:00 - 15:00)
+  if (currentMinutes < 5 * 60 || currentMinutes > 15 * 60) {
+    return;
+  }
+  
+  for (const user of users) {
+    try {
+      const schedule = getTodaySchedule(user.group_name, user.subgroup);
+      if (!schedule || schedule.lessons.length === 0) {
+        continue;
+      }
+      
+      const firstLessonTime = getFirstLessonTime(schedule);
+      if (!firstLessonTime) {
+        continue;
+      }
+      
+      // Вычисляем разницу во времени в минутах
+      const diffMinutes = Math.floor((firstLessonTime.getTime() - now.getTime()) / (1000 * 60));
+      
+      // Отправляем уведомление за 15 минут до первой пары
+      if (diffMinutes === 15) {
+        const firstLesson = schedule.lessons.sort((a: any, b: any) => {
+          const timeA = a.time.split(/[–-]/)[0].trim();
+          const timeB = b.time.split(/[–-]/)[0].trim();
+          return timeA.localeCompare(timeB);
+        })[0];
+        
+        let message = `⏰ Будильник! Первая пара через 15 минут!\n\n`;
+        message += `${firstLesson.time} — ${firstLesson.subject}`;
+        if (firstLesson.room) {
+          message += `\n📍 Ауд. ${firstLesson.room}`;
+        }
+        if (firstLesson.teacher) {
+          message += `\n👤 ${firstLesson.teacher}`;
+        }
+        
+        await botApi.sendMessage(user.user_id, message);
+      }
+      
+      // Также отправляем уведомление за 5 минут до первой пары
+      if (diffMinutes === 5) {
+        const firstLesson = schedule.lessons.sort((a: any, b: any) => {
+          const timeA = a.time.split(/[–-]/)[0].trim();
+          const timeB = b.time.split(/[–-]/)[0].trim();
+          return timeA.localeCompare(timeB);
+        })[0];
+        
+        let message = `🚨 Время собираться! Первая пара через 5 минут!\n\n`;
+        message += `${firstLesson.time} — ${firstLesson.subject}`;
+        if (firstLesson.room) {
+          message += `\n📍 Ауд. ${firstLesson.room}`;
+        }
+        if (firstLesson.teacher) {
+          message += `\n👤 ${firstLesson.teacher}`;
+        }
+        
+        await botApi.sendMessage(user.user_id, message);
+      }
+    } catch (error) {
+      console.error(`Ошибка при проверке будильника для пользователя ${user.user_id}:`, error);
+    }
+  }
 }
 

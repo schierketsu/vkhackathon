@@ -9,6 +9,10 @@
     "morning_time": "08:00",
     "evening_time": "20:00",
     "deadline_reminder_hours": 24
+  },
+  "bridge": {
+    "enabled": true,
+    "miniapp_api_url": "http://localhost:3002"
   }
 }
 

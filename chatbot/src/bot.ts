@@ -11,13 +11,16 @@ import { setupPracticeHandlers } from './handlers/practice';
 import { setupSupportHandlers } from './handlers/support';
 import { setupProfileHandlers } from './handlers/profile';
 import { setupServicesHandlers } from './handlers/services';
-import { searchTeachers, getTeacherScheduleForDate, formatTeacherSchedule, isFavoriteTeacher, getAllTeachers, getTeacherWeekSchedule, getFavoriteTeachers, addFavoriteTeacher, removeFavoriteTeacher } from './utils/teachers';
-import { getTeacherSearchMenu, getTeachersMenu, getTeacherScheduleMenu, getMainMenu } from './utils/menu';
+import { getMainMenu } from './utils/menu';
 import { startScheduler, setBotApi } from './utils/scheduler';
-import { createUser, getUser, updateUserGroup, updateUserInstitution, toggleNotifications, toggleEventsSubscription } from './utils/users';
+import { initBridge, syncDeadlinesToMiniapp, syncUserSettingsToMiniapp } from './utils/max-bridge';
+import { createUser, getUser, updateUserGroup, updateUserInstitution, toggleNotifications, toggleEventsSubscription, setUserState } from './utils/users';
+import { addDeadline } from './utils/deadlines';
+import { getDeadlinesMenu } from './utils/menu';
 import { getTodaySchedule, getTomorrowSchedule, getCurrentWeekSchedule, getWeekScheduleFromDate, getWeekNumber, getGroupsStructure, getAvailableSubgroups, getAvailableInstitutions, formatSchedule } from './utils/timetable';
 import { getUpcomingEvents, formatEvents } from './utils/events';
-import { getActiveDeadlines, addDeadline, deleteDeadline } from './utils/deadlines';
+import { getActiveDeadlines, deleteDeadline } from './utils/deadlines';
+import { getConfig } from './utils/config';
 import 'dotenv/config';
 
 const BOT_TOKEN = process.env.BOT_TOKEN || 'f9LHodD0cOIt4K8Vo1cVPjs6fgvu-1qb-jPkrptyJK32kQ2mGItB-uyU0pChqMe3yY6pvDHctFo3VXFTjZOk';
@@ -39,6 +42,15 @@ setBotApi({
     }
   }
 });
+
+// Инициализация Max Bridge
+const bridgeConfig = getConfig();
+if (bridgeConfig.bridge) {
+  initBridge({
+    miniappApiUrl: bridgeConfig.bridge.miniapp_api_url || 'http://localhost:3002',
+    enabled: bridgeConfig.bridge.enabled !== false
+  });
+}
 
 bot.on('bot_started', async (ctx: Context) => {
   if (!ctx.user) return;
@@ -182,14 +194,21 @@ bot.command('start', async (ctx: Context) => {
     return;
   }
   
-  // Показываем краткую сводку на сегодня
-  let message = `👋 Привет, ${userName}!\n\n`;
+  // Показываем красивое приветствие с краткой сводкой
+  let message = `✨ **Добро пожаловать, ${userName}!** ✨\n\n`;
+  message += `🎓 Я твой помощник в учебе. Вот что я могу:\n\n`;
+  message += `📅 **Расписание занятий** — всегда актуальное\n`;
+  message += `🎉 **Календарь мероприятий** — не пропусти ничего\n`;
+  message += `⏰ **Уведомления о дедлайнах** — всё под контролем\n`;
+  message += `👨‍🏫 **Поиск преподавателей** — быстро и удобно\n\n`;
+  message += `━━━━━━━━━━━━━━━━━━\n\n`;
   
   // Расписание на сегодня
   const schedule = getTodaySchedule(dbUser.group_name, dbUser.subgroup);
   if (schedule && schedule.lessons.length > 0) {
-    message += '📅 Сегодня у тебя:\n\n';
+    message += `📅 **Сегодня у тебя:**\n\n`;
     message += formatSchedule(schedule) + '\n\n';
+    message += `━━━━━━━━━━━━━━━━━━\n\n`;
   }
   
   // События на сегодня
@@ -199,46 +218,53 @@ bot.command('start', async (ctx: Context) => {
   const todayEvents = events.filter(e => e.date === todayStr);
   
   if (todayEvents.length > 0) {
-    message += '🎉 События сегодня:\n';
+    message += `🎉 **События сегодня:**\n\n`;
     todayEvents.forEach(event => {
-      message += `• ${event.title}`;
+      message += `• *${event.title}*`;
       if (event.location) {
-        message += ` (${event.location})`;
+        message += ` — ${event.location}`;
       }
       message += '\n';
     });
-    message += '\n';
+    message += '\n━━━━━━━━━━━━━━━━━━\n\n';
   }
   
-  message += 'Используйте кнопки меню для навигации!';
+  message += `💡 Используй кнопки меню для быстрого доступа!`;
   
   await ctx.reply(message, {
+    format: 'markdown',
     attachments: [getMainMenu()]
   });
 });
 
+// Команда поиска преподавателя обрабатывается в bot.on('message_created')
+// для обеспечения правильной работы (аналогично модулю поддержки)
+
 bot.command('help', async (ctx: Context) => {
-  const helpText = `📚 Доступные команды:\n\n` +
-    `📅 Расписание:\n` +
-    `  /сегодня — пары на сегодня\n` +
-    `  /завтра — пары на завтра\n` +
-    `  /неделя — расписание недели\n` +
-    `  /группа — выбрать группу\n` +
-    `  /подгруппа — выбрать подгруппу\n\n` +
-    `👨‍🏫 Преподаватели:\n` +
-    `  /поиск <имя> — поиск преподавателя\n\n` +
-    `🎉 Мероприятия:\n` +
-    `  /мероприятия — ближайшие мероприятия\n` +
-    `  /подписка — подписка на уведомления\n\n` +
-    `⏰ Дедлайны:\n` +
-    `  /дедлайны — список активных дедлайнов\n` +
-    `  /новыйдедлайн <название> <дата> — добавить дедлайн\n` +
-    `  /уведомления — настройки уведомлений\n\n` +
-    `Пример добавления дедлайна:\n` +
-    `  /новыйдедлайн РГР по ТРПО 20.11.2024\n\n` +
-    `💡 Совет: Используйте кнопки меню для быстрого доступа!`;
+  const helpText = `📚 **Справка по командам**\n\n` +
+    `━━━━━━━━━━━━━━━━━━\n\n` +
+    `📅 **Расписание:**\n` +
+    `  \`/сегодня\` — пары на сегодня\n` +
+    `  \`/завтра\` — пары на завтра\n` +
+    `  \`/неделя\` — расписание недели\n` +
+    `  \`/группа\` — выбрать группу\n` +
+    `  \`/подгруппа\` — выбрать подгруппу\n\n` +
+    `👨‍🏫 **Преподаватели:**\n` +
+    `  \`/поиск <имя>\` — поиск преподавателя\n\n` +
+    `🎉 **Мероприятия:**\n` +
+    `  \`/мероприятия\` — ближайшие мероприятия\n` +
+    `  \`/подписка\` — подписка на уведомления\n\n` +
+    `⏰ **Дедлайны:**\n` +
+    `  \`/дедлайны\` — список активных дедлайнов\n` +
+    `  \`/новыйдедлайн <название> <дата>\` — добавить дедлайн\n` +
+    `  \`/уведомления\` — настройки уведомлений\n\n` +
+    `━━━━━━━━━━━━━━━━━━\n\n` +
+    `💡 *Пример:*\n` +
+    `\`/новыйдедлайн РГР по ТРПО 20.11.2024\`\n\n` +
+    `💡 *Совет:* Используй кнопки меню для быстрого доступа!`;
   
   await ctx.reply(helpText, {
+    format: 'markdown',
     attachments: [getMainMenu()]
   });
 });
@@ -249,105 +275,87 @@ bot.on('message_created', async (ctx: Context, next: () => Promise<void>) => {
       return next();
     }
     
-    // Обработка поиска преподавателя
-    // Получаем текст сообщения правильно для MAX API
+    const userId = ctx.user.user_id.toString();
+    const user = getUser(userId);
     const messageText = ctx.message.body.text;
+    
     if (!messageText) {
       return next();
     }
     
-    // Пропускаем команды - они обрабатываются через bot.command()
+    // Пропускаем команды - они обрабатываются через bot.command() или в других модулях
     if (messageText.startsWith('/')) {
       return next();
     }
     
-    // Проверяем, начинается ли сообщение с /поиск
-    // Но команды уже обрабатываются через bot.command, так что это не нужно
-    // Оставляем только для обратной совместимости
-    const isSearchCommand = messageText.startsWith('/поиск ');
-    if (!isSearchCommand) {
-      // Если это не команда поиска, передаем управление другим обработчикам
-      // (например, обработчику поддержки)
-      return next();
-    }
-    
-    console.log('🔍 Команда поиска преподавателя обнаружена');
-    console.log('📝 Текст сообщения:', messageText);
-    
-    // Извлекаем запрос
-    const parts = messageText.split(' ');
-    const query = parts.slice(1).join(' ').trim();
-    
-    console.log('🔎 Запрос для поиска:', query);
-    
-    if (!query) {
-      await ctx.reply(
-        '❌ Укажите имя преподавателя для поиска.\n\nПример: /поиск Иванов',
-        { attachments: [getTeacherSearchMenu()] }
-      );
-      return;
-    }
-
-    console.log('🔍 Начинаю поиск...');
-    const allTeachers = getAllTeachers();
-    console.log('📊 Всего преподавателей в базе:', allTeachers.length);
-    
-    const results = searchTeachers(query);
-    console.log('✅ Найдено преподавателей:', results.length);
-    if (results.length > 0) {
-      console.log('📋 Первые результаты:', results.slice(0, 3));
-    } else {
-      console.log('⚠️ Результаты поиска пусты');
-      console.log('🔍 Примеры преподавателей в базе:', allTeachers.slice(0, 5));
-    }
-    
-    if (results.length === 0) {
-      await ctx.reply(
-        `❌ Преподаватели по запросу "${query}" не найдены.\n\n` +
-        `Попробуйте ввести фамилию преподавателя, например:\n` +
-        `/поиск Иванов\n` +
-        `/поиск Андреева`,
-        { attachments: [getTeacherSearchMenu()] }
-      );
-      return;
-    }
-
-    // Если найден один преподаватель, показываем его расписание
-    if (results.length === 1) {
-      const teacherName = results[0];
-      const userId = (ctx.user as any)?.user_id?.toString() || '';
-      const today = new Date();
-      const schedule = getTeacherScheduleForDate(teacherName, today);
-      const text = formatTeacherSchedule(schedule);
-      const favorite = isFavoriteTeacher(userId, teacherName);
+    // Обработка состояний пользователя для создания дедлайнов
+    if (user && user.user_state === 'waiting_deadline') {
+      // Парсинг текста дедлайна
+      const datePattern = /\b(\d{1,2}\.\d{1,2}(?:\.\d{4})?)\b/;
+      const match = messageText.match(datePattern);
       
-      await ctx.reply(`👨‍🏫 ${teacherName}\n\n${text}`, {
-        attachments: [getTeacherScheduleMenu(teacherName, favorite)]
-      });
+      if (!match) {
+        await ctx.reply(
+          '❌ Не удалось распознать дату в вашем сообщении.\n\n' +
+          'Пожалуйста, укажите дату в формате DD.MM.YYYY или DD.MM\n\n' +
+          'Примеры:\n• РГР по ТРПО 20.11.2024\n• Курсовая работа 15.12.2024',
+          {
+            attachments: [Keyboard.inlineKeyboard([
+              [Keyboard.button.callback('❌ Отмена', 'menu:deadlines')]
+            ])]
+          }
+        );
+        return;
+      }
+      
+      let dateStr = match[1];
+      
+      // Если год не указан, добавляем текущий или следующий
+      if (!dateStr.includes('.2024') && !dateStr.includes('.2025') && !dateStr.includes('.2026')) {
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth() + 1;
+        const dateParts = dateStr.split('.');
+        const month = parseInt(dateParts[1]);
+        
+        if (month < currentMonth) {
+          dateStr = `${dateStr}.${currentYear + 1}`;
+        } else {
+          dateStr = `${dateStr}.${currentYear}`;
+        }
+      }
+      
+      const title = messageText.replace(datePattern, '').trim();
+      
+      if (!title) {
+        await ctx.reply(
+          '❌ Не удалось найти название дедлайна.\n\n' +
+          'Пожалуйста, укажите название и дату, например:\n• РГР по ТРПО 20.11.2024',
+          {
+            attachments: [Keyboard.inlineKeyboard([
+              [Keyboard.button.callback('❌ Отмена', 'menu:deadlines')]
+            ])]
+          }
+        );
+        return;
+      }
+      
+      try {
+        addDeadline(userId, title, dateStr);
+        setUserState(userId, null);
+        await ctx.reply(`✅ Дедлайн добавлен:\n\n"${title}" — ${dateStr}`, {
+          attachments: [getDeadlinesMenu()]
+        });
+      } catch (error) {
+        await ctx.reply('❌ Ошибка при добавлении дедлайна. Попробуйте еще раз.');
+      }
       return;
     }
-
-    // Если найдено несколько, показываем список
-    let replyText = `🔍 Найдено преподавателей: ${results.length}\n\n`;
-    const buttons: any[][] = [];
     
-    const displayResults = results.slice(0, 20);
-    for (let i = 0; i < displayResults.length; i += 2) {
-      const row = displayResults.slice(i, i + 2).map(teacher =>
-        Keyboard.button.callback(teacher, `teacher:${encodeURIComponent(teacher)}`)
-      );
-      buttons.push(row);
-    }
+    // Обработка состояний пользователя для поиска преподавателей
+    // перенесена в handlers/teachers.ts (аналогично модулю поддержки)
     
-    if (results.length > 20) {
-      replyText += `Показано первых 20 результатов. Уточните запрос.\n\n`;
-    }
-    
-    buttons.push([Keyboard.button.callback('◀️ Назад', 'menu:teachers')]);
-    
-    await ctx.reply(replyText, {
-      attachments: [Keyboard.inlineKeyboard(buttons)]
-    });
+    // Команды обрабатываются через bot.command() или в других модулях, передаем управление дальше
+    return next();
   } catch (error) {
     console.error('Ошибка в обработчике сообщений:', error);
     // В случае ошибки передаем управление дальше

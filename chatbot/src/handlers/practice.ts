@@ -80,7 +80,7 @@ export function setupPracticeHandlers(bot: any) {
     });
   });
 
-  // Выбор факультета - показываем компании
+  // Выбор факультета - показываем компании с фильтром по стекам
   bot.action(/practice:faculty:(.+):(.+)/, async (ctx: Context) => {
     if (!ctx.user) return;
     const userId = ctx.user.user_id.toString();
@@ -88,6 +88,7 @@ export function setupPracticeHandlers(bot: any) {
     const facultyName = decodeURIComponent(ctx.match?.[2] || '');
 
     const companies = getPracticeCompanies(institutionName, facultyName);
+    const tags = getPracticeTagsForFaculty(institutionName, facultyName);
     
     if (companies.length === 0) {
       await ctx.answerOnCallback({
@@ -101,9 +102,152 @@ export function setupPracticeHandlers(bot: any) {
       return;
     }
 
-    // Показываем первые 10 компаний
+    let text = `💼 Практика\n\nУчебное заведение: ${institutionName}\nФакультет: ${formatFacultyName(facultyName)}\n\n`;
+    
+    // Показываем фильтры по стекам (тегам), если они есть
+    const buttons: any[][] = [];
+    
+    if (tags.length > 0) {
+      text += `🏷️ Фильтр по стекам:\n\n`;
+      // Добавляем кнопки для фильтров (первые 8 тегов)
+      const displayTags = tags.slice(0, 8);
+      for (let i = 0; i < displayTags.length; i += 2) {
+        const row = displayTags.slice(i, i + 2).map(tag =>
+          Keyboard.button.callback(`🔹 ${tag}`, `practice:filter:${encodeURIComponent(institutionName)}:${encodeURIComponent(facultyName)}:${encodeURIComponent(tag)}`)
+        );
+        buttons.push(row);
+      }
+      buttons.push([Keyboard.button.callback('📋 Показать все компании', `practice:faculty_all:${encodeURIComponent(institutionName)}:${encodeURIComponent(facultyName)}`)]);
+      buttons.push([Keyboard.button.callback('📋 Мои заявки', 'practice:applications')]);
+      buttons.push([Keyboard.button.callback('◀️ Назад', `practice:institution:${encodeURIComponent(institutionName)}`)]);
+    } else {
+      // Если нет тегов, показываем все компании
+      const displayCompanies = companies.slice(0, 10);
+      text += `Доступные компании:\n\n`;
+      
+      displayCompanies.forEach((company, index) => {
+        const rating = getCompanyRating(company.id);
+        text += `${index + 1}. ${company.name}`;
+        if (rating > 0) {
+          text += ` ⭐ ${rating.toFixed(1)}`;
+        }
+        text += '\n';
+        
+        if (index < 5) {
+          buttons.push([
+            Keyboard.button.callback(
+              `${index + 1}. ${company.name.substring(0, 30)}${company.name.length > 30 ? '...' : ''}`,
+              `practice:company:${encodeURIComponent(institutionName)}:${encodeURIComponent(facultyName)}:${encodeURIComponent(company.id)}`
+            )
+          ]);
+        }
+      });
+
+      if (companies.length > 10) {
+        text += `\n... и еще ${companies.length - 10} компаний`;
+      }
+
+      buttons.push([Keyboard.button.callback('📋 Мои заявки', 'practice:applications')]);
+      buttons.push([Keyboard.button.callback('◀️ Назад', `practice:institution:${encodeURIComponent(institutionName)}`)]);
+    }
+
+    await ctx.answerOnCallback({
+      message: {
+        text,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    });
+  });
+
+  // Показать все компании (без фильтра)
+  bot.action(/practice:faculty_all:(.+):(.+)/, async (ctx: Context) => {
+    if (!ctx.user) return;
+    const userId = ctx.user.user_id.toString();
+    const institutionName = decodeURIComponent(ctx.match?.[1] || '');
+    const facultyName = decodeURIComponent(ctx.match?.[2] || '');
+
+    const companies = getPracticeCompanies(institutionName, facultyName);
+    
+    if (companies.length === 0) {
+      await ctx.answerOnCallback({
+        message: {
+          text: `❌ Компании не найдены для факультета ${formatFacultyName(facultyName)}.`,
+          attachments: [Keyboard.inlineKeyboard([
+            [Keyboard.button.callback('◀️ Назад', `practice:faculty:${encodeURIComponent(institutionName)}:${encodeURIComponent(facultyName)}`)]
+          ])]
+        }
+      });
+      return;
+    }
+
     const displayCompanies = companies.slice(0, 10);
-    let text = `💼 Практика\n\nУчебное заведение: ${institutionName}\nФакультет: ${formatFacultyName(facultyName)}\n\nДоступные компании:\n\n`;
+    let text = `💼 Практика\n\nУчебное заведение: ${institutionName}\nФакультет: ${formatFacultyName(facultyName)}\n\nВсе компании:\n\n`;
+    
+    const buttons: any[][] = [];
+    
+    displayCompanies.forEach((company, index) => {
+      const rating = getCompanyRating(company.id);
+      text += `${index + 1}. ${company.name}`;
+      if (rating > 0) {
+        text += ` ⭐ ${rating.toFixed(1)}`;
+      }
+      if (company.tags && company.tags.length > 0) {
+        text += ` [${company.tags.join(', ')}]`;
+      }
+      text += '\n';
+      
+      if (index < 5) {
+        buttons.push([
+          Keyboard.button.callback(
+            `${index + 1}. ${company.name.substring(0, 30)}${company.name.length > 30 ? '...' : ''}`,
+            `practice:company:${encodeURIComponent(institutionName)}:${encodeURIComponent(facultyName)}:${encodeURIComponent(company.id)}`
+          )
+        ]);
+      }
+    });
+
+    if (companies.length > 10) {
+      text += `\n... и еще ${companies.length - 10} компаний`;
+    }
+
+    buttons.push([Keyboard.button.callback('📋 Мои заявки', 'practice:applications')]);
+    buttons.push([Keyboard.button.callback('◀️ Назад', `practice:faculty:${encodeURIComponent(institutionName)}:${encodeURIComponent(facultyName)}`)]);
+
+    await ctx.answerOnCallback({
+      message: {
+        text,
+        attachments: [Keyboard.inlineKeyboard(buttons)]
+      }
+    });
+  });
+
+  // Фильтр по тегу (стеку)
+  bot.action(/practice:filter:(.+):(.+):(.+)/, async (ctx: Context) => {
+    if (!ctx.user) return;
+    const userId = ctx.user.user_id.toString();
+    const institutionName = decodeURIComponent(ctx.match?.[1] || '');
+    const facultyName = decodeURIComponent(ctx.match?.[2] || '');
+    const tag = decodeURIComponent(ctx.match?.[3] || '');
+
+    const allCompanies = getPracticeCompanies(institutionName, facultyName);
+    const filteredCompanies = allCompanies.filter(company => 
+      company.tags && company.tags.some(t => t.toLowerCase() === tag.toLowerCase())
+    );
+    
+    if (filteredCompanies.length === 0) {
+      await ctx.answerOnCallback({
+        message: {
+          text: `❌ Компании со стеком "${tag}" не найдены.`,
+          attachments: [Keyboard.inlineKeyboard([
+            [Keyboard.button.callback('◀️ Назад', `practice:faculty:${encodeURIComponent(institutionName)}:${encodeURIComponent(facultyName)}`)]
+          ])]
+        }
+      });
+      return;
+    }
+
+    const displayCompanies = filteredCompanies.slice(0, 10);
+    let text = `💼 Практика\n\nУчебное заведение: ${institutionName}\nФакультет: ${formatFacultyName(facultyName)}\n🏷️ Стек: ${tag}\n\nКомпании (${filteredCompanies.length}):\n\n`;
     
     const buttons: any[][] = [];
     
@@ -125,12 +269,12 @@ export function setupPracticeHandlers(bot: any) {
       }
     });
 
-    if (companies.length > 10) {
-      text += `\n... и еще ${companies.length - 10} компаний`;
+    if (filteredCompanies.length > 10) {
+      text += `\n... и еще ${filteredCompanies.length - 10} компаний`;
     }
 
     buttons.push([Keyboard.button.callback('📋 Мои заявки', 'practice:applications')]);
-    buttons.push([Keyboard.button.callback('◀️ Назад', `practice:institution:${encodeURIComponent(institutionName)}`)]);
+    buttons.push([Keyboard.button.callback('◀️ Назад', `practice:faculty:${encodeURIComponent(institutionName)}:${encodeURIComponent(facultyName)}`)]);
 
     await ctx.answerOnCallback({
       message: {

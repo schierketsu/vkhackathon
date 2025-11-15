@@ -5,8 +5,46 @@ import {
   formatDeadlines,
   deleteDeadline 
 } from '../utils/deadlines';
-import { getUser, createUser, toggleNotifications } from '../utils/users';
+import { getUser, createUser, toggleNotifications, setUserState } from '../utils/users';
 import { getDeadlinesMenu, getMainMenu } from '../utils/menu';
+import { syncDeadlinesToMiniapp } from '../utils/max-bridge';
+
+// Парсинг текста дедлайна (название и дата)
+function parseDeadlineText(text: string): { title: string; date: string } | null {
+  // Пытаемся найти дату в формате DD.MM.YYYY или DD.MM
+  const datePattern = /\b(\d{1,2}\.\d{1,2}(?:\.\d{4})?)\b/;
+  const match = text.match(datePattern);
+  
+  if (!match) {
+    return null;
+  }
+  
+  let dateStr = match[1];
+  
+  // Если год не указан, добавляем текущий или следующий
+  if (!dateStr.includes('.2024') && !dateStr.includes('.2025') && !dateStr.includes('.2026')) {
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    const dateParts = dateStr.split('.');
+    const month = parseInt(dateParts[1]);
+    
+    // Если месяц уже прошел в этом году, берем следующий год
+    if (month < currentMonth) {
+      dateStr = `${dateStr}.${currentYear + 1}`;
+    } else {
+      dateStr = `${dateStr}.${currentYear}`;
+    }
+  }
+  
+  // Извлекаем название (все кроме даты)
+  const title = text.replace(datePattern, '').trim();
+  
+  if (!title) {
+    return null;
+  }
+  
+  return { title, date: dateStr };
+}
 
 export function setupDeadlinesHandlers(bot: any) {
   // Команда /дедлайны
@@ -18,6 +56,9 @@ export function setupDeadlinesHandlers(bot: any) {
       user = createUser(userId);
     }
     
+    // Сбрасываем состояние при открытии меню
+    setUserState(userId, null);
+    
     const deadlines = getActiveDeadlines(userId);
     const text = formatDeadlines(deadlines);
     
@@ -26,7 +67,25 @@ export function setupDeadlinesHandlers(bot: any) {
     });
   });
 
-  // Команда /новыйдедлайн
+  // Обработчик кнопки "Добавить" дедлайн
+  bot.action('menu:add_deadline', async (ctx: Context) => {
+    if (!ctx.user) return;
+    const userId = ctx.user.user_id.toString();
+    
+    // Устанавливаем состояние ожидания ввода дедлайна
+    setUserState(userId, 'waiting_deadline');
+    
+    await ctx.answerOnCallback({
+      message: {
+        text: '➕ Добавление дедлайна\n\nВведите название и дату дедлайна в произвольном формате.\n\nПримеры:\n• РГР по ТРПО 20.11.2024\n• Курсовая работа 15.12.2024\n• Контрольная 10.11',
+        attachments: [Keyboard.inlineKeyboard([
+          [Keyboard.button.callback('❌ Отмена', 'menu:deadlines')]
+        ])]
+      }
+    });
+  });
+
+  // Команда /новыйдедлайн (оставляем для обратной совместимости)
   bot.command('новыйдедлайн', async (ctx: Context) => {
     const userId = ctx.user?.user_id?.toString() || '';
     let user = getUser(userId);
@@ -36,49 +95,33 @@ export function setupDeadlinesHandlers(bot: any) {
     }
     
     const messageText = ctx.message?.body?.text || '';
-    const parts = messageText.split(' ').slice(1);
+    const parts = messageText.split(' ').slice(1).join(' ');
     
-    if (parts.length < 2) {
+    if (!parts) {
       return ctx.reply(
-        '❌ Неверный формат команды.\n\n' +
-        'Использование: /новыйдедлайн <название> <дата>\n\n' +
-        'Пример: /новыйдедлайн РГР по ТРПО 20.11.2024\n' +
-        'Или: /новыйдедлайн "Курсовая работа" 15.12.2024'
-      );
-    }
-    
-    // Пытаемся найти дату в формате DD.MM.YYYY или DD.MM
-    let dateStr = '';
-    let titleParts: string[] = [];
-    
-    for (let i = parts.length - 1; i >= 0; i--) {
-      const part = parts[i];
-      // Проверяем формат даты
-      if (/^\d{1,2}\.\d{1,2}(\.\d{4})?$/.test(part)) {
-        dateStr = part;
-        titleParts = parts.slice(0, i);
-        break;
-      }
-    }
-    
-    if (!dateStr) {
-      return ctx.reply(
-        '❌ Дата не найдена. Используйте формат: DD.MM.YYYY или DD.MM\n\n' +
+        '❌ Укажите название и дату дедлайна.\n\n' +
         'Пример: /новыйдедлайн РГР по ТРПО 20.11.2024'
       );
     }
     
-    // Если год не указан, добавляем текущий или следующий
-    if (!dateStr.includes('.2024') && !dateStr.includes('.2025')) {
-      const currentYear = new Date().getFullYear();
-      dateStr = `${dateStr}.${currentYear}`;
+    const parsed = parseDeadlineText(parts);
+    
+    if (!parsed) {
+      return ctx.reply(
+        '❌ Не удалось распознать дату. Используйте формат: DD.MM.YYYY или DD.MM\n\n' +
+        'Пример: /новыйдедлайн РГР по ТРПО 20.11.2024'
+      );
     }
     
-    const title = titleParts.join(' ') || 'Дедлайн';
-    
     try {
-      addDeadline(userId, title, dateStr);
-      await ctx.reply(`✅ Дедлайн добавлен:\n\n"${title}" — ${dateStr}`);
+      addDeadline(userId, parsed.title, parsed.date);
+      
+      // Синхронизация с мини-приложением
+      await syncDeadlinesToMiniapp(userId);
+      
+      await ctx.reply(`✅ Дедлайн добавлен:\n\n"${parsed.title}" — ${parsed.date}`, {
+        attachments: [getDeadlinesMenu()]
+      });
     } catch (error) {
       await ctx.reply('❌ Ошибка при добавлении дедлайна. Попробуйте еще раз.');
     }

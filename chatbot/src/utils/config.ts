@@ -13,6 +13,10 @@ export interface Config {
     evening_time: string;
     deadline_reminder_hours: number;
   };
+  bridge?: {
+    enabled?: boolean;
+    miniapp_api_url?: string;
+  };
 }
 
 let config: Config | null = null;

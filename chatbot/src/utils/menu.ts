@@ -20,14 +20,11 @@ export function getMainMenu(): InlineKeyboard {
     ],
     [
       Keyboard.button.callback('👤 Профиль', 'menu:profile'),
-      Keyboard.button.callback('📋 Сервисы', 'menu:services')
+      Keyboard.button.callback('🛠️ Сервисы', 'menu:services')
     ],
     [
-      Keyboard.button.link('📱 Открыть мини-приложение', 'https://maxhackathon.ru/')
-    ],
-    [
-      Keyboard.button.callback('❔', 'menu:help'),
-      Keyboard.button.callback('⚙️', 'menu:settings')
+      Keyboard.button.callback('❔ Помощь', 'menu:help'),
+      Keyboard.button.callback('⚙️ Настройки', 'menu:settings')
     ]
   ]);
 }
@@ -45,6 +42,9 @@ export function getSettingsMenu(): InlineKeyboard {
     [
       Keyboard.button.callback('🔔 Уведомления', 'menu:notifications'),
       Keyboard.button.callback('📢 Мероприятия', 'menu:events_subscribe')
+    ],
+    [
+      Keyboard.button.callback('⏰ Будильник к первой паре', 'menu:toggle_morning_alarm')
     ],
     [
       Keyboard.button.callback('◀️ Назад', 'menu:main')

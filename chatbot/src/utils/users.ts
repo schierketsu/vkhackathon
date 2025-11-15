@@ -8,6 +8,8 @@ export interface User {
   notifications_enabled: number;
   events_subscribed: number;
   created_at: string;
+  user_state?: string | null;
+  morning_alarm_enabled?: number;
 }
 
 export function getUser(userId: string): User | null {
@@ -50,5 +52,15 @@ export function toggleNotifications(userId: string, enabled: boolean): void {
 export function toggleEventsSubscription(userId: string, subscribed: boolean): void {
   const stmt = database.prepare('UPDATE users SET events_subscribed = ? WHERE user_id = ?');
   stmt.run(subscribed ? 1 : 0, userId);
+}
+
+export function setUserState(userId: string, state: string | null): void {
+  const stmt = database.prepare('UPDATE users SET user_state = ? WHERE user_id = ?');
+  stmt.run(state, userId);
+}
+
+export function toggleMorningAlarm(userId: string, enabled: boolean): void {
+  const stmt = database.prepare('UPDATE users SET morning_alarm_enabled = ? WHERE user_id = ?');
+  stmt.run(enabled ? 1 : 0, userId);
 }
 
